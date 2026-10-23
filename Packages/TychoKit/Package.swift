@@ -16,6 +16,8 @@ let package = Package(
         .target(name: "TychoDesign", swiftSettings: strict),
         .target(name: "TychoFeatures", dependencies: ["TychoCore", "TychoDesign"], swiftSettings: strict),
         .testTarget(name: "TychoCoreTests", dependencies: ["TychoCore"], swiftSettings: strict),
+        .testTarget(name: "TychoDesignTests", dependencies: ["TychoDesign"], swiftSettings: strict),
+
         .testTarget(
             name: "TychoFeaturesTests",
             dependencies: ["TychoFeatures", "TychoCore", "TychoDesign"],
