@@ -9,6 +9,15 @@ struct RootView: View {
 
     var body: some View {
         @Bindable var router = router
+        content
+            .onChange(of: workspaces.first?.id) {
+                router.closeInspector()
+                router.open(.home)
+            }
+    }
+
+    @ViewBuilder private var content: some View {
+        @Bindable var router = router
         if workspaces.isEmpty {
             OnboardingView()
         } else {

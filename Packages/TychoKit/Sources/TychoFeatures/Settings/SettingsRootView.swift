@@ -20,6 +20,7 @@ public struct SettingsRootView: View {
         }
         .environment(router)
         .environment(toast)
+        .toastOverlay(toast)
         .frame(width: 460)
         .tychoAppearance()
     }

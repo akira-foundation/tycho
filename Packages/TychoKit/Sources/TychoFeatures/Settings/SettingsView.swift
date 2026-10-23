@@ -5,7 +5,6 @@ import TychoDesign
 
 public struct SettingsView: View {
     @Environment(\.modelContext) private var context
-    @Environment(\.dismiss) private var dismiss
     @Environment(ToastCenter.self) private var toast
     @Environment(Router.self) private var router
     @AppStorage(AppearanceKey.theme) private var theme = ThemePreference.system
@@ -54,6 +53,7 @@ public struct SettingsView: View {
             Button(action == .deleteAll ? "Delete everything" : "Replace with demo", role: .destructive) {
                 router.closeInspector()
                 router.open(.home)
+                router.isShowingSettings = false
                 toast.perform {
                     switch action {
                     case .reloadDemo: try DataReset.reloadDemo(in: context, now: .now, calendar: .current)

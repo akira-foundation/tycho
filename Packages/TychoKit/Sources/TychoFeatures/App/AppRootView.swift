@@ -1,6 +1,5 @@
 import SwiftData
 import SwiftUI
-import TychoDesign
 
 public struct AppRootView: View {
     private let loader: StoreLoader
@@ -25,21 +24,7 @@ public struct AppRootView: View {
         .environment(router)
         .environment(toast)
         .focusedSceneValue(\.router, router)
-        .overlay(alignment: .bottom) { toastView }
+        .toastOverlay(toast)
         .tychoAppearance()
-    }
-
-    @ViewBuilder private var toastView: some View {
-        if let message = toast.message {
-            Text(message)
-                .tychoFont(.sm, weight: .medium)
-                .padding(.horizontal, Spacing.s4)
-                .padding(.vertical, Spacing.s2)
-                .background(Token.surface.color, in: Capsule())
-                .shadowPop(radius: Radius.full)
-                .padding(.bottom, Spacing.s6)
-                .transition(.move(edge: .bottom).combined(with: .opacity))
-                .accessibilityIdentifier("toast")
-        }
     }
 }
