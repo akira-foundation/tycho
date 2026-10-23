@@ -18,3 +18,10 @@ public enum AppRoute: Hashable, Sendable {
     case projects
     case project(UUID, ProjectTab)
 }
+
+public enum SidebarItem: Hashable, Sendable {
+    case home
+    case myTasks
+    case projects
+    case project(UUID)
+}
