@@ -32,11 +32,17 @@ struct NotesEditor: View {
             }
         }
         .tychoFont(.base)
+        .onDisappear(perform: commitDraft)
     }
 
     private var rendered: AttributedString {
         let options = AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)
         return (try? AttributedString(markdown: task.notes, options: options)) ?? AttributedString(task.notes)
+    }
+
+    private func commitDraft() {
+        guard editing, !task.isDeleted, task.modelContext != nil, text != task.notes else { return }
+        toast.perform { try TaskActions(context: context).edit(task) { $0.notes = text } }
     }
 
     private func toggleEditing() {

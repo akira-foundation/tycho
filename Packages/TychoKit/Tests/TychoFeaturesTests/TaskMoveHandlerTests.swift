@@ -64,4 +64,21 @@ struct TaskMoveHandlerTests {
         #expect(foreign.sortOrder == foreignOrderBefore)
         #expect(TaskActions.siblings(of: .done, in: projectA, excluding: nil).map(\.title) == [existing.title, "A"])
     }
+
+    @Test func droppingWithADisplayedSubsetKeepsSortOrdersUniqueInTheProject() throws {
+        let (context, project, tasks) = try setUp()
+        let actions = TaskActions(context: context)
+        let hidden = try actions.create(TaskDraft(title: "Hidden", status: .done), in: project)
+        let shown = try actions.create(TaskDraft(title: "Shown", status: .done), in: project)
+        let displayed = [tasks[0], shown]
+
+        let handled = try TaskMoveHandler(context: context).drop(
+            [tasks[0].id], into: .done, before: shown, in: displayed)
+
+        let orders = TaskActions.siblings(of: .done, in: project, excluding: nil).map(\.sortOrder)
+        #expect(handled)
+        #expect(Set(orders).count == orders.count)
+        #expect(
+            TaskActions.siblings(of: .done, in: project, excluding: nil).map(\.title) == [hidden.title, "A", "Shown"])
+    }
 }

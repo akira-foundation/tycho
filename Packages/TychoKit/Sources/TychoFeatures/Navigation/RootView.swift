@@ -8,9 +8,10 @@ struct RootView: View {
     @Query(sort: \Workspace.createdAt) private var workspaces: [Workspace]
 
     var body: some View {
-        @Bindable var router = router
         content
             .onChange(of: workspaces.first?.id) {
+                router.isCreatingTask = false
+                router.isCreatingProject = false
                 router.closeInspector()
                 router.open(.home)
             }

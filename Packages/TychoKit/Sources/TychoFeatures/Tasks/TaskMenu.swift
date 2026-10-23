@@ -1,3 +1,4 @@
+import SwiftData
 import SwiftUI
 import TychoCore
 
@@ -6,6 +7,7 @@ struct TaskMenu: View {
     @Environment(ToastCenter.self) private var toast
     @Environment(Router.self) private var router
     let task: TaskItem
+    @State private var confirmingDelete = false
 
     var body: some View {
         Button("Open") { router.inspect(task.id) }
@@ -28,9 +30,17 @@ struct TaskMenu: View {
             toast.perform { try TaskActions(context: context).toggleFavorite(task) }
         }
         Divider()
-        Button("Delete", role: .destructive) {
-            if router.inspectedTaskID == task.id { router.closeInspector() }
-            toast.perform { try TaskActions(context: context).delete(task) }
+        Button("Delete", role: .destructive) { confirmingDelete = true }
+            .confirmationDialog("Delete \(task.key)?", isPresented: $confirmingDelete) {
+                Button("Delete", role: .destructive, action: delete)
+            }
+    }
+
+    private func delete() {
+        let id = task.id
+        toast.perform {
+            try TaskActions(context: context).delete(task)
+            if router.inspectedTaskID == id { router.closeInspector() }
         }
     }
 }

@@ -23,7 +23,9 @@ struct BoardColumn: View {
                                 .draggable(TaskTransfer(id: task.id)) {
                                     TaskCard(task: task).frame(width: 260).shadowDrag()
                                 }
-                                .dropDestination(for: TaskTransfer.self) { items, _ in drop(items, before: task) }
+                                .dropDestination(for: TaskTransfer.self) { items, _ in
+                                    return drop(items, before: task)
+                                }
                                 .contextMenu { TaskMenu(task: task) }
                         }
                         InlineComposer(placeholder: "Add task") { title in

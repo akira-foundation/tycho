@@ -19,7 +19,7 @@ struct TaskListView: View {
                             TaskRow(task: task, showsProject: project == nil)
                                 .draggable(TaskTransfer(id: task.id))
                                 .dropDestination(for: TaskTransfer.self) { items, _ in
-                                    drop(items, into: group.status, before: task)
+                                    return drop(items, into: group.status, before: task)
                                 }
                                 .contextMenu { TaskMenu(task: task) }
                         }
@@ -35,7 +35,7 @@ struct TaskListView: View {
                 } header: {
                     header(group)
                         .dropDestination(for: TaskTransfer.self) { items, _ in
-                            drop(items, into: group.status, before: nil)
+                            return drop(items, into: group.status, before: nil)
                         }
                 }
             }
