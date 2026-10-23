@@ -5,15 +5,17 @@
 A app é um target fino (`Tycho/`) sobre o package local `Packages/TychoKit`, com três módulos:
 
 - `TychoCore`: modelos SwiftData, vocabulários, ações de domínio, lógica derivada e seed. Depende só de Foundation e SwiftData.
-- `TychoDesign`: tokens, tema e componentes base. Depende só de SwiftUI.
+- `TychoDesign`: tokens, tema e componentes base. Depende só de SwiftUI e das frameworks da plataforma (CoreGraphics, AppKit, UIKit), nunca de `TychoCore`.
 - `TychoFeatures`: ecrãs, navegação e estado de vista. Depende dos dois anteriores.
 
 ```
 Tycho (app) → TychoFeatures → TychoDesign
                             → TychoCore
+
+TychoDesign e TychoCore não dependem um do outro
 ```
 
-A dependência vai num só sentido. O app target importa apenas `TychoFeatures` e `TychoCore`, e `TychoCore` nunca importa SwiftUI. Sem dependências externas.
+A dependência vai num só sentido. O app target importa `TychoFeatures` (e SwiftUI), e `TychoCore` nunca importa SwiftUI. Sem dependências externas.
 
 ## Modelo de dados
 
@@ -35,7 +37,7 @@ Ficam fora da Fase 1: dependências entre tarefas, anexos, comentários, ativida
 
 As mutações passam pelas ações do `TychoCore` (`ProjectActions`, `TaskActions`, `SubtaskActions`), que recebem um `ModelContext` e um relógio injetado. Cada ação valida, muta e atualiza `updatedAt`. As vistas leem com `@Query` e nunca escrevem diretamente, exceto bindings simples do inspector, que também passam por `TaskActions.update`.
 
-- A ordem usa pontos médios (`SortOrder.midpoint(before:after:)`) e renormaliza o grupo quando o intervalo fica demasiado pequeno.
+- A ordem usa `Rank` (`Rank.swift`): `Rank.between` devolve o ponto médio entre dois vizinhos, `Rank.insert` posiciona um item entre irmãos e `Rank.appendOrder` calcula a ordem do fim do grupo. Quando o intervalo fica abaixo de `Rank.epsilon`, `Rank.insert` renormaliza o grupo em múltiplos de `Rank.step`.
 - A lógica derivada é feita de funções puras: `Project.progress`, `TaskItem.progress`, `TaskItem.isOverdue(now:)` e `HomeSummary(now:)`.
 - `DemoSeed` porta o seed do original (workspace Gr8r Studio, 7 projetos, 49 tarefas); `EmptySeed` cria só o workspace e o membro "me".
 
@@ -44,8 +46,8 @@ As mutações passam pelas ações do `TychoCore` (`ProjectActions`, `TaskAction
 - `NavigationSplitView` em todas as plataformas, que no iPhone colapsa em stack.
 - A rota é um `enum AppRoute` num `@Observable Router` por janela.
 - Ecrãs: primeiro arranque, Home, My Tasks, Projects, Project (List e Board), inspector de tarefa, sheets de criação e Settings.
-- O inspector abre em `.inspector` nos tamanhos regulares e numa sheet com detents no iPhone.
-- Comandos: ⌘N nova tarefa, ⌘⇧N novo projeto, ⌘⇧L alterna light e dark, `[` alterna a sidebar e ⌘, abre as Settings.
+- O detalhe da tarefa usa `.inspector(...)` com `inspectorColumnWidth`; em largura compacta (iPhone) o SwiftUI apresenta-o como sheet.
+- Comandos: ⌘N nova tarefa, ⌘⇧N novo projeto, ⌘⇧L alterna light e dark, ⌘, abre as Settings. A sidebar alterna pelo `SidebarCommands()` do sistema (⌃⌘S).
 
 ## Design system
 

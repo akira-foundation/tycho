@@ -28,12 +28,12 @@ O código do Gr8r Studio vive em `~/akira-foundation/references/gr8r-studio`: `r
 
 ## CI
 
-- `test.yml` (push em `main` e pull requests): lint dos workflows e do Swift num runner Linux, e depois formatação, `make test` e build macOS no runner `xcode-27`.
-- `nightly.yml` (diário): sai cedo se não houve commits nas últimas 24 horas; caso contrário corre `make build`, `make test-ios` e `make test-ui`.
+- `test.yml` (push em `main` e pull requests): o job `lint` corre em `ubuntu-latest` (actionlint, verificação de sintaxe dos scripts shell e SwiftLint); depois o job macOS, no runner `xcode-27`, corre `make format-check`, `make test` e o build para macOS. Os testes de UI e o build para iOS não correm aqui, só no nightly.
+- `nightly.yml` (diário): sai cedo se não houve commits nas últimas 24 horas; caso contrário corre `make build` (macOS e simulador iOS), `make test-ios` e `make test-ui`. É o único workflow que corre os testes de UI e o build iOS.
 - `branch-policy.yml`: valida o ramo de origem e o de destino de cada pull request.
 - `release.yml` (tags `v*`): gera o changelog com git-cliff, publica a GitHub Release e valida o build com `xcodebuild archive` sem assinatura. A distribuição assinada fica fora da Fase 1.
 
-Os runners macOS gastam minutos a um múltiplo do preço dos Linux (10x no GitHub-hosted). Por isso o trabalho pesado fica num único job macOS por push, o nightly não corre sem commits novos e o lint corre em Linux.
+Os minutos dos runners macOS são faturados a um múltiplo mais alto do que os dos Linux. Por isso o trabalho pesado fica num único job macOS por push, o nightly não corre sem commits novos e o lint corre em Linux.
 
 ---
 Anterior: [Arquitetura](01-architecture.md) · [Índice](00-index.md)

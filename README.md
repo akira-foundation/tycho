@@ -3,7 +3,6 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/akira-foundation/tycho/actions/workflows/test.yml"><img src="https://github.com/akira-foundation/tycho/actions/workflows/test.yml/badge.svg" alt="tests"></a>
   <img src="https://img.shields.io/badge/platforms-iOS%2027%20%7C%20macOS%2027-blueviolet" alt="Platforms">
   <img src="https://img.shields.io/badge/Swift-6.2-orange" alt="Swift">
   <img src="https://img.shields.io/badge/license-MIT%20%2F%20Apache--2.0-blue" alt="license">
@@ -16,7 +15,7 @@ schema is ready for CloudKit.
 
 ## Install
 
-Tycho is not published to a package registry. Build it from source with Xcode 27:
+Tycho is not published to a package registry. Build it from source with Xcode 27. The repository is private, so cloning requires access to the `akira-foundation` organisation:
 
 ```sh
 git clone https://github.com/akira-foundation/tycho.git
@@ -45,8 +44,8 @@ make test-ui   # macOS UI smoke tests
 
 ## Changelog
 
-Please see [CHANGELOG.md](CHANGELOG.md) for what has changed recently. The changelog is generated
-from conventional commits via [git-cliff](https://git-cliff.org) on every release tag.
+The changelog is generated from conventional commits via [git-cliff](https://git-cliff.org) and
+will be published as `CHANGELOG.md` with the first tagged release.
 
 ## Contributing
 
