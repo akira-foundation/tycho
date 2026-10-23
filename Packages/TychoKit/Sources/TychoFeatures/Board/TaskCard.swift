@@ -32,6 +32,8 @@ struct TaskCard: View {
                     .foregroundStyle(task.status == .done ? Token.text3.color : Token.text.color)
                     .lineLimit(3)
                     .frame(maxWidth: .infinity, alignment: .leading)
+                    .accessibilityAddTraits(.isButton)
+                    .accessibilityAction { router.inspect(task.id) }
             }
             let labels = TaskLabel.allCases.filter(task.labels.contains)
             if !labels.isEmpty {
@@ -45,6 +47,7 @@ struct TaskCard: View {
         .contentShape(Rectangle())
         .onTapGesture { router.inspect(task.id) }
         .accessibilityElement(children: .contain)
+        .accessibilityAction(named: "Open") { router.inspect(task.id) }
         .accessibilityIdentifier("card.\(task.key)")
     }
 
