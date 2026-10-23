@@ -7,7 +7,7 @@ struct RouteDetail: View {
     var body: some View {
         switch route {
         case .home:
-            EmptyState(title: "Home", symbol: "house", message: "Coming in the next task.")
+            HomeView()
         case .myTasks:
             EmptyState(title: "My Tasks", symbol: "checklist", message: "Coming in the next task.")
         case .projects:
