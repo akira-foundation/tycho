@@ -36,7 +36,7 @@ struct ProjectActionsTests {
         }
     }
 
-    @Test(arguments: ["W", "WEBSITE", "W3B", "WÉB", ""])
+    @Test(arguments: ["W", "WEBSITE", "W3B", "WÉB", "", "ß", "ﬁ"])
     func rejectsAnInvalidKey(key: String) throws {
         let (_, workspace, actions) = try setUp()
         #expect(throws: ValidationError.invalidProjectKey) {
