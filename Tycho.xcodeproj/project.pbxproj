@@ -1,0 +1,396 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		7A0000000000000000000101 /* TychoFeatures in Frameworks */ = {isa = PBXBuildFile; productRef = 7A0000000000000000000201 /* TychoFeatures */; };
+		7A0000000000000000000102 /* TychoCore in Frameworks */ = {isa = PBXBuildFile; productRef = 7A0000000000000000000202 /* TychoCore */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		7A0000000000000000000301 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 7A0000000000000000000001 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 7A0000000000000000000011;
+			remoteInfo = Tycho;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		7A0000000000000000000401 /* Tycho.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Tycho.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		7A0000000000000000000402 /* TychoUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TychoUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		7A0000000000000000000501 /* Tycho */ = {isa = PBXFileSystemSynchronizedRootGroup; path = Tycho; sourceTree = "<group>"; };
+		7A0000000000000000000502 /* TychoUITests */ = {isa = PBXFileSystemSynchronizedRootGroup; path = TychoUITests; sourceTree = "<group>"; };
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		7A0000000000000000000601 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7A0000000000000000000101 /* TychoFeatures in Frameworks */,
+				7A0000000000000000000102 /* TychoCore in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7A0000000000000000000602 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		7A0000000000000000000701 = {
+			isa = PBXGroup;
+			children = (
+				7A0000000000000000000501 /* Tycho */,
+				7A0000000000000000000502 /* TychoUITests */,
+				7A0000000000000000000702 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		7A0000000000000000000702 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				7A0000000000000000000401 /* Tycho.app */,
+				7A0000000000000000000402 /* TychoUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		7A0000000000000000000011 /* Tycho */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7A0000000000000000000902 /* Build configuration list for PBXNativeTarget "Tycho" */;
+			buildPhases = (
+				7A0000000000000000000801 /* Sources */,
+				7A0000000000000000000601 /* Frameworks */,
+				7A0000000000000000000803 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				7A0000000000000000000501 /* Tycho */,
+			);
+			name = Tycho;
+			packageProductDependencies = (
+				7A0000000000000000000201 /* TychoFeatures */,
+				7A0000000000000000000202 /* TychoCore */,
+			);
+			productName = Tycho;
+			productReference = 7A0000000000000000000401 /* Tycho.app */;
+			productType = "com.apple.product-type.application";
+		};
+		7A0000000000000000000012 /* TychoUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7A0000000000000000000903 /* Build configuration list for PBXNativeTarget "TychoUITests" */;
+			buildPhases = (
+				7A0000000000000000000802 /* Sources */,
+				7A0000000000000000000602 /* Frameworks */,
+				7A0000000000000000000804 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				7A0000000000000000000A01 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				7A0000000000000000000502 /* TychoUITests */,
+			);
+			name = TychoUITests;
+			productName = TychoUITests;
+			productReference = 7A0000000000000000000402 /* TychoUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		7A0000000000000000000001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2700;
+				LastUpgradeCheck = 2700;
+				TargetAttributes = {
+					7A0000000000000000000011 = {
+						CreatedOnToolsVersion = 27.0;
+					};
+					7A0000000000000000000012 = {
+						CreatedOnToolsVersion = 27.0;
+						TestTargetID = 7A0000000000000000000011;
+					};
+				};
+			};
+			buildConfigurationList = 7A0000000000000000000901 /* Build configuration list for PBXProject "Tycho" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 7A0000000000000000000701;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				7A0000000000000000000B01 /* XCLocalSwiftPackageReference "Packages/TychoKit" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 7A0000000000000000000702 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				7A0000000000000000000011 /* Tycho */,
+				7A0000000000000000000012 /* TychoUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		7A0000000000000000000803 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7A0000000000000000000804 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		7A0000000000000000000801 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7A0000000000000000000802 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		7A0000000000000000000A01 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 7A0000000000000000000011 /* Tycho */;
+			targetProxy = 7A0000000000000000000301 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		7A0000000000000000000C01 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ENABLE_MODULES = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
+				MACOSX_DEPLOYMENT_TARGET = 27.0;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		7A0000000000000000000C02 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ENABLE_MODULES = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
+				MACOSX_DEPLOYMENT_TARGET = 27.0;
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 6.0;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		7A0000000000000000000C03 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Tycho;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
+				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = io.akira.tycho;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		7A0000000000000000000C04 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Tycho;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
+				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = io.akira.tycho;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		7A0000000000000000000C05 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = io.akira.tycho.uitests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Tycho;
+			};
+			name = Debug;
+		};
+		7A0000000000000000000C06 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = io.akira.tycho.uitests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Tycho;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		7A0000000000000000000901 /* Build configuration list for PBXProject "Tycho" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7A0000000000000000000C01 /* Debug */,
+				7A0000000000000000000C02 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		7A0000000000000000000902 /* Build configuration list for PBXNativeTarget "Tycho" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7A0000000000000000000C03 /* Debug */,
+				7A0000000000000000000C04 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		7A0000000000000000000903 /* Build configuration list for PBXNativeTarget "TychoUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7A0000000000000000000C05 /* Debug */,
+				7A0000000000000000000C06 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		7A0000000000000000000B01 /* XCLocalSwiftPackageReference "Packages/TychoKit" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Packages/TychoKit;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		7A0000000000000000000201 /* TychoFeatures */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = TychoFeatures;
+		};
+		7A0000000000000000000202 /* TychoCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = TychoCore;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 7A0000000000000000000001 /* Project object */;
+}
