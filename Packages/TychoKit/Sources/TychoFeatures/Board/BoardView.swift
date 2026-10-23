@@ -25,5 +25,6 @@ struct BoardView: View {
             .padding(Spacing.s4)
         }
         .scrollIndicators(.visible)
+        .tychoAnimation(value: tasks.movementSignature)
     }
 }

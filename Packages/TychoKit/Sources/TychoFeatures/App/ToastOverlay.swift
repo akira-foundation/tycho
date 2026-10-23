@@ -18,6 +18,7 @@ private struct ToastOverlay: ViewModifier {
                     .accessibilityIdentifier("toast")
             }
         }
+        .tychoAnimation(value: toast.message)
     }
 }
 

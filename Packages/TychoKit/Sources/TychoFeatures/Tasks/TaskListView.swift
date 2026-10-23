@@ -42,6 +42,7 @@ struct TaskListView: View {
         }
         .listStyle(.inset)
         .scrollContentBackground(.hidden)
+        .tychoAnimation(value: tasks.movementSignature)
     }
 
     private func header(_ group: TaskGroup) -> some View {
