@@ -20,7 +20,19 @@ struct RootView: View {
                 }
             }
             .background(Token.bg.color)
+            .inspector(
+                isPresented: Binding(
+                    get: { router.inspectedTaskID != nil },
+                    set: { if !$0 { router.closeInspector() } }
+                )
+            ) {
+                if let id = router.inspectedTaskID {
+                    TaskInspectorView(taskID: id)
+                        .inspectorColumnWidth(min: 320, ideal: 380, max: 520)
+                }
+            }
             .sheet(isPresented: $router.isCreatingProject) { NewProjectSheet(project: nil) }
+            .sheet(isPresented: $router.isCreatingTask) { NewTaskSheet(status: router.draftStatus) }
         }
     }
 }
