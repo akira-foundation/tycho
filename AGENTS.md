@@ -24,5 +24,6 @@ Atributos com default ou opcionais, relações opcionais com inverso, nunca `.un
 - `make test`: testes do package (Swift Testing).
 - `make build`: build da app para macOS e para o simulador iOS.
 - `make test-ui`: smoke XCUITest em macOS.
+- `make test-ios`: smoke XCUITest no simulador iOS; `SIM_NAME` escolhe o simulador (por omissão `iPhone 17`).
 - `make lint`: SwiftLint e swift-format em modo estrito.
 - `make format`: aplica o swift-format.
