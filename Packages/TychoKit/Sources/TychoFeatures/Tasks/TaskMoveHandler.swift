@@ -12,7 +12,7 @@ struct TaskMoveHandler {
         }
         let siblings =
             tasks
-            .filter { $0.status == status && $0 !== moved }
+            .filter { $0.status == status && $0 !== moved && $0.project === moved.project }
             .sorted { $0.sortOrder < $1.sortOrder }
         let index = target.flatMap { target in siblings.firstIndex { $0 === target } } ?? siblings.count
         try TaskActions(context: context).move(moved, to: status, at: index, among: siblings)

@@ -46,4 +46,22 @@ struct TaskMoveHandlerTests {
         #expect(
             try !TaskMoveHandler(context: context).drop([UUID()], into: .todo, before: nil, in: project.tasks ?? []))
     }
+
+    @Test func droppingBeforeATaskOfAnotherProjectStaysInTheMovedTasksProject() throws {
+        let (context, projectA, tasksA) = try setUp()
+        let projectB = Project(key: "API", name: "Api")
+        context.insert(projectB)
+        let actions = TaskActions(context: context)
+        let existing = try actions.create(TaskDraft(title: "A-done", status: .done), in: projectA)
+        let foreign = try actions.create(TaskDraft(title: "B-done", status: .done), in: projectB)
+        let foreignOrderBefore = foreign.sortOrder
+        let all = (projectA.tasks ?? []) + (projectB.tasks ?? [])
+
+        let handled = try TaskMoveHandler(context: context).drop([tasksA[0].id], into: .done, before: foreign, in: all)
+
+        #expect(handled)
+        #expect(tasksA[0].status == .done)
+        #expect(foreign.sortOrder == foreignOrderBefore)
+        #expect(TaskActions.siblings(of: .done, in: projectA, excluding: nil).map(\.title) == [existing.title, "A"])
+    }
 }

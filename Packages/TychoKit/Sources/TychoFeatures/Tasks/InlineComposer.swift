@@ -16,8 +16,9 @@ struct InlineComposer: View {
                 .onSubmit {
                     let value = text
                     text = ""
-                    onSubmit(value)
                     focused = true
+                    guard !value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
+                    onSubmit(value)
                 }
                 .onKeyPress(.escape) {
                     text = ""
