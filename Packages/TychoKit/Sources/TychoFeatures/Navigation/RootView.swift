@@ -20,6 +20,7 @@ struct RootView: View {
                 }
             }
             .background(Token.bg.color)
+            .sheet(isPresented: $router.isCreatingProject) { NewProjectSheet(project: nil) }
         }
     }
 }

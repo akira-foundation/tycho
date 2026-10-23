@@ -11,9 +11,9 @@ struct RouteDetail: View {
         case .myTasks:
             EmptyState(title: "My Tasks", symbol: "checklist", message: "Coming in the next task.")
         case .projects:
-            EmptyState(title: "Projects", symbol: "folder", message: "Coming in the next task.")
-        case .project:
-            EmptyState(title: "Project", symbol: "folder", message: "Coming in the next task.")
+            ProjectsView()
+        case .project(let id, let tab):
+            ProjectDetailView(projectID: id, tab: tab)
         }
     }
 }
