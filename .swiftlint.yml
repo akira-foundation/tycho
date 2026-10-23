@@ -1,0 +1,53 @@
+included:
+  - Packages/TychoKit/Sources
+  - Packages/TychoKit/Tests
+  - Tycho
+  - TychoUITests
+
+disabled_rules:
+  - file_length
+  - type_body_length
+  - function_body_length
+  - closure_body_length
+  - cyclomatic_complexity
+  - function_parameter_count
+  - nesting
+  - line_length
+  - trailing_comma
+  - opening_brace
+  - large_tuple
+  - multiple_closures_with_trailing_closure
+  - redundant_discardable_let
+  - empty_collection_literal
+
+opt_in_rules:
+  - discarded_notification_center_observer
+  - unhandled_throwing_task
+  - private_swiftui_state
+  - weak_delegate
+  - overridden_super_call
+  - prohibited_super_call
+  - static_over_final_class
+  - fatal_error_message
+  - explicit_init
+  - yoda_condition
+  - contains_over_filter_is_empty
+  - contains_over_filter_count
+  - contains_over_first_not_nil
+  - first_where
+  - last_where
+  - sorted_first_last
+  - flatmap_over_map_reduce
+  - redundant_nil_coalescing
+  - toggle_bool
+  - joined_default_parameter
+
+identifier_name:
+  min_length:
+    warning: 1
+  max_length:
+    warning: 60
+  allowed_symbols: ["_"]
+
+force_try:
+  severity: warning
