@@ -68,6 +68,10 @@ struct TaskInspectorView: View {
             .labelStyle(.iconOnly)
             Button("Delete", systemImage: "trash", role: .destructive) { confirmingDelete = true }
                 .labelStyle(.iconOnly)
+            Button("Close", systemImage: "xmark") { router.closeInspector() }
+                .labelStyle(.iconOnly)
+                .keyboardShortcut(.cancelAction)
+                .accessibilityIdentifier("inspector.close")
         }
         .buttonStyle(.borderless)
     }

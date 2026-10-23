@@ -38,5 +38,17 @@ final class TychoSmokeTests: XCTestCase {
 
         XCTAssertTrue(app.staticTexts["Title can't be empty."].waitForExistence(timeout: 5))
     }
+
+    func testInspectorCloseButtonDismissesThePanel() {
+        app.buttons["onboarding.demo"].click()
+        app.outlines.staticTexts["Website Redesign"].firstMatch.click()
+        app.descendants(matching: .any)["card.WEB-109"].click()
+
+        let title = app.textFields["inspector.title"].firstMatch
+        XCTAssertTrue(title.waitForExistence(timeout: 5))
+        app.buttons["inspector.close"].firstMatch.click()
+
+        XCTAssertTrue(title.waitForNonExistence(timeout: 5))
+    }
 }
 #endif

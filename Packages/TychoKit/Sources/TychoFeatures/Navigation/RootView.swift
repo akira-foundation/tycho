@@ -30,6 +30,13 @@ struct RootView: View {
                 }
             }
             .background(Token.bg.color)
+            .toolbar {
+                ToolbarItem {
+                    Button("Inspector", systemImage: "sidebar.right") { router.closeInspector() }
+                        .disabled(router.inspectedTaskID == nil)
+                        .accessibilityIdentifier("toolbar.inspector")
+                }
+            }
             .inspector(
                 isPresented: Binding(
                     get: { router.inspectedTaskID != nil },
