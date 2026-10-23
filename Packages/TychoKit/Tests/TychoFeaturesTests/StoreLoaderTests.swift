@@ -61,4 +61,41 @@ struct StoreLoaderTests {
         toast.perform { throw ValidationError.emptyTitle }
         #expect(toast.message == "Title can't be empty.")
     }
+
+    @Test func resetFailureIsReportedAndSkipsReload() {
+        var loads = 0
+        let loader = StoreLoader(
+            factory: {
+                loads += 1
+                return try TychoSchema.makeContainer(inMemory: true)
+            },
+            resetStore: { throw BrokenStore() }
+        )
+        loader.resetAndReload()
+        guard case .failed(let message) = loader.state else {
+            Issue.record("expected failed, got \(loader.state)")
+            return
+        }
+        #expect(message.hasPrefix("Couldn't reset data"))
+        #expect(loads == 0)
+    }
+
+    @Test func removeStoreFilesDeletesFilesInDirectoriesWithSpaces() throws {
+        let directory = FileManager.default.temporaryDirectory
+            .appending(path: "Application Support \(UUID().uuidString)")
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let storeURL = directory.appending(path: "Tycho.store")
+        let names = ["Tycho.store", "Tycho.store-shm", "Tycho.store-wal"]
+        for name in names {
+            try Data("x".utf8).write(to: directory.appending(path: name))
+        }
+
+        try StoreLoader.removeStoreFiles(at: storeURL)
+
+        for name in names {
+            let path = directory.appending(path: name).path(percentEncoded: false)
+            #expect(!FileManager.default.fileExists(atPath: path))
+        }
+    }
 }

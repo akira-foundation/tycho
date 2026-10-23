@@ -29,16 +29,18 @@ public final class StoreLoader {
         let inMemory = usesMemory(arguments: arguments)
         return StoreLoader(
             factory: { try TychoSchema.makeContainer(inMemory: inMemory) },
-            resetStore: {
-                let url = URL.applicationSupportDirectory.appending(path: "Tycho.store")
-                for suffix in ["", "-shm", "-wal"] {
-                    let file = URL(filePath: url.path() + suffix)
-                    if FileManager.default.fileExists(atPath: file.path()) {
-                        try FileManager.default.removeItem(at: file)
-                    }
-                }
-            }
+            resetStore: { try removeStoreFiles(at: TychoSchema.storeURL) }
         )
+    }
+
+    static func removeStoreFiles(at storeURL: URL, fileManager: FileManager = .default) throws {
+        let directory = storeURL.deletingLastPathComponent()
+        for suffix in ["", "-shm", "-wal"] {
+            let file = directory.appending(path: storeURL.lastPathComponent + suffix)
+            if fileManager.fileExists(atPath: file.path(percentEncoded: false)) {
+                try fileManager.removeItem(at: file)
+            }
+        }
     }
 
     public func load() {
@@ -55,6 +57,8 @@ public final class StoreLoader {
             try resetStore()
         } catch {
             logger.error("Store reset failed: \(error.localizedDescription, privacy: .public)")
+            state = .failed("Couldn't reset data: \(error.localizedDescription)")
+            return
         }
         load()
     }

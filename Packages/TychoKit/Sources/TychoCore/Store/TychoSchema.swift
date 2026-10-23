@@ -1,3 +1,4 @@
+import Foundation
 import SwiftData
 
 public enum TychoSchema {
@@ -5,15 +6,19 @@ public enum TychoSchema {
         Workspace.self, Member.self, Team.self, Project.self, TaskItem.self, Subtask.self,
     ]
 
-    @MainActor
-    public static func makeContainer(inMemory: Bool) throws -> ModelContainer {
-        let schema = Schema(models)
-        let configuration = ModelConfiguration(
+    public static func configuration(inMemory: Bool) -> ModelConfiguration {
+        ModelConfiguration(
             "Tycho",
-            schema: schema,
+            schema: Schema(models),
             isStoredInMemoryOnly: inMemory,
             cloudKitDatabase: .none
         )
-        return try ModelContainer(for: schema, configurations: configuration)
+    }
+
+    public static var storeURL: URL { configuration(inMemory: false).url }
+
+    @MainActor
+    public static func makeContainer(inMemory: Bool) throws -> ModelContainer {
+        try ModelContainer(for: Schema(models), configurations: configuration(inMemory: inMemory))
     }
 }
