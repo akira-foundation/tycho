@@ -69,7 +69,7 @@ struct ProjectTabContent: View {
     var body: some View {
         switch tab {
         case .list:
-            EmptyState(title: "List", symbol: "list.bullet", message: "Coming in the next task.")
+            TaskListView(tasks: project.tasks ?? [], project: project)
         case .board:
             EmptyState(title: "Board", symbol: "rectangle.split.3x1", message: "Coming in the next task.")
         }

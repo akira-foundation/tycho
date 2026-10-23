@@ -9,7 +9,7 @@ struct RouteDetail: View {
         case .home:
             HomeView()
         case .myTasks:
-            EmptyState(title: "My Tasks", symbol: "checklist", message: "Coming in the next task.")
+            MyTasksView()
         case .projects:
             ProjectsView()
         case .project(let id, let tab):
