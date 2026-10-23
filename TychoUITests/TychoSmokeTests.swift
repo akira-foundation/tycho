@@ -12,17 +12,20 @@ final class TychoSmokeTests: XCTestCase {
         app.launch()
     }
 
-    func testDemoBoardMovesACardToAnotherColumn() {
+    func testDemoBoardMovesACardThroughTheContextMenu() {
         app.buttons["onboarding.demo"].click()
         app.outlines.staticTexts["Website Redesign"].firstMatch.click()
 
         let card = app.descendants(matching: .any)["card.WEB-124"]
         XCTAssertTrue(card.waitForExistence(timeout: 5))
-        let review = app.descendants(matching: .any)["column.review"]
-        card.press(forDuration: 0.3, thenDragTo: review)
+        card.rightClick()
+        app.menuItems["Status"].firstMatch.click()
+        app.menuItems["In Progress"].firstMatch.click()
 
-        XCTAssertTrue(app.staticTexts["Moved WEB-124 to Review"].waitForExistence(timeout: 5))
-        XCTAssertTrue(review.descendants(matching: .any)["card.WEB-124"].waitForExistence(timeout: 5))
+        let progress = app.descendants(matching: .any)["column.progress"]
+        let todo = app.descendants(matching: .any)["column.todo"]
+        XCTAssertTrue(progress.descendants(matching: .any)["card.WEB-124"].waitForExistence(timeout: 5))
+        XCTAssertFalse(todo.descendants(matching: .any)["card.WEB-124"].exists)
     }
 
     func testInspectorRejectsABlankTitle() {
