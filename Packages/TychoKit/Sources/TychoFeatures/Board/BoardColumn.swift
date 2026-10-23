@@ -50,6 +50,7 @@ struct BoardColumn: View {
         } isTargeted: {
             targeted = $0
         }
+        .accessibilityElement(children: .contain)
         .accessibilityIdentifier("column.\(group.status.rawValue)")
     }
 

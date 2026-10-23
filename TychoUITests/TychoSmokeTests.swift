@@ -22,6 +22,7 @@ final class TychoSmokeTests: XCTestCase {
         card.press(forDuration: 0.3, thenDragTo: review)
 
         XCTAssertTrue(app.staticTexts["Moved WEB-124 to Review"].waitForExistence(timeout: 5))
+        XCTAssertTrue(review.descendants(matching: .any)["card.WEB-124"].waitForExistence(timeout: 5))
     }
 
     func testInspectorRejectsABlankTitle() {
