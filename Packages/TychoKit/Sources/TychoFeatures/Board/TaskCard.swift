@@ -26,6 +26,7 @@ struct TaskCard: View {
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel(task.status == .done ? "Reopen" : "Mark complete")
+                .accessibilityIdentifier("card.\(task.key).toggle")
                 Text(task.title)
                     .tychoFont(.base, weight: .medium)
                     .foregroundStyle(task.status == .done ? Token.text3.color : Token.text.color)
@@ -43,7 +44,7 @@ struct TaskCard: View {
         .shadowCard()
         .contentShape(Rectangle())
         .onTapGesture { router.inspect(task.id) }
-        .accessibilityElement(children: .combine)
+        .accessibilityElement(children: .contain)
         .accessibilityIdentifier("card.\(task.key)")
     }
 
