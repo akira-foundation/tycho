@@ -71,7 +71,7 @@ struct ProjectTabContent: View {
         case .list:
             TaskListView(tasks: project.tasks ?? [], project: project)
         case .board:
-            EmptyState(title: "Board", symbol: "rectangle.split.3x1", message: "Coming in the next task.")
+            BoardView(project: project)
         }
     }
 }
