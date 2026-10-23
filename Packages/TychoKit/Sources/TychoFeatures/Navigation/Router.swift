@@ -10,6 +10,7 @@ public final class Router {
     public var inspectedTaskID: UUID?
     public var isCreatingTask = false
     public var isCreatingProject = false
+    public var isShowingSettings = false
     public var draftStatus: TaskStatus = .todo
     public var columnVisibility: NavigationSplitViewVisibility = .automatic
     private var projectTabs: [UUID: ProjectTab] = [:]
@@ -60,6 +61,8 @@ public final class Router {
     }
 
     public func newProject() { isCreatingProject = true }
+
+    public func showSettings() { isShowingSettings = true }
 }
 
 extension FocusedValues {

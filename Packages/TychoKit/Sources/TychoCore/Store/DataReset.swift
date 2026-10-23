@@ -1,3 +1,4 @@
+import Foundation
 import SwiftData
 
 @MainActor
@@ -10,5 +11,10 @@ public enum DataReset {
         try context.delete(model: Team.self)
         try context.delete(model: Workspace.self)
         try context.saveOrRollback()
+    }
+
+    public static func reloadDemo(in context: ModelContext, now: Date, calendar: Calendar) throws {
+        try deleteAll(in: context)
+        try DemoSeed.load(into: context, now: now, calendar: calendar)
     }
 }

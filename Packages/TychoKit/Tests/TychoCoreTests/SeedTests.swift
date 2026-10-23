@@ -79,4 +79,18 @@ struct SeedTests {
             #expect(count == 0)
         }
     }
+
+    @Test func reloadDemoRestoresTheOriginalWorkspace() throws {
+        let context = try makeTestContext()
+        let workspace = try DemoSeed.load(into: context, now: referenceNow, calendar: utcCalendar)
+        let web = try #require(workspace.projects?.first { $0.key == "WEB" })
+        context.delete(web)
+        try context.save()
+
+        try DataReset.reloadDemo(in: context, now: referenceNow, calendar: utcCalendar)
+
+        #expect(try context.fetchCount(FetchDescriptor<Workspace>()) == 1)
+        #expect(try context.fetchCount(FetchDescriptor<Project>()) == 7)
+        #expect(try context.fetchCount(FetchDescriptor<TaskItem>()) == 49)
+    }
 }

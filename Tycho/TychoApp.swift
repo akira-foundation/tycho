@@ -10,5 +10,10 @@ struct TychoApp: App {
             AppRootView(loader: loader)
         }
         .commands { TychoCommands() }
+        #if os(macOS)
+        Settings {
+            SettingsRootView(loader: loader)
+        }
+        #endif
     }
 }

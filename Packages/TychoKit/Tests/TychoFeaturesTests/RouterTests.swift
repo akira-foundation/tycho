@@ -37,4 +37,10 @@ struct RouterTests {
         router.newProject()
         #expect(router.isCreatingProject)
     }
+
+    @Test func showsSettings() {
+        let router = Router()
+        router.showSettings()
+        #expect(router.isShowingSettings)
+    }
 }
