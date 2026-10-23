@@ -6,7 +6,8 @@ SWIFT_FORMAT := xcrun swift-format
 SOURCES := $(KIT)/Sources $(KIT)/Tests $(KIT)/Package.swift Tycho TychoUITests
 MAC := -scheme Tycho -destination 'platform=macOS'
 IOS := -scheme Tycho -destination 'generic/platform=iOS Simulator'
-SIM := -scheme Tycho -destination 'platform=iOS Simulator,name=iPhone 17'
+SIM_NAME ?= iPhone 17
+SIM = -scheme Tycho -destination 'platform=iOS Simulator,name=$(SIM_NAME)'
 
 help: ## Show this list
 	@grep -hE '^[a-z-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  make %-13s %s\n", $$1, $$2}'
