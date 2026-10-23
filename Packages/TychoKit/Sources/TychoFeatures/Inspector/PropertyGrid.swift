@@ -8,6 +8,7 @@ struct PropertyGrid: View {
     @Environment(ToastCenter.self) private var toast
     @Query(sort: \Member.name) private var members: [Member]
     let task: TaskItem
+    @State private var estimate = ""
 
     var body: some View {
         Grid(alignment: .leading, horizontalSpacing: Spacing.s4, verticalSpacing: Spacing.s2) {
@@ -48,22 +49,18 @@ struct PropertyGrid: View {
                     ForEach(members) { Text($0.name).tag(Member?.some($0)) }
                 }
             }
-            row("Start") { dateField(\.start) }
-            row("Due") { dateField(\.due) }
+            row("Start") { dateField("Start", \.start) }
+            row("Due") { dateField("Due", \.due) }
             row("Labels") { labelsMenu }
             row("Estimate") {
-                TextField(
-                    "e.g. 2d",
-                    text: Binding(
-                        get: { task.estimate ?? "" },
-                        set: { value in
-                            let trimmed = value.trimmingCharacters(in: .whitespaces)
-                            edit { $0.estimate = trimmed.isEmpty ? nil : trimmed }
-                        })
-                )
-                .textFieldStyle(.plain)
+                TextField("e.g. 2d", text: $estimate)
+                    .textFieldStyle(.plain)
+                    .onSubmit(commitEstimate)
             }
         }
+        .onAppear { estimate = task.estimate ?? "" }
+        .onChange(of: task.id) { estimate = task.estimate ?? "" }
+        .onDisappear(perform: commitEstimate)
         .labelsHidden()
         .tychoFont(.base)
     }
@@ -100,11 +97,11 @@ struct PropertyGrid: View {
         .frame(minHeight: 30)
     }
 
-    private func dateField(_ keyPath: ReferenceWritableKeyPath<TaskItem, Date?>) -> some View {
+    private func dateField(_ title: String, _ keyPath: ReferenceWritableKeyPath<TaskItem, Date?>) -> some View {
         HStack {
             if let date = task[keyPath: keyPath] {
                 DatePicker(
-                    "",
+                    title,
                     selection: Binding(get: { date }, set: { value in edit { $0[keyPath: keyPath] = value } }),
                     displayedComponents: .date)
                 Button("Clear", systemImage: "xmark.circle.fill") { edit { $0[keyPath: keyPath] = nil } }
@@ -119,6 +116,14 @@ struct PropertyGrid: View {
                 .foregroundStyle(Token.text4.color)
             }
         }
+    }
+
+    private func commitEstimate() {
+        guard !task.isDeleted, task.modelContext != nil else { return }
+        let trimmed = estimate.trimmingCharacters(in: .whitespaces)
+        let value = trimmed.isEmpty ? nil : trimmed
+        guard value != task.estimate else { return }
+        edit { $0.estimate = value }
     }
 
     private func edit(_ change: (TaskItem) -> Void) {

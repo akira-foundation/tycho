@@ -73,7 +73,7 @@ struct TaskInspectorView: View {
     }
 
     private func commitTitle(_ task: TaskItem) {
-        guard !task.isDeleted, title != task.title else { return }
+        guard !task.isDeleted, task.modelContext != nil, title != task.title else { return }
         toast.perform { try TaskActions(context: context).rename(task, to: title) }
         title = task.title
     }

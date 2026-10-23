@@ -29,12 +29,22 @@ struct SubtaskList: View {
         }
     }
 
+    static func dropIndex(moving: Int, onto target: Int) -> Int {
+        target
+    }
+
     private func reorder(_ items: [String], onto target: Subtask) -> Bool {
+        let ordered = task.orderedSubtasks
         guard let id = items.first.flatMap(UUID.init(uuidString:)),
-            let moved = task.orderedSubtasks.first(where: { $0.id == id }),
-            let index = task.orderedSubtasks.filter({ $0 !== moved }).firstIndex(where: { $0 === target })
+            let from = ordered.firstIndex(where: { $0.id == id }),
+            let to = ordered.firstIndex(where: { $0 === target })
         else { return false }
-        toast.perform { try SubtaskActions(context: context).move(moved, to: index) }
-        return true
+        let index = Self.dropIndex(moving: from, onto: to)
+        var succeeded = false
+        toast.perform {
+            try SubtaskActions(context: context).move(ordered[from], to: index)
+            succeeded = true
+        }
+        return succeeded
     }
 }

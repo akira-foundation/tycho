@@ -23,6 +23,7 @@ struct NewTaskSheet: View {
             Form {
                 TextField("Task title", text: $draft.title)
                     .accessibilityIdentifier("task.title")
+                    .onChange(of: draft.title) { error = nil }
                 Picker("Project", selection: $project) {
                     ForEach(projects.filter { !$0.isArchived }) { Text($0.name).tag(Project?.some($0)) }
                 }

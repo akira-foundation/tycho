@@ -28,6 +28,7 @@ struct RootView: View {
             ) {
                 if let id = router.inspectedTaskID {
                     TaskInspectorView(taskID: id)
+                        .id(id)
                         .inspectorColumnWidth(min: 320, ideal: 380, max: 520)
                 }
             }
