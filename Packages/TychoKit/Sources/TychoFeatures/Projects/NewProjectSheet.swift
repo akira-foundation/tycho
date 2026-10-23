@@ -32,6 +32,7 @@ struct NewProjectSheet: View {
                     TextField("Name", text: $draft.name)
                         .accessibilityIdentifier("project.name")
                         .onChange(of: draft.name) { _, name in
+                            error = nil
                             if !keyEdited { draft.key = ProjectSymbols.suggestedKey(for: name) }
                         }
                     TextField(
@@ -98,6 +99,7 @@ struct NewProjectSheet: View {
                 ToolbarItem(placement: .confirmationAction) {
                     Button(project == nil ? "Create" : "Save", action: save)
                         .keyboardShortcut(.return, modifiers: .command)
+                        .disabled(project == nil && workspaces.isEmpty)
                         .accessibilityIdentifier("project.save")
                 }
             }
@@ -124,8 +126,7 @@ struct NewProjectSheet: View {
         } catch let validation as ValidationError {
             error = validation
         } catch {
-            toast.show("Couldn't save changes.")
-            dismiss()
+            toast.report(error)
         }
     }
 }

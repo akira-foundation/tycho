@@ -39,8 +39,12 @@ public final class ToastCenter {
         } catch let error as ValidationError {
             show(error.userMessage)
         } catch {
-            logger.error("Action failed: \(error.localizedDescription, privacy: .public)")
-            show("Couldn't save changes.")
+            report(error)
         }
+    }
+
+    public func report(_ error: Error) {
+        logger.error("Action failed: \(error.localizedDescription, privacy: .public)")
+        show("Couldn't save changes.")
     }
 }

@@ -70,13 +70,12 @@ struct ProjectsView: View {
             ToolbarItem { Button("New Project", systemImage: "plus") { router.newProject() } }
         }
         .confirmationDialog(
-            "Delete \(pendingDelete?.name ?? "project")?",
-            isPresented: Binding(get: { pendingDelete != nil }, set: { if !$0 { pendingDelete = nil } })
-        ) {
-            Button("Delete project and its tasks", role: .destructive) {
-                if let project = pendingDelete {
-                    toast.perform { try ProjectActions(context: context).delete(project) }
-                }
+            "Delete project?",
+            isPresented: Binding(get: { pendingDelete != nil }, set: { if !$0 { pendingDelete = nil } }),
+            presenting: pendingDelete
+        ) { project in
+            Button("Delete \(project.name) and its tasks", role: .destructive) {
+                toast.perform { try ProjectActions(context: context).delete(project) }
                 pendingDelete = nil
             }
         }
