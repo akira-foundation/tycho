@@ -77,7 +77,9 @@ struct ProjectTabContent: View {
                 tasks: project.tasks ?? [], project: project, stateKey: TableViewStates.projectKey(project.id))
         case .calendar:
             CalendarView(tasks: project.tasks ?? [], events: project.events ?? [], project: project)
-        case .timeline, .files:
+        case .timeline:
+            TimelineView(tasks: project.tasks ?? [], milestones: project.milestones ?? [], project: project)
+        case .files:
             EmptyState(title: "Coming soon", symbol: "hammer", message: "This view is on its way.")
         }
     }

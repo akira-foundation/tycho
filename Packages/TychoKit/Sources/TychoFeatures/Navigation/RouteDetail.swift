@@ -1,5 +1,4 @@
 import SwiftUI
-import TychoDesign
 
 struct RouteDetail: View {
     let route: AppRoute
@@ -15,7 +14,7 @@ struct RouteDetail: View {
         case .calendar:
             WorkspaceCalendarView()
         case .timeline:
-            EmptyState(title: "Coming soon", symbol: "hammer", message: "This view is on its way.")
+            WorkspaceTimelineView()
         case .projects:
             ProjectsView()
         case .project(let id, let tab):

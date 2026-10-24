@@ -90,7 +90,8 @@ public struct TimelineLayout: Sendable {
     }
 
     public func dayOffset(forDrag translation: Double) -> Int {
-        Int((translation / dayWidth).rounded())
+        guard translation.isFinite else { return 0 }
+        return Int((translation / dayWidth).rounded())
     }
 
     public var monthBlocks: [TimelineBlock] {
