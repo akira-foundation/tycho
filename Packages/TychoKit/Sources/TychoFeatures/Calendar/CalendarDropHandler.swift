@@ -17,7 +17,7 @@ struct CalendarDropHandler {
         -> Bool
     {
         var moved: TaskItem?
-        toast.perform { moved = try drop(ids, on: day, in: tasks, calendar: DateText.gregorian) }
+        toast.perform { moved = try drop(ids, on: day, in: tasks, calendar: dateText.calendar) }
         guard let moved else { return false }
         toast.show(ScheduleMessages.rescheduled(moved.title, to: day, dateText: dateText))
         return true

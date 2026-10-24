@@ -38,7 +38,9 @@ struct DateCell: View {
                     "Date",
                     selection: Binding(
                         get: { task[keyPath: keyPath] ?? .now },
-                        set: { value in edit { $0[keyPath: keyPath] = DayTime.noon(of: value, calendar: .current) } }),
+                        set: { value in
+                            edit { $0[keyPath: keyPath] = DayTime.noon(of: value, calendar: DateText.gregorian) }
+                        }),
                     displayedComponents: .date
                 )
                 .datePickerStyle(.graphical)

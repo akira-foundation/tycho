@@ -12,7 +12,7 @@ public struct DateText: Sendable {
 
     public let format: DateFormatPreference
     private let now: Date
-    private let calendar: Calendar
+    public let calendar: Calendar
 
     public static var gregorian: Calendar {
         var calendar = Calendar(identifier: .gregorian)

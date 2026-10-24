@@ -103,7 +103,11 @@ struct PropertyGrid: View {
             if let date = task[keyPath: keyPath] {
                 DatePicker(
                     title,
-                    selection: Binding(get: { date }, set: { value in edit { $0[keyPath: keyPath] = value } }),
+                    selection: Binding(
+                        get: { date },
+                        set: { value in
+                            edit { $0[keyPath: keyPath] = DayTime.noon(of: value, calendar: DateText.gregorian) }
+                        }),
                     displayedComponents: .date)
                 Button("Clear", systemImage: "xmark.circle.fill") { edit { $0[keyPath: keyPath] = nil } }
                     .labelStyle(.iconOnly)
@@ -111,7 +115,7 @@ struct PropertyGrid: View {
                     .foregroundStyle(Token.text4.color)
             } else {
                 Button("Set date") {
-                    edit { $0[keyPath: keyPath] = Calendar.current.startOfDay(for: .now).addingTimeInterval(12 * 3600) }
+                    edit { $0[keyPath: keyPath] = DayTime.noon(of: .now, calendar: DateText.gregorian) }
                 }
                 .buttonStyle(.plain)
                 .foregroundStyle(Token.text4.color)

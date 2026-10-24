@@ -40,6 +40,22 @@ struct CalendarFeatureTests {
         #expect(toast.message == "Rescheduled “Wireframes” to Oct 17")
     }
 
+    @Test func droppingNormalisesToNoonInTheCalendarOfTheDateText() throws {
+        var kiritimati = Calendar(identifier: .gregorian)
+        kiritimati.timeZone = TimeZone(identifier: "Pacific/Kiritimati")!
+        let (context, task) = try setUp()
+        task.start = nil
+        task.due = nil
+        let target = kiritimati.date(from: DateComponents(year: 2026, month: 10, day: 20, hour: 3))!
+        let text = DateText(format: .monthDay, now: now, calendar: kiritimati)
+
+        _ = CalendarDropHandler(context: context).announceDrop(
+            [task.id], on: target, in: [task], toast: ToastCenter(), dateText: text)
+
+        let due = try #require(task.due)
+        #expect(kiritimati.dateComponents([.day, .hour], from: due) == DateComponents(day: 20, hour: 12))
+    }
+
     @Test func droppingOnTheSameDayOrAnUnknownTaskDoesNothing() throws {
         let (context, task) = try setUp()
         let handler = CalendarDropHandler(context: context)
