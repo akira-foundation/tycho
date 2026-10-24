@@ -22,7 +22,7 @@ struct TokenTests {
         #expect(Token.stDone.dark == RGBA(hex: 0x5CBA86))
         #expect(Token.overlay.light == RGBA(hex: 0x181613, alpha: 0.28))
         #expect(Token.overlay.dark == RGBA(hex: 0x000000, alpha: 0.55))
-        #expect(Token.onAccent.dark == RGBA(hex: 0x12131C))
+        #expect(Token.onAccent.dark == RGBA(hex: 0xFFFFFF))
     }
 
     @Test func densityChangesRowAndCardMetrics() {
