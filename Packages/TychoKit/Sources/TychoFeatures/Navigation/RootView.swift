@@ -6,6 +6,9 @@ import TychoDesign
 struct RootView: View {
     @Environment(Router.self) private var router
     @Query(sort: \Workspace.createdAt) private var workspaces: [Workspace]
+    #if os(iOS)
+    @Environment(\.horizontalSizeClass) private var sizeClass
+    #endif
 
     var body: some View {
         content
@@ -44,7 +47,7 @@ struct RootView: View {
                 )
             ) {
                 if let id = router.inspectedTaskID {
-                    TaskInspectorView(taskID: id)
+                    TaskInspectorView(taskID: id, presentedAsSheet: inspectorIsSheet)
                         .id(id)
                         .inspectorColumnWidth(min: 320, ideal: 380, max: 520)
                 }
@@ -57,5 +60,13 @@ struct RootView: View {
                 NavigationStack { SettingsView() }
             }
         }
+    }
+
+    private var inspectorIsSheet: Bool {
+        #if os(iOS)
+        sizeClass == .compact
+        #else
+        false
+        #endif
     }
 }
