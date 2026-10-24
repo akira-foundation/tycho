@@ -52,6 +52,7 @@ struct TimelineCanvas: View {
 }
 
 struct TimelineBackdrop: View {
+    @Environment(\.accent) private var accent
     let rows: [TimelineRow]
     let layout: TimelineLayout
 
@@ -72,7 +73,7 @@ struct TimelineBackdrop: View {
                 context.stroke(vertical(at: x, height: size.height), with: .color(Token.divider.color), lineWidth: 1)
             }
             context.stroke(
-                vertical(at: layout.todayLineX, height: size.height), with: .color(.accentColor), lineWidth: 1.5)
+                vertical(at: layout.todayLineX, height: size.height), with: .color(accent.color), lineWidth: 1.5)
         }
         .allowsHitTesting(false)
         .accessibilityHidden(true)

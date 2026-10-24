@@ -43,6 +43,7 @@ struct DependencyPicker: View {
 }
 
 struct DependencyList: View {
+    @Environment(\.accent) private var accent
     @Environment(\.modelContext) private var context
     @Environment(ToastCenter.self) private var toast
     let task: TaskItem
@@ -78,7 +79,7 @@ struct DependencyList: View {
             Text(candidate.title).lineLimit(1)
             Spacer()
             if task.isBlocked(by: candidate) {
-                Image(systemName: "checkmark").foregroundStyle(Color.accentColor)
+                Image(systemName: "checkmark").foregroundStyle(accent.color)
             }
         }
         .frame(height: 28)

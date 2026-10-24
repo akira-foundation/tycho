@@ -28,6 +28,7 @@ struct CalendarWeekView: View {
 }
 
 struct CalendarWeekColumn: View {
+    @Environment(\.accent) private var accent
     @Environment(\.modelContext) private var context
     @Environment(ToastCenter.self) private var toast
     @Environment(Router.self) private var router
@@ -89,7 +90,7 @@ struct CalendarWeekColumn: View {
         Text("\(cell.day)")
             .tychoFont(.lg, weight: .semibold)
             .monospacedDigit()
-            .foregroundStyle(cell.isToday ? Color.accentColor : Token.text.color)
+            .foregroundStyle(cell.isToday ? accent.color : Token.text.color)
             .accessibilityLabel(cell.isToday ? "Today, \(cell.day)" : "\(cell.day)")
             .accessibilityAddTraits(cell.isToday ? .isSelected : [])
     }
