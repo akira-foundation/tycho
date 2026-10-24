@@ -7,9 +7,20 @@ struct TaskInspectorView: View {
     @Environment(\.modelContext) private var context
     @Environment(ToastCenter.self) private var toast
     @Environment(Router.self) private var router
+    #if os(iOS)
+    @Environment(\.horizontalSizeClass) private var sizeClass
+    #endif
     @Query private var matches: [TaskItem]
     @State private var title = ""
     @State private var confirmingDelete = false
+
+    private var isSheet: Bool {
+        #if os(iOS)
+        sizeClass == .compact
+        #else
+        false
+        #endif
+    }
 
     init(taskID: UUID) {
         _matches = Query(filter: #Predicate<TaskItem> { $0.id == taskID })
@@ -36,6 +47,7 @@ struct TaskInspectorView: View {
                 .padding(Spacing.s5)
             }
             .background(Token.surface.color)
+            .toastOverlay(toast, enabled: isSheet)
             .onAppear { title = task.title }
             .onChange(of: task.id) { title = task.title }
             .onDisappear { commitTitle(task) }
