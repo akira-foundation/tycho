@@ -34,17 +34,28 @@ public struct TaskComparator: SortComparator, Codable, Hashable, Sendable {
 
     private func ascending(_ lhs: TaskItem, _ rhs: TaskItem) -> ComparisonResult {
         switch field {
-        case .manual: Self.rank(lhs.sortOrder, rhs.sortOrder)
+        case .manual: Self.manual(lhs, rhs)
         case .title: Self.rank(lhs.title.lowercased(), rhs.title.lowercased())
         case .status: Self.rank(Self.statusIndex(lhs), Self.statusIndex(rhs))
         case .priority: Self.rank(-lhs.priority.weight, -rhs.priority.weight)
         case .assignee: Self.rank(lhs.assignee?.name ?? "zzz", rhs.assignee?.name ?? "zzz")
         case .due: Self.rank(lhs.due ?? .distantFuture, rhs.due ?? .distantFuture)
         case .start: Self.rank(lhs.start ?? .distantFuture, rhs.start ?? .distantFuture)
-        case .estimate: Self.rank(lhs.estimate ?? "zzz", rhs.estimate ?? "zzz")
+        case .estimate: Self.rank(Self.estimateKey(lhs), Self.estimateKey(rhs))
         case .created: Self.rank(rhs.createdAt, lhs.createdAt)
         case .project: Self.rank(lhs.project?.name ?? "", rhs.project?.name ?? "")
         }
+    }
+
+    private static func estimateKey(_ task: TaskItem) -> String {
+        let text = task.estimate?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        return text.isEmpty ? "zzz" : text
+    }
+
+    private static func manual(_ lhs: TaskItem, _ rhs: TaskItem) -> ComparisonResult {
+        guard lhs.sortOrder == rhs.sortOrder else { return rank(lhs.sortOrder, rhs.sortOrder) }
+        guard lhs.number == rhs.number else { return rank(lhs.number, rhs.number) }
+        return rank(lhs.id.uuidString, rhs.id.uuidString)
     }
 
     private static func statusIndex(_ task: TaskItem) -> Int {

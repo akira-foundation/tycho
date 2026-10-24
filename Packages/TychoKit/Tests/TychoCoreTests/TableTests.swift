@@ -108,4 +108,41 @@ struct TableTests {
         #expect(
             TableSort.sorted(all, by: [TaskComparator(field: .priority)]).map(\.title) == ["beta", "Alpha", "gamma"])
     }
+
+    @Test func blankEstimatesSortLikeMissingOnes() throws {
+        let all = try tasks()
+        all[0].estimate = ""
+        all[1].estimate = "  "
+        let sorted = TableSort.sorted(all, by: [TaskComparator(field: .estimate)])
+        #expect(sorted.map(\.title) == ["gamma", "beta", "Alpha"])
+    }
+
+    @Test func equalManualOrderFallsBackToNumberThenId() throws {
+        let all = try tasks()
+        all.forEach { $0.sortOrder = 1 }
+        let expected = all.sorted { $0.number < $1.number }.map(\.title)
+        #expect(TableSort.sorted(all.reversed(), by: []).map(\.title) == expected)
+        all[1].number = all[0].number
+        let byId = all.sorted { $0.number == $1.number ? $0.id.uuidString < $1.id.uuidString : $0.number < $1.number }
+        #expect(TableSort.sorted(all.reversed(), by: []).map(\.title) == byId.map(\.title))
+    }
+
+    @Test func decodingToleratesMissingKeysAndUnknownColumns() throws {
+        let json = Data(#"{"hidden":["created","retired","deps"]}"#.utf8)
+        let state = try JSONDecoder().decode(TableViewState.self, from: json)
+        #expect(state.hidden == [.created, .deps])
+        #expect(state.sort.isEmpty)
+        #expect(state.columns == nil)
+        let empty = try JSONDecoder().decode(TableViewState.self, from: Data("{}".utf8))
+        #expect(empty.hidden == TableColumnID.defaultHidden(inProject: false))
+    }
+
+    @Test func hiddenColumnsEncodeInCaseOrder() throws {
+        var state = TableViewState(inProject: true)
+        state.hidden = [.project, .start, .created]
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = .sortedKeys
+        let text = try #require(String(bytes: try encoder.encode(state), encoding: .utf8))
+        #expect(text.contains(#""hidden":["start","created","project"]"#))
+    }
 }
