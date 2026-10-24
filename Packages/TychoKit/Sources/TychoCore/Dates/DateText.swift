@@ -29,7 +29,9 @@ public struct DateText: Sendable {
         self.calendar = calendar
     }
 
-    public func short(_ date: Date) -> String { render(date, withYear: includesYear(date, long: false)) }
+    public func short(_ date: Date) -> String {
+        render(date, withYear: format == .monthDay && includesYear(date, long: false))
+    }
 
     public func long(_ date: Date) -> String { render(date, withYear: true) }
 

@@ -26,8 +26,8 @@ struct DateTextTests {
     @Test func shortDatesShowAnotherYear() {
         let date = utcDate(2025, 12, 31, hour: 12)
         #expect(text(.monthDay).short(date) == "Dec 31, 2025")
-        #expect(text(.dayMonth).short(date) == "31/12/2025")
-        #expect(text(.monthDayNumeric).short(date) == "12/31/2025")
+        #expect(text(.dayMonth).short(date) == "31/12")
+        #expect(text(.monthDayNumeric).short(date) == "12/31")
         #expect(text(.iso).short(date) == "2025-12-31")
     }
 
