@@ -7,6 +7,7 @@ struct FilesToolbar: View {
     @Binding var kind: FileKind?
     @Binding var sort: FileSort
     @Binding var layout: FileLayout
+    let onUpload: () -> Void
 
     var body: some View {
         HStack(spacing: Spacing.s2) {
@@ -33,6 +34,9 @@ struct FilesToolbar: View {
             .pickerStyle(.segmented)
             .labelsHidden()
             .fixedSize()
+            Button("Upload", systemImage: "arrow.up.doc", action: onUpload)
+                .buttonStyle(.borderedProminent)
+                .controlSize(.small)
         }
         .padding(.horizontal, Spacing.s4)
         .padding(.vertical, Spacing.s2)

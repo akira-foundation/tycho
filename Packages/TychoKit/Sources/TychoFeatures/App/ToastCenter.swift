@@ -14,6 +14,7 @@ extension ValidationError {
         case .dependencyAcrossProjects: "Dependencies must be in the same project."
         case .dependencyCycle: "These tasks would block each other."
         case .fileTooLarge: "Files can be up to 250 MB each."
+        case .unsupportedFile: "Only files can be uploaded."
         }
     }
 }

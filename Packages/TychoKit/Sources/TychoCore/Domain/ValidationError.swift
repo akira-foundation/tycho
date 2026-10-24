@@ -7,4 +7,5 @@ public enum ValidationError: Error, Equatable, Sendable {
     case dependencyAcrossProjects
     case dependencyCycle
     case fileTooLarge
+    case unsupportedFile
 }

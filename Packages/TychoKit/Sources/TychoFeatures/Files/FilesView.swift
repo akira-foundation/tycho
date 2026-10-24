@@ -2,6 +2,7 @@ import SwiftData
 import SwiftUI
 import TychoCore
 import TychoDesign
+import UniformTypeIdentifiers
 
 struct FilesView: View {
     @Environment(\.modelContext) private var context
@@ -15,20 +16,30 @@ struct FilesView: View {
     @State private var renaming: FileRecord?
     @State private var renameText = ""
     @State private var deleting: FileRecord?
+    @State private var importing = false
 
     var body: some View {
         let files = FileQuery.apply(project.files ?? [], search: search, kind: kind, sort: sort)
         VStack(spacing: 0) {
-            FilesToolbar(search: $search, kind: $kind, sort: $sort, layout: $layout)
+            FilesToolbar(search: $search, kind: $kind, sort: $sort, layout: $layout) { importing = true }
             Divider()
             ScrollView {
                 VStack(alignment: .leading, spacing: Spacing.s4) {
+                    FileDropzone(
+                        message: "Drop files here or browse, up to 250 MB each", onBrowse: { importing = true },
+                        onDrop: upload)
                     content(files)
                 }
                 .padding(Spacing.s6)
             }
         }
         .background(Token.bg.color)
+        .fileImporter(isPresented: $importing, allowedContentTypes: [.item], allowsMultipleSelection: true) { result in
+            switch result {
+            case .success(let urls): upload(urls)
+            case .failure(let error): toast.report(error)
+            }
+        }
         .sheet(item: $previewing) { FilePreviewSheet(file: $0) }
         .alert("Rename file", isPresented: isRenaming) {
             TextField("File name", text: $renameText)
@@ -84,6 +95,10 @@ struct FilesView: View {
             duplicate: { duplicate(file) },
             delete: { deleting = file }
         )
+    }
+
+    private func upload(_ urls: [URL]) {
+        FileUpload.perform(urls, project: project, task: nil, context: context, toast: toast)
     }
 
     private func commitRename() {

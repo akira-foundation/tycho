@@ -33,4 +33,8 @@ struct ToastCenterTests {
     @Test func largeFilesExplainTheLimit() {
         #expect(ValidationError.fileTooLarge.userMessage == "Files can be up to 250 MB each.")
     }
+
+    @Test func foldersExplainThatOnlyFilesUpload() {
+        #expect(ValidationError.unsupportedFile.userMessage == "Only files can be uploaded.")
+    }
 }
