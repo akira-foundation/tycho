@@ -17,8 +17,9 @@ struct TimelineView: View {
     var body: some View {
         let layout = makeLayout()
         let grouping = router.timelineGrouping.effective(inProject: project != nil)
+        let marks = MilestoneMark.marks(from: milestones, includeProject: project == nil)
         let rows = TimelineRows.build(
-            tasks: tasks, grouping: grouping, milestoneCount: milestones.count, members: members, projects: projects)
+            tasks: tasks, grouping: grouping, milestoneCount: marks.count, members: members, projects: projects)
         VStack(spacing: 0) {
             TimelineControls(showsNewTask: project != nil) { sync.scrollHorizontally(to: layout.initialScrollX) }
             Divider()
@@ -26,10 +27,8 @@ struct TimelineView: View {
                 empty
             } else {
                 TimelinePanes(
-                    rows: rows, layout: layout, grouping: grouping,
-                    pins: MilestoneLane.pins(
-                        for: MilestoneMark.marks(from: milestones, includeProject: project == nil),
-                        layout: layout, dateText: dateText),
+                    rows: rows, layout: layout, grouping: router.timelineGrouping,
+                    pins: MilestoneLane.pins(for: marks, layout: layout, dateText: dateText),
                     curves: DependencyPath.curves(rows: rows, layout: layout), sync: sync)
             }
         }
