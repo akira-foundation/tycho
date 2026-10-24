@@ -1,10 +1,17 @@
+import SwiftData
 import SwiftUI
 import TychoCore
 import TychoDesign
 
 struct FileThumbnail: View {
+    @Environment(\.modelContext) private var context
     let file: FileRecord
     @State private var decoded: CGImage?
+
+    private struct TaskKey: Hashable {
+        let id: UUID
+        let kind: FileKind
+    }
 
     var body: some View {
         let showsImage = decoded != nil
@@ -26,15 +33,15 @@ struct FileThumbnail: View {
             }
         }
         .clipped()
-        .task(id: file.id) { await decodeImage() }
+        .task(id: TaskKey(id: file.id, kind: file.kind)) { await decodeImage() }
     }
 
     private func decodeImage() async {
-        guard file.kind == .img, file.hasData, let data = file.data else {
+        guard file.kind == .img, file.hasData else {
             decoded = nil
             return
         }
-        decoded = await ThumbnailDecoder.decodeOffMainActor(data)
+        decoded = await ThumbnailDecoder.thumbnail(for: file.persistentModelID, container: context.container)
     }
 }
 

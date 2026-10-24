@@ -121,20 +121,57 @@ struct FilesFeatureTests {
         #expect(url.deletingLastPathComponent().lastPathComponent == record.id.uuidString)
     }
 
-    @Test func thumbnailsAreDownscaledAndInvalidDataIsRejected() throws {
-        let side = 400
+    private func encodedImage(_ type: UTType, side: Int = 400) -> Data {
         let space = CGColorSpaceCreateDeviceRGB()
         let bitmap = CGContext(
             data: nil, width: side, height: side, bitsPerComponent: 8, bytesPerRow: 0, space: space,
             bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)!
-        let png = NSMutableData()
-        let destination = CGImageDestinationCreateWithData(png, UTType.png.identifier as CFString, 1, nil)!
+        let output = NSMutableData()
+        let destination = CGImageDestinationCreateWithData(output, type.identifier as CFString, 1, nil)!
         CGImageDestinationAddImage(destination, bitmap.makeImage()!, nil)
         CGImageDestinationFinalize(destination)
+        return output as Data
+    }
 
-        let thumbnail = try #require(ThumbnailDecoder.decode(png as Data, maxPixelSize: 100))
+    @Test func thumbnailsAreDownscaledAndInvalidDataIsRejected() throws {
+        let thumbnail = try #require(ThumbnailDecoder.decode(encodedImage(.png), maxPixelSize: 100))
 
         #expect(thumbnail.width == 100)
         #expect(ThumbnailDecoder.decode(Data("nope".utf8), maxPixelSize: 100) == nil)
+    }
+
+    @Test func decoderAcceptsOnlyTheAllowedImageTypes() {
+        let allowed = [UTType.png, .jpeg, .tiff, .gif].map {
+            ThumbnailDecoder.decode(encodedImage($0), maxPixelSize: 50)
+        }
+        #expect(allowed.allSatisfy { $0 != nil })
+        #expect(ThumbnailDecoder.decode(encodedImage(.bmp), maxPixelSize: 50) == nil)
+    }
+
+    @Test func decoderUsesTheFileNameAsATypeHint() {
+        let png = encodedImage(.png)
+        #expect(ThumbnailDecoder.decode(png, maxPixelSize: 50, fileName: "hero.png") != nil)
+        #expect(ThumbnailDecoder.decode(png, maxPixelSize: 50, fileName: "noext") != nil)
+    }
+
+    @Test func thumbnailLoadsFromABackgroundContextWithoutFaultingTheMainContext() async throws {
+        let container = try TychoSchema.makeContainer(inMemory: true)
+        let main = container.mainContext
+        let record = FileRecord(name: "hero.png", byteCount: 10, uploadedAt: now)
+        record.data = encodedImage(.png)
+        record.hasData = true
+        main.insert(record)
+        try main.save()
+
+        let image = await ThumbnailDecoder.thumbnail(for: record.persistentModelID, container: container)
+
+        #expect(image != nil)
+        let doc = FileRecord(name: "brief.pdf", byteCount: 10, uploadedAt: now)
+        doc.data = Data("x".utf8)
+        doc.hasData = true
+        main.insert(doc)
+        try main.save()
+        let none = await ThumbnailDecoder.thumbnail(for: doc.persistentModelID, container: container)
+        #expect(none == nil)
     }
 }
