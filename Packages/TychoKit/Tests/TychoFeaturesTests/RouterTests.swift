@@ -43,4 +43,41 @@ struct RouterTests {
         router.showSettings()
         #expect(router.isShowingSettings)
     }
+
+    @Test func workspaceRoutesMapToTheSidebar() {
+        let router = Router()
+        let pairs: [(SidebarItem, AppRoute)] = [(.tasks, .tasks), (.calendar, .calendar), (.timeline, .timeline)]
+        for (item, route) in pairs {
+            router.sidebarItem = item
+            #expect(router.route == route)
+            #expect(router.sidebarItem == item)
+        }
+    }
+
+    @Test func newTaskCarriesAnOptionalDueDate() {
+        let router = Router()
+        let due = Date(timeIntervalSince1970: 1_800_000_000)
+        router.newTask(due: due)
+        #expect(router.draftDue == due)
+        #expect(router.isCreatingTask)
+        router.newTask()
+        #expect(router.draftDue == nil)
+    }
+
+    @Test func scheduleStateStartsLikeTheOriginal() {
+        let router = Router()
+        #expect(router.calendarMode == .month)
+        #expect(router.timelineZoom == .week)
+        #expect(router.timelineGrouping == .status)
+    }
+
+    @Test func theWorkspaceTimelineStartsGroupedByProjectOnlyOnce() {
+        let router = Router()
+        router.openWorkspaceTimeline()
+        #expect(router.timelineGrouping == .project)
+        router.timelineGrouping = .assignee
+        router.openWorkspaceTimeline()
+        #expect(router.timelineGrouping == .assignee)
+        #expect(router.hasOpenedWorkspaceTimeline)
+    }
 }

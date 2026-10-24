@@ -9,4 +9,8 @@ struct AppRouteTests {
         #expect(AppRoute.project(id, .board) == .project(id, .board))
         #expect(AppRoute.project(id, .board) != .project(id, .list))
     }
+
+    @Test func projectTabsFollowTheOriginalOrder() {
+        #expect(ProjectTab.allCases.map(\.title) == ["Board", "List", "Table", "Calendar", "Timeline", "Files"])
+    }
 }

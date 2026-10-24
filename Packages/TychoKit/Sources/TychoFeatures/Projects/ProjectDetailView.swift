@@ -68,10 +68,12 @@ struct ProjectTabContent: View {
 
     var body: some View {
         switch tab {
-        case .list:
-            TaskListView(tasks: project.tasks ?? [], project: project)
         case .board:
             BoardView(project: project)
+        case .list:
+            TaskListView(tasks: project.tasks ?? [], project: project)
+        case .table, .calendar, .timeline, .files:
+            EmptyState(title: "Coming soon", symbol: "hammer", message: "This view is on its way.")
         }
     }
 }

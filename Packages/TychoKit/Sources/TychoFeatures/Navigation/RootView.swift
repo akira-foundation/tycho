@@ -50,7 +50,9 @@ struct RootView: View {
                 }
             }
             .sheet(isPresented: $router.isCreatingProject) { NewProjectSheet(project: nil) }
-            .sheet(isPresented: $router.isCreatingTask) { NewTaskSheet(status: router.draftStatus) }
+            .sheet(isPresented: $router.isCreatingTask) {
+                NewTaskSheet(status: router.draftStatus, due: router.draftDue)
+            }
             .sheet(isPresented: $router.isShowingSettings) {
                 NavigationStack { SettingsView() }
             }

@@ -12,6 +12,12 @@ public final class Router {
     public var isCreatingProject = false
     public var isShowingSettings = false
     public var draftStatus: TaskStatus = .todo
+    public var draftDue: Date?
+    public var calendarDate: Date = .now
+    public var calendarMode: CalendarMode = .month
+    public var timelineZoom: TimelineZoom = .week
+    public var timelineGrouping: TimelineGrouping = .status
+    public private(set) var hasOpenedWorkspaceTimeline = false
     public var columnVisibility: NavigationSplitViewVisibility = .automatic
     private var projectTabs: [UUID: ProjectTab] = [:]
 
@@ -22,6 +28,9 @@ public final class Router {
             switch route {
             case .home: .home
             case .myTasks: .myTasks
+            case .tasks: .tasks
+            case .calendar: .calendar
+            case .timeline: .timeline
             case .projects: .projects
             case .project(let id, _): .project(id)
             }
@@ -30,6 +39,9 @@ public final class Router {
             switch newValue {
             case .home?: route = .home
             case .myTasks?: route = .myTasks
+            case .tasks?: route = .tasks
+            case .calendar?: route = .calendar
+            case .timeline?: route = .timeline
             case .projects?: route = .projects
             case .project(let id)?: openProject(id, tab: projectTabs[id] ?? .board)
             case nil: break
@@ -55,9 +67,16 @@ public final class Router {
     public func inspect(_ taskID: UUID) { inspectedTaskID = taskID }
     public func closeInspector() { inspectedTaskID = nil }
 
-    public func newTask(status: TaskStatus = .todo) {
+    public func newTask(status: TaskStatus = .todo, due: Date? = nil) {
         draftStatus = status
+        draftDue = due
         isCreatingTask = true
+    }
+
+    public func openWorkspaceTimeline() {
+        guard !hasOpenedWorkspaceTimeline else { return }
+        hasOpenedWorkspaceTimeline = true
+        timelineGrouping = .project
     }
 
     public func newProject() { isCreatingProject = true }

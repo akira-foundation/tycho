@@ -14,8 +14,10 @@ struct NewTaskSheet: View {
     @State private var project: Project?
     @State private var error: ValidationError?
 
-    init(status: TaskStatus) {
-        _draft = State(initialValue: TaskDraft(title: "", status: status))
+    init(status: TaskStatus, due: Date? = nil) {
+        var draft = TaskDraft(title: "", status: status)
+        draft.due = due
+        _draft = State(initialValue: draft)
     }
 
     var body: some View {
@@ -36,6 +38,10 @@ struct NewTaskSheet: View {
                 Picker("Assignee", selection: $draft.assignee) {
                     Text("Unassigned").tag(Member?.none)
                     ForEach(members) { Text($0.name).tag(Member?.some($0)) }
+                }
+                if let due = draft.due {
+                    DatePicker(
+                        "Due", selection: Binding(get: { due }, set: { draft.due = $0 }), displayedComponents: .date)
                 }
                 if let error {
                     Text(error.userMessage).foregroundStyle(Token.red.color)
