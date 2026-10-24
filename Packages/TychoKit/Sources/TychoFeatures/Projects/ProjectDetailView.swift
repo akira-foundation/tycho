@@ -69,7 +69,7 @@ struct ProjectTabContent: View {
     var body: some View {
         switch tab {
         case .board:
-            BoardView(project: project)
+            BoardView(tasks: project.tasks ?? [], project: project)
         case .list:
             TaskListView(tasks: project.tasks ?? [], project: project)
         case .table:
