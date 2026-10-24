@@ -127,7 +127,7 @@ enum DemoSeedData {
             labels: [.qa, .design], estimate: "1d", length: 3),
         SeedTask(
             project: "p1", title: "Prepare developer handoff", status: .todo, assignee: "m2", priority: .high, due: 14,
-            labels: [.frontend], estimate: "2d", length: 4),
+            labels: [.frontend], estimate: "2d", length: 4, blockedBy: [3, 5]),
         SeedTask(
             project: "p1", title: "Design mobile onboarding", status: .progress, assignee: "m4", priority: .urgent,
             due: -1, labels: [.design], estimate: "3d", length: 6,
@@ -143,7 +143,7 @@ enum DemoSeedData {
             due: 22, labels: [.qa], estimate: "2d"),
         SeedTask(
             project: "p1", title: "Build hero component", status: .todo, assignee: "m3", priority: .medium, due: 10,
-            labels: [.frontend], estimate: "2d", length: 3),
+            labels: [.frontend], estimate: "2d", length: 3, blockedBy: [3]),
         SeedTask(
             project: "p1", title: "Image optimization pipeline", status: .review, assignee: "m6", priority: .low,
             due: 2, labels: [.backend], estimate: "1d", length: 5),
@@ -167,7 +167,7 @@ enum DemoSeedData {
             due: 6, labels: [.backend], estimate: "5d", length: 9),
         SeedTask(
             project: "p2", title: "Offline mode sync", status: .todo, assignee: "m3", priority: .urgent, due: 5,
-            labels: [.frontend, .backend], estimate: "8d", length: 10),
+            labels: [.frontend, .backend], estimate: "8d", length: 10, blockedBy: [20]),
         SeedTask(
             project: "p2", title: "App Store screenshots", status: .backlog, assignee: "m5", priority: .low, due: 40,
             labels: [.content], estimate: "1d"),

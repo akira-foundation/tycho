@@ -57,6 +57,7 @@ public enum DemoSeed {
 
         var countByProject: [String: Int] = [:]
         var doneIndex = 0
+        var seededTasks: [TaskItem] = []
         for (index, seed) in DemoSeedData.tasks.enumerated() {
             let count = (countByProject[seed.project] ?? 0) + 1
             countByProject[seed.project] = count
@@ -77,6 +78,7 @@ public enum DemoSeed {
                 doneIndex += 1
             }
             context.insert(task)
+            seededTasks.append(task)
             task.project = projects[seed.project]
             task.assignee = members[seed.assignee]
             for (offset, subtaskSeed) in seed.subtasks.enumerated() {
@@ -90,6 +92,8 @@ public enum DemoSeed {
         for (ref, project) in projects {
             project.nextTaskNumber = 100 + (countByProject[ref] ?? 0) * 3 + 1
         }
+
+        loadSchedule(into: context, projects: projects, members: members, tasks: seededTasks, now: now, date: date)
 
         try context.saveOrRollback()
         return workspace
