@@ -12,7 +12,9 @@ struct RouteDetail: View {
             MyTasksView()
         case .tasks:
             TasksView()
-        case .calendar, .timeline:
+        case .calendar:
+            WorkspaceCalendarView()
+        case .timeline:
             EmptyState(title: "Coming soon", symbol: "hammer", message: "This view is on its way.")
         case .projects:
             ProjectsView()
