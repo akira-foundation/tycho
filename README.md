@@ -9,8 +9,9 @@
 </p>
 
 Tycho is a native SwiftUI task manager for iOS 27 and macOS 27, named after Tycho Brahe. It is a native port of
-[Gr8r Studio](https://github.com/gr8rstudio/gr8r-studio), keeping the original's interface and principles: projects,
-list and board views, a task inspector and a focused home screen. Everything runs on-device with SwiftData, and the
+[Gr8r Studio](https://github.com/gr8rstudio/gr8r-studio), keeping the original's interface and principles: projects
+with board, list, table, calendar, timeline and files views, task dependencies and attachments, a task
+inspector and a focused home screen. Everything runs on-device with SwiftData, and the
 schema is ready for CloudKit.
 
 ## Install
@@ -39,7 +40,7 @@ to launch it.
 make test      # TychoKit package suite
 make build     # macOS and iOS simulator builds
 make lint      # SwiftLint and swift-format, strict
-make test-ui   # macOS UI smoke tests
+make test-ui   # macOS UI tests
 ```
 
 ## Changelog
