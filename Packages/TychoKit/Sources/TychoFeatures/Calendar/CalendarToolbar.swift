@@ -35,7 +35,6 @@ struct CalendarToolbar: View {
             .labelsHidden()
             .fixedSize()
             .accessibilityIdentifier("calendar.mode")
-            Button("New task", systemImage: "plus") { router.newTask() }
         }
         .buttonStyle(.borderless)
         .padding(.horizontal, Spacing.s4)
