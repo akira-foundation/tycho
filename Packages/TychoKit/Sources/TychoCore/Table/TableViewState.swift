@@ -17,7 +17,7 @@ public struct TableViewState: Codable, Equatable, Sendable {
 
     public init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        sort = try container.decodeIfPresent([TaskComparator].self, forKey: .sort) ?? []
+        sort = (try container.decodeIfPresent([Lossy<TaskComparator>].self, forKey: .sort) ?? []).compactMap(\.value)
         columns = try container.decodeIfPresent(Data.self, forKey: .columns)
         let rawHidden = try container.decodeIfPresent([String].self, forKey: .hidden)
         hidden =
@@ -47,5 +47,13 @@ public struct TableViewState: Codable, Equatable, Sendable {
 
     public mutating func resetWidths() {
         columns = nil
+    }
+}
+
+private struct Lossy<Value: Decodable>: Decodable {
+    let value: Value?
+
+    init(from decoder: any Decoder) throws {
+        value = try? Value(from: decoder)
     }
 }

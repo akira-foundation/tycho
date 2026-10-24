@@ -30,6 +30,42 @@ struct TableStateTests {
         #expect(state.sort == [TaskComparator(field: .priority)])
     }
 
+    @Test func aCorruptEntryDoesNotDiscardTheValidOnes() {
+        var valid = TableViewState(inProject: false)
+        valid.sort = [TaskComparator(field: .due, order: .reverse)]
+        let good = String(decoding: try! JSONEncoder().encode(valid), as: UTF8.self)
+        let data = Data(#"{"tasks":\#(good),"p:bad":{"hidden":42},"p:worse":"nope"}"#.utf8)
+
+        #expect(TableViewStates.state(for: "tasks", inProject: false, in: data) == valid)
+        #expect(TableViewStates.state(for: "p:bad", inProject: true, in: data) == TableViewState(inProject: true))
+    }
+
+    @Test func anUnknownSortFieldIsDroppedAndKeepsTheRest() throws {
+        let known = String(decoding: try JSONEncoder().encode(TaskComparator(field: .due)), as: UTF8.self)
+        let unknown = known.replacingOccurrences(of: "\"due\"", with: "\"nonsense\"")
+        let data = Data(#"{"tasks":{"hidden":["labels"],"sort":[\#(unknown),\#(known)]}}"#.utf8)
+
+        let state = TableViewStates.state(for: "tasks", inProject: false, in: data)
+
+        #expect(state.sort == [TaskComparator(field: .due)])
+        #expect(state.hidden == [.labels])
+    }
+
+    @Test func storingPrunesTheKeysOfProjectsThatNoLongerExist() {
+        let alive = UUID()
+        let gone = UUID()
+        var data = Data()
+        for key in [TableViewStates.projectKey(alive), TableViewStates.projectKey(gone), TableViewStates.workspaceKey] {
+            data = TableViewStates.storing(TableViewState(inProject: true), for: key, in: data)
+        }
+
+        data = TableViewStates.storing(
+            TableViewState(inProject: true), for: TableViewStates.workspaceKey, in: data, liveProjectIDs: [alive])
+
+        let keys = Set(((try? JSONSerialization.jsonObject(with: data)) as? [String: Any])?.keys.map { $0 } ?? [])
+        #expect(keys == [TableViewStates.projectKey(alive), TableViewStates.workspaceKey])
+    }
+
     @Test func projectKeysUseTheProjectID() {
         let id = UUID()
         #expect(TableViewStates.projectKey(id) == "p:\(id.uuidString)")

@@ -7,6 +7,7 @@ struct TaskTableView: View {
     @Environment(Router.self) private var router
     @AppStorage(TableViewStates.storageKey) private var stored = Data()
     @Query(sort: \Member.name) var members: [Member]
+    @Query private var projects: [Project]
     #if os(iOS)
     @Environment(\.horizontalSizeClass) private var sizeClass
     #endif
@@ -32,18 +33,25 @@ struct TaskTableView: View {
         }
     }
 
+    private var liveProjectIDs: Set<UUID> { Set(projects.map(\.id)) }
+
     private var state: TableViewState {
         TableViewStates.state(for: stateKey, inProject: project != nil, in: stored)
     }
 
     private var stateBinding: Binding<TableViewState> {
-        Binding(get: { state }, set: { stored = TableViewStates.storing($0, for: stateKey, in: stored) })
+        Binding(
+            get: { state },
+            set: { stored = TableViewStates.storing($0, for: stateKey, in: stored, liveProjectIDs: liveProjectIDs) })
     }
 
     private var sortBinding: Binding<[TaskComparator]> {
         Binding(
             get: { state.sort },
-            set: { stored = TableViewStates.storingSort($0, for: stateKey, inProject: project != nil, in: stored) })
+            set: {
+                stored = TableViewStates.storingSort(
+                    $0, for: stateKey, inProject: project != nil, in: stored, liveProjectIDs: liveProjectIDs)
+            })
     }
 
     private var customization: Binding<TableColumnCustomization<TaskItem>> {
@@ -52,7 +60,7 @@ struct TaskTableView: View {
             set: { value in
                 var next = state
                 TableCustomization.store(value, into: &next)
-                stored = TableViewStates.storing(next, for: stateKey, in: stored)
+                stored = TableViewStates.storing(next, for: stateKey, in: stored, liveProjectIDs: liveProjectIDs)
             })
     }
 
