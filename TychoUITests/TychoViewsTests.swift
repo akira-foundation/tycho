@@ -30,6 +30,14 @@ final class TychoViewsTests: XCTestCase {
         picker.descendants(matching: .any)[tab].firstMatch.click()
     }
 
+    private func text(of element: XCUIElement) -> String {
+        element.value as? String ?? ""
+    }
+
+    private func contextMenuItem(_ title: String) -> XCUIElement {
+        app.menuItems.matching(NSPredicate(format: "title == %@ AND enabled == true", title)).firstMatch
+    }
+
     private func eventually(timeout: TimeInterval = 5, _ condition: () -> Bool) -> Bool {
         let deadline = Date().addingTimeInterval(timeout)
         while Date() < deadline {
@@ -61,7 +69,9 @@ final class TychoViewsTests: XCTestCase {
         XCTAssertTrue(tokens.waitForExistence(timeout: 5))
         let handoffFirst = handoff.frame.minY < tokens.frame.minY
 
-        app.tables.firstMatch.buttons["Priority"].firstMatch.click()
+        element("table.grid").buttons["Priority"].firstMatch.coordinate(
+            withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)
+        ).click()
 
         XCTAssertTrue(eventually { (handoff.frame.minY < tokens.frame.minY) != handoffFirst })
     }
@@ -83,12 +93,12 @@ final class TychoViewsTests: XCTestCase {
         openSidebar("Calendar")
         let title = element("calendar.title")
         XCTAssertTrue(title.waitForExistence(timeout: 5))
-        let current = title.label
+        let current = text(of: title)
 
         element("calendar.next").click()
-        XCTAssertTrue(eventually { title.label != current })
+        XCTAssertTrue(eventually { text(of: title) != current })
         element("calendar.today").click()
-        XCTAssertTrue(eventually { title.label == current })
+        XCTAssertTrue(eventually { text(of: title) == current })
     }
 
     func testCalendarOpensTheDayList() {
@@ -111,13 +121,13 @@ final class TychoViewsTests: XCTestCase {
         let original = element("file.sitemap-v2.pdf")
         XCTAssertTrue(original.waitForExistence(timeout: 5))
         original.rightClick()
-        app.menuItems["Duplicate"].firstMatch.click()
+        contextMenuItem("Duplicate").click()
 
         let copy = element("file.sitemap-v2 copy.pdf")
         XCTAssertTrue(copy.waitForExistence(timeout: 5))
         copy.rightClick()
-        app.menuItems["Delete"].firstMatch.click()
-        let confirm = app.buttons["Delete file"].firstMatch
+        contextMenuItem("Delete").click()
+        let confirm = app.sheets.buttons["Delete file"].firstMatch
         XCTAssertTrue(confirm.waitForExistence(timeout: 5))
         confirm.click()
 

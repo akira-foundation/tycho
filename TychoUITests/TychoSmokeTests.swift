@@ -45,7 +45,13 @@ final class TychoSmokeTests: XCTestCase {
     func testInspectorCloseButtonDismissesThePanel() {
         app.buttons["onboarding.demo"].click()
         app.outlines.staticTexts["Website Redesign"].firstMatch.click()
-        app.descendants(matching: .any)["card.WEB-109"].click()
+        let backlog = app.descendants(matching: .any)["column.backlog"].firstMatch
+        XCTAssertTrue(backlog.waitForExistence(timeout: 5))
+        let firstCard = backlog.descendants(matching: .any).matching(
+            NSPredicate(format: "identifier BEGINSWITH 'card.' AND NOT identifier ENDSWITH '.toggle'")
+        ).firstMatch
+        XCTAssertTrue(firstCard.waitForExistence(timeout: 5))
+        firstCard.click()
 
         let title = app.textFields["inspector.title"].firstMatch
         XCTAssertTrue(title.waitForExistence(timeout: 5))
