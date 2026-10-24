@@ -41,7 +41,9 @@ struct FileThumbnail: View {
             decoded = nil
             return
         }
-        decoded = await ThumbnailDecoder.thumbnail(for: file.persistentModelID, container: context.container)
+        let image = await ThumbnailDecoder.thumbnail(forFileID: file.id, container: context.container)
+        guard !Task.isCancelled else { return }
+        decoded = image
     }
 }
 

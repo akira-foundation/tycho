@@ -6,7 +6,7 @@ import UniformTypeIdentifiers
 
 enum ThumbnailDecoder {
     static let defaultMaxPixelSize = 960
-    static let allowedTypes: [UTType] = [.png, .jpeg, .heic, .gif, .webP, .tiff]
+    static let allowedTypes: [UTType] = [.png, .jpeg, .heic, .heif, .gif, .webP, .tiff]
 
     static func decode(_ data: Data, maxPixelSize: Int = defaultMaxPixelSize, fileName: String? = nil) -> CGImage? {
         var sourceOptions: [CFString: Any] = [:]
@@ -29,10 +29,12 @@ enum ThumbnailDecoder {
         return allowedTypes.contains { type.conforms(to: $0) }
     }
 
-    static func thumbnail(for id: PersistentIdentifier, container: ModelContainer) async -> CGImage? {
+    static func thumbnail(forFileID fileID: UUID, container: ModelContainer) async -> CGImage? {
         await Task.detached(priority: .utility) {
             let context = ModelContext(container)
-            guard let file = context.model(for: id) as? FileRecord, file.kind == .img, file.hasData,
+            var descriptor = FetchDescriptor<FileRecord>(predicate: #Predicate { $0.id == fileID })
+            descriptor.fetchLimit = 1
+            guard let file = try? context.fetch(descriptor).first, file.kind == .img, file.hasData,
                 let data = file.data
             else { return nil }
             return decode(data, fileName: file.name)

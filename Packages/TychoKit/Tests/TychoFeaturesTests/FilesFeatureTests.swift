@@ -192,7 +192,7 @@ struct FilesFeatureTests {
         main.insert(record)
         try main.save()
 
-        let image = await ThumbnailDecoder.thumbnail(for: record.persistentModelID, container: container)
+        let image = await ThumbnailDecoder.thumbnail(forFileID: record.id, container: container)
 
         #expect(image != nil)
         let doc = FileRecord(name: "brief.pdf", byteCount: 10, uploadedAt: now)
@@ -200,7 +200,28 @@ struct FilesFeatureTests {
         doc.hasData = true
         main.insert(doc)
         try main.save()
-        let none = await ThumbnailDecoder.thumbnail(for: doc.persistentModelID, container: container)
+        let none = await ThumbnailDecoder.thumbnail(forFileID: doc.id, container: container)
         #expect(none == nil)
+    }
+
+    @Test func thumbnailOfADeletedFileIsNilWithoutCrashing() async throws {
+        let container = try TychoSchema.makeContainer(inMemory: true)
+        let main = container.mainContext
+        let record = FileRecord(name: "gone.png", byteCount: 10, uploadedAt: now)
+        record.data = encodedImage(.png)
+        record.hasData = true
+        main.insert(record)
+        try main.save()
+        let id = record.id
+        main.delete(record)
+        try main.save()
+
+        #expect(await ThumbnailDecoder.thumbnail(forFileID: id, container: container) == nil)
+        #expect(await ThumbnailDecoder.thumbnail(forFileID: UUID(), container: container) == nil)
+    }
+
+    @Test func heifIsAnAllowedType() {
+        #expect(ThumbnailDecoder.isAllowed(UTType.heif.identifier))
+        #expect(!ThumbnailDecoder.isAllowed(UTType.bmp.identifier))
     }
 }
