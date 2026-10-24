@@ -72,7 +72,10 @@ struct ProjectTabContent: View {
             BoardView(project: project)
         case .list:
             TaskListView(tasks: project.tasks ?? [], project: project)
-        case .table, .calendar, .timeline, .files:
+        case .table:
+            TaskTableView(
+                tasks: project.tasks ?? [], project: project, stateKey: TableViewStates.projectKey(project.id))
+        case .calendar, .timeline, .files:
             EmptyState(title: "Coming soon", symbol: "hammer", message: "This view is on its way.")
         }
     }
