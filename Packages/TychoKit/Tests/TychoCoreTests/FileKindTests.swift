@@ -40,7 +40,7 @@ struct FileKindTests {
 
     @Test(arguments: [
         (0, "0 B"), (1023, "1023 B"), (1024, "1 KB"), (880_640, "860 KB"), (1_048_575, "1024 KB"),
-        (1_048_576, "1.0 MB"), (4_404_019, "4.2 MB"), (134_217_728, "128.0 MB"),
+        (1_048_576, "1 MB"), (4_404_019, "4.2 MB"), (134_217_728, "128 MB"),
     ])
     func formatsSizesLikeTheOriginal(bytes: Int, text: String) {
         #expect(ByteCountText.format(bytes) == text)

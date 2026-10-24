@@ -80,7 +80,7 @@ struct ProjectTabContent: View {
         case .timeline:
             TimelineView(tasks: project.tasks ?? [], milestones: project.milestones ?? [], project: project)
         case .files:
-            EmptyState(title: "Coming soon", symbol: "hammer", message: "This view is on its way.")
+            FilesView(project: project)
         }
     }
 }
