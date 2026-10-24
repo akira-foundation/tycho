@@ -5,6 +5,7 @@ struct FileDropzone: View {
     let message: String
     let onBrowse: () -> Void
     let onDrop: ([URL]) -> Void
+    var identifier = "files.dropzone"
     @State private var targeted = false
 
     var body: some View {
@@ -34,6 +35,6 @@ struct FileDropzone: View {
         } isTargeted: {
             targeted = $0
         }
-        .accessibilityIdentifier("files.dropzone")
+        .accessibilityIdentifier(identifier)
     }
 }

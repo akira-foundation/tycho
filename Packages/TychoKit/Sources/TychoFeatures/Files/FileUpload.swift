@@ -4,7 +4,11 @@ import TychoCore
 
 @MainActor
 enum FileUpload {
-    static func perform(_ urls: [URL], project: Project, task: TaskItem?, context: ModelContext, toast: ToastCenter) {
+    static func perform(_ urls: [URL], project: Project?, task: TaskItem?, context: ModelContext, toast: ToastCenter) {
+        guard let project else {
+            toast.show("This task isn't in a project, so files can't be attached.")
+            return
+        }
         var uploaded: [String] = []
         var firstFailure: String?
         for url in urls {

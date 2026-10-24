@@ -2,7 +2,6 @@ import SwiftData
 import SwiftUI
 import TychoCore
 import TychoDesign
-import UniformTypeIdentifiers
 
 struct AttachmentsSection: View {
     @Environment(\.modelContext) private var context
@@ -25,24 +24,25 @@ struct AttachmentsSection: View {
             if !files.isEmpty {
                 LazyVGrid(columns: columns, spacing: Spacing.s2) {
                     ForEach(files) { file in
-                        AttachmentCard(file: file).onTapGesture { previewing = file }
+                        Button {
+                            previewing = file
+                        } label: {
+                            AttachmentCard(file: file)
+                        }
+                        .buttonStyle(.plain)
                     }
                 }
             }
-            FileDropzone(message: "Drop files or click to attach", onBrowse: { importing = true }, onDrop: upload)
+            FileDropzone(
+                message: "Drop files or click to attach", onBrowse: { importing = true }, onDrop: upload,
+                identifier: "inspector.attachments.dropzone")
         }
-        .fileImporter(isPresented: $importing, allowedContentTypes: [.item], allowsMultipleSelection: true) { result in
-            switch result {
-            case .success(let urls): upload(urls)
-            case .failure(let error): toast.report(error)
-            }
-        }
-        .sheet(item: $previewing) { FilePreviewSheet(file: $0) }
+        .fileUploader(isPresented: $importing, project: task.project, task: task)
+        .filePreview(item: $previewing)
     }
 
     private func upload(_ urls: [URL]) {
-        guard let project = task.project else { return }
-        FileUpload.perform(urls, project: project, task: task, context: context, toast: toast)
+        FileUpload.perform(urls, project: task.project, task: task, context: context, toast: toast)
     }
 }
 

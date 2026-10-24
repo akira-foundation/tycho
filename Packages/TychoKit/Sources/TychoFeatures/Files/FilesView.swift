@@ -2,7 +2,6 @@ import SwiftData
 import SwiftUI
 import TychoCore
 import TychoDesign
-import UniformTypeIdentifiers
 
 struct FilesView: View {
     @Environment(\.modelContext) private var context
@@ -34,13 +33,8 @@ struct FilesView: View {
             }
         }
         .background(Token.bg.color)
-        .fileImporter(isPresented: $importing, allowedContentTypes: [.item], allowsMultipleSelection: true) { result in
-            switch result {
-            case .success(let urls): upload(urls)
-            case .failure(let error): toast.report(error)
-            }
-        }
-        .sheet(item: $previewing) { FilePreviewSheet(file: $0) }
+        .fileUploader(isPresented: $importing, project: project)
+        .filePreview(item: $previewing)
         .alert("Rename file", isPresented: isRenaming) {
             TextField("File name", text: $renameText)
             Button("Rename", action: commitRename)

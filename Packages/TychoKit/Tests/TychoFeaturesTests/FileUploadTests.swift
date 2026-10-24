@@ -42,8 +42,13 @@ struct FileUploadTests {
     @Test func countsZeroWhenEveryFileInABatchFails() throws {
         let urls = [directory, directory.appending(path: "missing")]
         FileUpload.perform(urls, project: project, task: nil, context: context, toast: toast)
-        #expect(toast.message?.hasSuffix("(0 of 2 uploaded)") == true)
+        #expect(toast.message == "Only files can be uploaded. (0 of 2 uploaded)")
         #expect(project.files?.isEmpty != false)
+    }
+
+    @Test func tellsWhenTheTaskHasNoProject() throws {
+        FileUpload.perform([try write("a.png")], project: nil, task: nil, context: context, toast: toast)
+        #expect(toast.message == "This task isn't in a project, so files can't be attached.")
     }
 
     @Test func keepsTheSingleFileMessages() throws {
