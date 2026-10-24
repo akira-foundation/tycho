@@ -46,3 +46,16 @@ struct DateTextTests {
         #expect(format.ago(utcDate(2026, 10, 5, hour: 10)) == "Oct 5")
     }
 }
+
+struct DateTextDefaultCalendarTests {
+    @Test func defaultCalendarIsGregorianInTheCurrentTimeZone() {
+        let calendar = DateText.gregorian
+        #expect(calendar.identifier == .gregorian)
+        #expect(calendar.timeZone == TimeZone.current)
+    }
+
+    @Test func defaultInitRendersAnyDateWithoutIndexingOutOfRange() {
+        let text = DateText(format: .monthDay)
+        #expect(!text.long(Date(timeIntervalSince1970: 1_800_000_000)).isEmpty)
+    }
+}

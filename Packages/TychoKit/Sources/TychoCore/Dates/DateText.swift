@@ -14,7 +14,13 @@ public struct DateText: Sendable {
     private let now: Date
     private let calendar: Calendar
 
-    public init(format: DateFormatPreference = .monthDay, now: Date = .now, calendar: Calendar = .current) {
+    public static var gregorian: Calendar {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = .current
+        return calendar
+    }
+
+    public init(format: DateFormatPreference = .monthDay, now: Date = .now, calendar: Calendar = DateText.gregorian) {
         self.format = format
         self.now = now
         self.calendar = calendar

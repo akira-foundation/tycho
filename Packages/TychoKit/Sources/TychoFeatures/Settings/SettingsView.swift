@@ -11,6 +11,8 @@ public struct SettingsView: View {
     @AppStorage(AppearanceKey.accent) private var accent = Accent.indigo
     @AppStorage(AppearanceKey.density) private var density = Density.comfortable
     @AppStorage(AppearanceKey.motion) private var motion = MotionPreference.system
+    @AppStorage(AppearanceKey.weekStart) private var weekStart = WeekStart.monday
+    @AppStorage(AppearanceKey.dateFormat) private var dateFormat = DateFormatPreference.monthDay
     @State private var confirming: DataAction?
 
     enum DataAction: Identifiable {
@@ -37,6 +39,18 @@ public struct SettingsView: View {
                 Picker("Motion", selection: $motion) {
                     ForEach(MotionPreference.allCases) { Text($0.title).tag($0) }
                 }
+            }
+            Section {
+                Picker("Date format", selection: $dateFormat) {
+                    ForEach(DateFormatPreference.allCases) { Text($0.example).tag($0) }
+                }
+                Picker("Start week on", selection: $weekStart) {
+                    ForEach(WeekStart.allCases) { Text($0.title).tag($0) }
+                }
+            } header: {
+                Text("Date & time")
+            } footer: {
+                Text("Affects calendars and the timeline.")
             }
             Section("Data") {
                 Button("Restore demo data…") { confirming = .reloadDemo }
