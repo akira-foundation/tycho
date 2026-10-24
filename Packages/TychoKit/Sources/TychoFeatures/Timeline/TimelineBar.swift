@@ -13,7 +13,7 @@ struct TimelineBar: View {
     let start: Date
     let tint: Color
     let layout: TimelineLayout
-    @State private var drag: Double = 0
+    @GestureState private var drag: Double = 0
 
     static func showsTitleInside(width: Double) -> Bool { width > TimelineLayout.insideLabelWidth }
 
@@ -43,25 +43,44 @@ struct TimelineBar: View {
                     .foregroundStyle(Token.text2.color)
                     .fixedSize()
                     .offset(x: frame.width + 8)
+                    .allowsHitTesting(false)
             }
         }
         .opacity(task.status == .done ? 0.55 : 1)
         .offset(x: frame.x + Double(layout.dayOffset(forDrag: drag)) * layout.dayWidth)
         .help("\(task.title) · \(dateText.short(start)) → \(task.due.map(dateText.short) ?? "")")
         .onTapGesture { router.inspect(task.id) }
-        .gesture(
-            DragGesture(minimumDistance: 4)
-                .onChanged { drag = $0.translation.width }
-                .onEnded { finish($0.translation.width) }
-        )
+        .gesture(dragGesture)
         .contextMenu { TaskMenu(task: task) }
         .accessibilityElement(children: .combine)
         .accessibilityAddTraits(.isButton)
         .accessibilityIdentifier("timeline.bar.\(task.key)")
     }
 
+    private var barDrag: DragGesture {
+        DragGesture(minimumDistance: 4, coordinateSpace: .named(TimelineCanvas.coordinateSpace))
+    }
+
+    #if os(iOS)
+    private var dragGesture: some Gesture {
+        LongPressGesture(minimumDuration: 0.25)
+            .sequenced(before: barDrag)
+            .updating($drag) { value, state, _ in
+                if case .second(true, let drag?) = value { state = drag.translation.width }
+            }
+            .onEnded { value in
+                if case .second(true, let drag?) = value { finish(drag.translation.width) }
+            }
+    }
+    #else
+    private var dragGesture: some Gesture {
+        barDrag
+            .updating($drag) { value, state, _ in state = value.translation.width }
+            .onEnded { finish($0.translation.width) }
+    }
+    #endif
+
     private func finish(_ translation: Double) {
-        drag = 0
         let days = layout.dayOffset(forDrag: translation)
         var moved = false
         toast.perform { moved = try TaskActions(context: context).shift(task, byDays: days, calendar: layout.calendar) }

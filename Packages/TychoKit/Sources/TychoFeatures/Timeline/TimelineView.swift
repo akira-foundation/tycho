@@ -11,8 +11,7 @@ struct TimelineView: View {
     let tasks: [TaskItem]
     let milestones: [Milestone]
     let project: Project?
-    @State private var horizontal = ScrollPosition(edge: .leading)
-    @State private var vertical = ScrollPosition(edge: .top)
+    @State private var sync = TimelineScrollSync()
 
     var body: some View {
         let layout = makeLayout()
@@ -20,44 +19,20 @@ struct TimelineView: View {
         let rows = TimelineRows.build(
             tasks: tasks, grouping: grouping, milestoneCount: milestones.count, members: members, projects: projects)
         VStack(spacing: 0) {
-            TimelineControls(showsNewTask: project != nil) { horizontal.scrollTo(x: layout.initialScrollX) }
+            TimelineControls(showsNewTask: project != nil) { sync.scrollHorizontally(to: layout.initialScrollX) }
             Divider()
             if rows.isEmpty {
                 empty
             } else {
-                panes(rows: rows, layout: layout, grouping: grouping)
+                TimelinePanes(rows: rows, layout: layout, grouping: grouping, sync: sync)
             }
         }
         .background(Token.bg.color)
-        .onAppear { horizontal.scrollTo(x: layout.initialScrollX) }
-        .onChange(of: router.timelineZoom) { horizontal.scrollTo(x: makeLayout().initialScrollX) }
+        .onChange(of: router.timelineZoom) { sync.scrollHorizontally(to: makeLayout().initialScrollX) }
     }
 
     private func makeLayout() -> TimelineLayout {
         TimelineLayout(zoom: router.timelineZoom, today: .now, weekStart: weekStart, calendar: DateText.gregorian)
-    }
-
-    private func panes(rows: [TimelineRow], layout: TimelineLayout, grouping: TimelineGrouping) -> some View {
-        HStack(alignment: .top, spacing: 0) {
-            TimelineTaskPane(rows: rows, position: $vertical)
-                .frame(width: 280)
-            Divider()
-            ScrollView(.horizontal) {
-                VStack(alignment: .leading, spacing: 0) {
-                    TimelineHeader(layout: layout)
-                    Divider()
-                    ScrollView(.vertical) {
-                        TimelineCanvas(rows: rows, layout: layout, grouping: grouping)
-                    }
-                    .onScrollGeometryChange(for: CGFloat.self) { geometry in
-                        geometry.contentOffset.y
-                    } action: { _, offset in
-                        vertical.scrollTo(y: offset)
-                    }
-                }
-            }
-            .scrollPosition($horizontal)
-        }
     }
 
     private var empty: some View {

@@ -15,6 +15,7 @@ enum TimelineBarTint: Equatable {
 }
 
 struct TimelineCanvas: View {
+    static let coordinateSpace = "timeline.canvas"
     let rows: [TimelineRow]
     let layout: TimelineLayout
     let grouping: TimelineGrouping
@@ -33,7 +34,9 @@ struct TimelineCanvas: View {
             }
         }
         .frame(
-            width: layout.width, height: Double(rows.count) * TimelineLayout.rowHeight + 40, alignment: .topLeading)
+            width: layout.width, height: Double(rows.count) * TimelineLayout.rowHeight + 40, alignment: .topLeading
+        )
+        .coordinateSpace(.named(Self.coordinateSpace))
     }
 
     private func tint(for task: TaskItem) -> Color {
