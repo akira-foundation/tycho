@@ -42,6 +42,8 @@ struct FileCard: View {
         .onTapGesture(perform: actions.preview)
         .contextMenu { FileMenuItems(actions: actions) }
         .accessibilityElement(children: .contain)
+        .accessibilityAddTraits(.isButton)
+        .accessibilityAction(named: "Preview", actions.preview)
         .accessibilityIdentifier("file.\(file.name)")
     }
 }

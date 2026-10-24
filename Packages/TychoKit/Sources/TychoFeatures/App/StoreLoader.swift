@@ -44,6 +44,7 @@ public final class StoreLoader {
     }
 
     public func load() {
+        FileQuickLook.sweep()
         do {
             state = .ready(try factory())
         } catch {

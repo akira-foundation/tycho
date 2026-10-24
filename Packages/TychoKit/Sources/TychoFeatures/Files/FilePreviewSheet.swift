@@ -1,3 +1,4 @@
+import OSLog
 import QuickLook
 import SwiftUI
 import TychoCore
@@ -10,6 +11,7 @@ struct FilePreviewSheet: View {
     @Environment(\.dateText) private var dateText
     let file: FileRecord
     @State private var quickLookURL: URL?
+    private let logger = Logger(subsystem: "io.akira.tycho", category: "files")
 
     var body: some View {
         VStack(alignment: .leading, spacing: Spacing.s4) {
@@ -54,6 +56,11 @@ struct FilePreviewSheet: View {
         .padding(Spacing.s6)
         .frame(minWidth: 480)
         .quickLookPreview($quickLookURL)
+        .onChange(of: quickLookURL) { _, url in
+            if url == nil { FileQuickLook.cleanUp(file) }
+        }
+        .onDisappear { FileQuickLook.cleanUp(file) }
+        .toastOverlay(toast)
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("file.preview")
     }
@@ -62,7 +69,8 @@ struct FilePreviewSheet: View {
         do {
             quickLookURL = try FileQuickLook.temporaryURL(for: file)
         } catch {
-            toast.report(error)
+            logger.error("Quick Look failed: \(error.localizedDescription, privacy: .public)")
+            toast.show("Couldn't open preview.")
         }
     }
 }

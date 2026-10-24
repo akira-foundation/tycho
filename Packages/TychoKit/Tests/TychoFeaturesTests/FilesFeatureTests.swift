@@ -1,6 +1,8 @@
 import Foundation
+import ImageIO
 import SwiftData
 import Testing
+import UniformTypeIdentifiers
 
 @testable import TychoCore
 @testable import TychoFeatures
@@ -80,5 +82,59 @@ struct FilesFeatureTests {
         #expect(url.lastPathComponent == "brief.pdf")
         #expect(try Data(contentsOf: url) == Data("hello".utf8))
         try FileManager.default.removeItem(at: base)
+    }
+
+    @Test func cleanupRemovesOneCopyAndSweepRemovesAll() throws {
+        let first = file("a.pdf", minutesAgo: 1)
+        let second = file("b.pdf", minutesAgo: 2)
+        for record in [first, second] {
+            record.data = Data("x".utf8)
+            record.hasData = true
+        }
+        let base = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: base) }
+        let firstURL = try FileQuickLook.temporaryURL(for: first, in: base)
+        let secondURL = try FileQuickLook.temporaryURL(for: second, in: base)
+
+        FileQuickLook.cleanUp(first, in: base)
+        #expect(!FileManager.default.fileExists(atPath: firstURL.path(percentEncoded: false)))
+        #expect(FileManager.default.fileExists(atPath: secondURL.path(percentEncoded: false)))
+
+        FileQuickLook.sweep(in: base)
+        #expect(!FileManager.default.fileExists(atPath: secondURL.path(percentEncoded: false)))
+        #expect(
+            !FileManager.default.fileExists(atPath: base.appending(path: "tycho-files").path(percentEncoded: false)))
+    }
+
+    @Test(arguments: [".", "..", "", "a/b.pdf"])
+    func temporaryNamesAreSanitised(name: String) throws {
+        let record = file("x", minutesAgo: 1)
+        record.name = name
+        record.data = Data("x".utf8)
+        record.hasData = true
+        let base = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: base) }
+
+        let url = try FileQuickLook.temporaryURL(for: record, in: base)
+
+        #expect(url.lastPathComponent == (name == "a/b.pdf" ? "a-b.pdf" : "file"))
+        #expect(url.deletingLastPathComponent().lastPathComponent == record.id.uuidString)
+    }
+
+    @Test func thumbnailsAreDownscaledAndInvalidDataIsRejected() throws {
+        let side = 400
+        let space = CGColorSpaceCreateDeviceRGB()
+        let bitmap = CGContext(
+            data: nil, width: side, height: side, bitsPerComponent: 8, bytesPerRow: 0, space: space,
+            bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)!
+        let png = NSMutableData()
+        let destination = CGImageDestinationCreateWithData(png, UTType.png.identifier as CFString, 1, nil)!
+        CGImageDestinationAddImage(destination, bitmap.makeImage()!, nil)
+        CGImageDestinationFinalize(destination)
+
+        let thumbnail = try #require(ThumbnailDecoder.decode(png as Data, maxPixelSize: 100))
+
+        #expect(thumbnail.width == 100)
+        #expect(ThumbnailDecoder.decode(Data("nope".utf8), maxPixelSize: 100) == nil)
     }
 }

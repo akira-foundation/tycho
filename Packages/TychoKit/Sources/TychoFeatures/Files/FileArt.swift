@@ -4,13 +4,14 @@ import TychoDesign
 
 struct FileThumbnail: View {
     let file: FileRecord
+    @State private var decoded: CGImage?
 
     var body: some View {
-        let showsImage = file.kind == .img && file.hasData
+        let showsImage = decoded != nil
         ZStack(alignment: .bottomLeading) {
             Token.surface2.color
-            if showsImage, let image = PlatformImage.make(from: file.data) {
-                image.resizable().scaledToFill()
+            if let decoded {
+                Image(decorative: decoded, scale: 1).resizable().scaledToFill()
             } else {
                 FileArt(kind: file.kind)
             }
@@ -25,6 +26,15 @@ struct FileThumbnail: View {
             }
         }
         .clipped()
+        .task(id: file.id) { await decodeImage() }
+    }
+
+    private func decodeImage() async {
+        guard file.kind == .img, file.hasData, let data = file.data else {
+            decoded = nil
+            return
+        }
+        decoded = await ThumbnailDecoder.decodeOffMainActor(data)
     }
 }
 
