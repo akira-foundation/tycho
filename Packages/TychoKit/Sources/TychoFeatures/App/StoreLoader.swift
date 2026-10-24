@@ -35,8 +35,9 @@ public final class StoreLoader {
 
     static func removeStoreFiles(at storeURL: URL, fileManager: FileManager = .default) throws {
         let directory = storeURL.deletingLastPathComponent()
-        for suffix in ["", "-shm", "-wal"] {
-            let file = directory.appending(path: storeURL.lastPathComponent + suffix)
+        let name = storeURL.lastPathComponent
+        for sibling in [name, name + "-shm", name + "-wal", ".\(name)_SUPPORT"] {
+            let file = directory.appending(path: sibling)
             if fileManager.fileExists(atPath: file.path(percentEncoded: false)) {
                 try fileManager.removeItem(at: file)
             }

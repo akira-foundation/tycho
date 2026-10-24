@@ -98,4 +98,18 @@ struct StoreLoaderTests {
             #expect(!FileManager.default.fileExists(atPath: path))
         }
     }
+
+    @Test func removeStoreFilesAlsoDeletesTheSupportDirectory() throws {
+        let directory = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
+        let support = directory.appending(path: ".Tycho.store_SUPPORT").appending(path: "_EXTERNAL_DATA")
+        try FileManager.default.createDirectory(at: support, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        try Data("x".utf8).write(to: support.appending(path: "blob"))
+        try Data("x".utf8).write(to: directory.appending(path: "Other.store"))
+
+        try StoreLoader.removeStoreFiles(at: directory.appending(path: "Tycho.store"))
+
+        let remaining = try FileManager.default.contentsOfDirectory(atPath: directory.path(percentEncoded: false))
+        #expect(remaining == ["Other.store"])
+    }
 }
