@@ -55,6 +55,8 @@ struct CalendarDayCell: View {
             .foregroundStyle(numberColor)
             .frame(minWidth: 22, minHeight: 22)
             .background(cell.isToday ? Color.accentColor : Color.clear, in: Circle())
+            .accessibilityLabel(cell.isToday ? "Today, \(cell.day)" : "\(cell.day)")
+            .accessibilityAddTraits(cell.isToday ? .isSelected : [])
     }
 
     private var numberColor: Color {

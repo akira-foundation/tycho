@@ -70,4 +70,9 @@ struct CalendarFeatureTests {
         ]
         #expect(CalendarLegend.projects(in: tasks).map(\.key) == ["MOB", "WEB"])
     }
+
+    @Test func weekColumnsNameTheirWeekday() {
+        let cells = CalendarGrid.week(containing: now, weekStart: .sunday, today: now, calendar: utc)
+        #expect(cells.map(CalendarWeekView.weekdayName) == ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"])
+    }
 }

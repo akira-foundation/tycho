@@ -10,7 +10,8 @@ struct CalendarToolbar: View {
     let showsLegend: Bool
 
     var body: some View {
-        HStack(spacing: Spacing.s2) {
+        @Bindable var router = router
+        return HStack(spacing: Spacing.s2) {
             Button("Today") { router.calendarDate = .now }
                 .accessibilityIdentifier("calendar.today")
             HStack(spacing: 0) {
@@ -27,6 +28,13 @@ struct CalendarToolbar: View {
             if showsLegend {
                 CalendarLegend(tasks: tasks)
             }
+            Picker("Mode", selection: $router.calendarMode) {
+                ForEach(CalendarMode.allCases) { Text($0.title).tag($0) }
+            }
+            .pickerStyle(.segmented)
+            .labelsHidden()
+            .fixedSize()
+            .accessibilityIdentifier("calendar.mode")
             Button("New task", systemImage: "plus") { router.newTask() }
         }
         .buttonStyle(.borderless)
