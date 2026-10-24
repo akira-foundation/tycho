@@ -1,11 +1,13 @@
 import OSLog
 import QuickLook
+import SwiftData
 import SwiftUI
 import TychoCore
 import TychoDesign
 
 struct FilePreviewSheet: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.modelContext) private var context
     @Environment(Router.self) private var router
     @Environment(ToastCenter.self) private var toast
     @Environment(\.dateText) private var dateText
@@ -67,14 +69,18 @@ struct FilePreviewSheet: View {
     }
 
     private func openQuickLook() {
-        do {
-            removeCopy()
-            let url = try FileQuickLook.temporaryURL(for: file)
-            copyURL = url
-            quickLookURL = url
-        } catch {
-            logger.error("Quick Look failed: \(error.localizedDescription, privacy: .public)")
-            toast.show("Couldn't open preview.")
+        removeCopy()
+        let fileID = file.id
+        let container = context.container
+        Task {
+            do {
+                let url = try await FileQuickLook.temporaryURL(forFileID: fileID, container: container)
+                copyURL = url
+                quickLookURL = url
+            } catch {
+                logger.error("Quick Look failed: \(error.localizedDescription, privacy: .public)")
+                toast.show("Couldn't open preview.")
+            }
         }
     }
 

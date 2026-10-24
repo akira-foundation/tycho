@@ -1,4 +1,5 @@
 import Foundation
+import SwiftData
 import TychoCore
 
 enum FileQuickLook {
@@ -8,12 +9,24 @@ enum FileQuickLook {
 
     private static let directoryName = "tycho-files"
 
-    static func temporaryURL(for file: FileRecord, in base: URL = FileManager.default.temporaryDirectory) throws -> URL
-    {
-        guard file.hasData, let data = file.data else { throw MissingContent() }
+    static func temporaryURL(
+        forFileID fileID: UUID, container: ModelContainer, in base: URL = FileManager.default.temporaryDirectory
+    ) async throws -> URL {
+        try await Task.detached(priority: .userInitiated) {
+            let context = ModelContext(container)
+            var descriptor = FetchDescriptor<FileRecord>(predicate: #Predicate { $0.id == fileID })
+            descriptor.fetchLimit = 1
+            guard let file = try context.fetch(descriptor).first, file.hasData, let data = file.data else {
+                throw MissingContent()
+            }
+            return try write(data, named: file.name, in: base)
+        }.value
+    }
+
+    private static func write(_ data: Data, named name: String, in base: URL) throws -> URL {
         let directory = base.appending(path: directoryName).appending(path: UUID().uuidString)
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
-        let url = directory.appending(path: safeName(file.name))
+        let url = directory.appending(path: safeName(name))
         try data.write(to: url, options: .atomic)
         return url
     }

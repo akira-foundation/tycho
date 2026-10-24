@@ -9,15 +9,22 @@ import UniformTypeIdentifiers
 
 @MainActor
 struct FilesFeatureTests {
+    private let container: ModelContainer
     private let context: ModelContext
     private let utc: Calendar
     private let now = Date(timeIntervalSince1970: 1_791_892_800)
 
     init() throws {
-        context = ModelContext(try TychoSchema.makeContainer(inMemory: true))
+        container = try TychoSchema.makeContainer(inMemory: true)
+        context = ModelContext(container)
         var calendar = Calendar(identifier: .gregorian)
         calendar.timeZone = TimeZone(identifier: "UTC")!
         utc = calendar
+    }
+
+    private func quickLookURL(_ record: FileRecord, in base: URL) async throws -> URL {
+        try context.save()
+        return try await FileQuickLook.temporaryURL(forFileID: record.id, container: container, in: base)
     }
 
     private func file(_ name: String, minutesAgo: Double, by member: Member? = nil) -> FileRecord {
@@ -70,28 +77,28 @@ struct FilesFeatureTests {
         #expect(FileMessages.link(loose) == "tycho://file/\(loose.id.uuidString)")
     }
 
-    @Test func quickLookWritesATemporaryCopyOnlyWhenThereIsContent() throws {
+    @Test func quickLookWritesATemporaryCopyOnlyWhenThereIsContent() async throws {
         let record = file("brief.pdf", minutesAgo: 1)
         let base = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
-        #expect(throws: FileQuickLook.MissingContent.self) { try FileQuickLook.temporaryURL(for: record, in: base) }
+        await #expect(throws: FileQuickLook.MissingContent.self) { try await quickLookURL(record, in: base) }
 
         record.data = Data("hello".utf8)
         record.hasData = true
-        let url = try FileQuickLook.temporaryURL(for: record, in: base)
+        let url = try await quickLookURL(record, in: base)
 
         #expect(url.lastPathComponent == "brief.pdf")
         #expect(try Data(contentsOf: url) == Data("hello".utf8))
         try FileManager.default.removeItem(at: base)
     }
 
-    @Test func cleanupRemovesOnePresentationCopyAndSweepRemovesAll() throws {
+    @Test func cleanupRemovesOnePresentationCopyAndSweepRemovesAll() async throws {
         let record = file("a.pdf", minutesAgo: 1)
         record.data = Data("x".utf8)
         record.hasData = true
         let base = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
         defer { try? FileManager.default.removeItem(at: base) }
-        let firstURL = try FileQuickLook.temporaryURL(for: record, in: base)
-        let secondURL = try FileQuickLook.temporaryURL(for: record, in: base)
+        let firstURL = try await quickLookURL(record, in: base)
+        let secondURL = try await quickLookURL(record, in: base)
         #expect(firstURL.deletingLastPathComponent() != secondURL.deletingLastPathComponent())
 
         FileQuickLook.cleanUp(firstURL)
@@ -116,8 +123,8 @@ struct FilesFeatureTests {
         #expect(FileManager.default.fileExists(atPath: url.path(percentEncoded: false)))
     }
 
-    @Test(arguments: [".", "..", "", "a/b.pdf", "nu\u{0}ll.txt"])
-    func temporaryNamesAreSanitised(name: String) throws {
+    @Test(arguments: [".", "..", "", "a/b.pdf"])
+    func temporaryNamesAreSanitised(name: String) async throws {
         let record = file("x", minutesAgo: 1)
         record.name = name
         record.data = Data("x".utf8)
@@ -125,13 +132,17 @@ struct FilesFeatureTests {
         let base = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
         defer { try? FileManager.default.removeItem(at: base) }
 
-        let url = try FileQuickLook.temporaryURL(for: record, in: base)
+        let url = try await quickLookURL(record, in: base)
 
-        let expected = ["a/b.pdf": "a-b.pdf", "nu\u{0}ll.txt": "null.txt"][name] ?? "file"
+        let expected = name == "a/b.pdf" ? "a-b.pdf" : "file"
         #expect(url.lastPathComponent == expected)
     }
 
-    @Test func longNamesAreTruncatedKeepingTheExtension() throws {
+    @Test func nulBytesAreStrippedFromTemporaryNames() {
+        #expect(FileQuickLook.safeName("nu\u{0}ll.txt") == "null.txt")
+    }
+
+    @Test func longNamesAreTruncatedKeepingTheExtension() async throws {
         let long = String(repeating: "é", count: 200) + ".pdf"
         let safe = FileQuickLook.safeName(long)
         #expect(safe.utf8.count <= FileQuickLook.maxNameByteCount)
@@ -144,7 +155,7 @@ struct FilesFeatureTests {
         record.hasData = true
         let base = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
         defer { try? FileManager.default.removeItem(at: base) }
-        let url = try FileQuickLook.temporaryURL(for: record, in: base)
+        let url = try await quickLookURL(record, in: base)
         #expect(try Data(contentsOf: url) == Data("x".utf8))
         #expect(FileQuickLook.safeName("short.txt") == "short.txt")
         #expect(FileQuickLook.safeName(String(repeating: "a", count: 300)).utf8.count == 255)
