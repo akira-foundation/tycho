@@ -78,13 +78,17 @@ struct NewProjectSheet: View {
                     Toggle("Start date", isOn: $hasStart)
                     if hasStart {
                         DatePicker(
-                            "Start", selection: Binding(get: { draft.start ?? .now }, set: { draft.start = $0 }),
+                            "Start",
+                            selection: Binding(
+                                get: { draft.start ?? .now }, set: { draft.start = DatePill.normalized($0) }),
                             displayedComponents: .date)
                     }
                     Toggle("Due date", isOn: $hasDue)
                     if hasDue {
                         DatePicker(
-                            "Due", selection: Binding(get: { draft.due ?? .now }, set: { draft.due = $0 }),
+                            "Due",
+                            selection: Binding(
+                                get: { draft.due ?? .now }, set: { draft.due = DatePill.normalized($0) }),
                             displayedComponents: .date)
                     }
                 }
