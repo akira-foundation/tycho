@@ -13,6 +13,7 @@ extension ValidationError {
         case .dependencyOnSelf: "A task can't depend on itself."
         case .dependencyAcrossProjects: "Dependencies must be in the same project."
         case .dependencyCycle: "These tasks would block each other."
+        case .fileTooLarge: "Files can be up to 250 MB each."
         }
     }
 }

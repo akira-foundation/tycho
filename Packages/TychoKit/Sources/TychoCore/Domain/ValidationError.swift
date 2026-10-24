@@ -6,4 +6,5 @@ public enum ValidationError: Error, Equatable, Sendable {
     case dependencyOnSelf
     case dependencyAcrossProjects
     case dependencyCycle
+    case fileTooLarge
 }
