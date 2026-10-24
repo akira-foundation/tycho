@@ -4,7 +4,8 @@ import TychoCore
 import TychoDesign
 
 struct TaskTableView: View {
-    @Environment(Router.self) private var router
+    @Environment(Router.self) var router
+    @Environment(ToastCenter.self) var toast
     @AppStorage(TableViewStates.storageKey) private var stored = Data()
     @Query(sort: \Member.name) var members: [Member]
     @Query private var projects: [Project]

@@ -2,42 +2,46 @@ import SwiftUI
 import TychoCore
 
 extension TaskTableView {
+    func cell<Content: View>(_ content: Content) -> some View {
+        content.environment(toast).environment(router)
+    }
+
     @TableColumnBuilder<TaskItem, TaskComparator>
     var columns: some TableColumnContent<TaskItem, TaskComparator> {
         Group {
-            TableColumn("Task", sortUsing: TaskComparator(field: .title)) { TitleCell(task: $0) }
+            TableColumn("Task", sortUsing: TaskComparator(field: .title)) { cell(TitleCell(task: $0)) }
                 .width(min: CGFloat(TableColumnID.minimumWidth), ideal: CGFloat(TableColumnID.title.defaultWidth))
                 .customizationID(TableColumnID.title.rawValue)
                 .disabledCustomizationBehavior([.visibility, .reorder])
-            TableColumn("Status", sortUsing: TaskComparator(field: .status)) { StatusCell(task: $0) }
+            TableColumn("Status", sortUsing: TaskComparator(field: .status)) { cell(StatusCell(task: $0)) }
                 .tychoColumn(.status)
-            TableColumn("Priority", sortUsing: TaskComparator(field: .priority)) { PriorityCell(task: $0) }
+            TableColumn("Priority", sortUsing: TaskComparator(field: .priority)) { cell(PriorityCell(task: $0)) }
                 .tychoColumn(.priority)
             TableColumn("Assignee", sortUsing: TaskComparator(field: .assignee)) {
-                AssigneeCell(task: $0, members: members)
+                cell(AssigneeCell(task: $0, members: members))
             }
             .tychoColumn(.assignee)
             TableColumn("Due date", sortUsing: TaskComparator(field: .due)) {
-                DateCell(task: $0, keyPath: \.due, highlightsOverdue: true)
+                cell(DateCell(task: $0, keyPath: \.due, highlightsOverdue: true))
             }
             .tychoColumn(.due)
             TableColumn("Start date", sortUsing: TaskComparator(field: .start)) {
-                DateCell(task: $0, keyPath: \.start, highlightsOverdue: false)
+                cell(DateCell(task: $0, keyPath: \.start, highlightsOverdue: false))
             }
             .tychoColumn(.start)
         }
         Group {
-            TableColumn("Labels", sortUsing: TaskComparator(field: .manual)) { LabelsCell(task: $0) }
+            TableColumn("Labels", sortUsing: TaskComparator(field: .manual)) { cell(LabelsCell(task: $0)) }
                 .tychoColumn(.labels)
             TableColumn("Dependencies", sortUsing: TaskComparator(field: .manual)) {
-                DependencyPicker(task: $0, showsTitles: false, emptyText: "—")
+                cell(DependencyPicker(task: $0, showsTitles: false, emptyText: "—"))
             }
             .tychoColumn(.deps)
-            TableColumn("Estimate", sortUsing: TaskComparator(field: .estimate)) { EstimateCell(task: $0) }
+            TableColumn("Estimate", sortUsing: TaskComparator(field: .estimate)) { cell(EstimateCell(task: $0)) }
                 .tychoColumn(.estimate)
-            TableColumn("Created", sortUsing: TaskComparator(field: .created)) { CreatedCell(task: $0) }
+            TableColumn("Created", sortUsing: TaskComparator(field: .created)) { cell(CreatedCell(task: $0)) }
                 .tychoColumn(.created)
-            TableColumn("Project", sortUsing: TaskComparator(field: .project)) { ProjectCell(task: $0) }
+            TableColumn("Project", sortUsing: TaskComparator(field: .project)) { cell(ProjectCell(task: $0)) }
                 .tychoColumn(.project)
         }
     }
