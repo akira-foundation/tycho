@@ -1,0 +1,44 @@
+import Foundation
+import SwiftData
+import Testing
+
+@testable import TychoCore
+
+@MainActor
+struct CalendarDayTests {
+    @Test func eventsComeFirstThenTasksDueThatDay() throws {
+        let context = try makeTestContext()
+        let project = Project(key: "WEB", name: "Website")
+        context.insert(project)
+        let late = TaskItem(number: 1, title: "Late")
+        let early = TaskItem(number: 2, title: "Early")
+        let other = TaskItem(number: 3, title: "Other day")
+        let undated = TaskItem(number: 4, title: "Undated")
+        for (offset, task) in [late, early, other, undated].enumerated() {
+            context.insert(task)
+            task.project = project
+            task.sortOrder = Double(offset)
+        }
+        late.due = day(1, hour: 23)
+        early.due = day(1)
+        early.sortOrder = -1
+        other.due = day(2)
+        let review = CalendarEvent(title: "Review", date: day(1), time: "14:00")
+        let standup = CalendarEvent(title: "Standup", date: day(1), time: "09:30")
+        let retro = CalendarEvent(title: "Retro", date: day(2), time: "16:00")
+
+        let items = CalendarDay.items(
+            on: day(1, hour: 0), events: [review, standup, retro], tasks: [late, early, other, undated],
+            calendar: utcCalendar)
+
+        #expect(items.map(\.id) == [standup.id, review.id, early.id, late.id])
+    }
+
+    @Test func chipsShowThreeAndCountTheRest() {
+        let events = (0..<5).map { CalendarEvent(title: "E\($0)", date: day(1), time: "10:0\($0)") }
+        let chips = CalendarDay.chips(for: events.map(CalendarItem.event))
+        #expect(chips.shown.map(\.id) == events.prefix(3).map(\.id))
+        #expect(chips.overflow == 2)
+        #expect(CalendarDay.chips(for: events.prefix(2).map(CalendarItem.event)).overflow == 0)
+    }
+}
