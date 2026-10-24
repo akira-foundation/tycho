@@ -30,6 +30,8 @@ struct TaskInspectorView: View {
                     NotesEditor(task: task)
                     Divider()
                     SubtaskList(task: task)
+                    Divider()
+                    AttachmentsSection(task: task)
                 }
                 .padding(Spacing.s5)
             }

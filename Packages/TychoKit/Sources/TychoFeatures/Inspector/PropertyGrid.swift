@@ -52,6 +52,7 @@ struct PropertyGrid: View {
             row("Start") { dateField("Start", \.start) }
             row("Due") { dateField("Due", \.due) }
             row("Labels") { labelsMenu }
+            row("Blocked by") { DependencyPicker(task: task, showsTitles: true, emptyText: "None") }
             row("Estimate") {
                 TextField("e.g. 2d", text: $estimate)
                     .textFieldStyle(.plain)
