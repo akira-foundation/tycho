@@ -16,8 +16,8 @@ struct WorkspaceCalendarView: View {
             }
             Divider()
             CalendarView(
-                tasks: tasks.filter { $0.project?.isArchived == false },
-                events: events.filter { $0.project?.isArchived == false },
+                tasks: tasks.inLiveProjects(),
+                events: events.inLiveProjects(),
                 project: nil)
         }
         .navigationTitle("Calendar")

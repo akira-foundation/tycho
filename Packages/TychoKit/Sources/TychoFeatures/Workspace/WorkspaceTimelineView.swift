@@ -13,8 +13,8 @@ struct WorkspaceTimelineView: View {
             PageHeader(title: "Timeline", subtitle: "Schedules, dependencies, and milestones across projects.") {}
             Divider()
             TimelineView(
-                tasks: tasks.filter { $0.project?.isArchived == false },
-                milestones: milestones.filter { $0.project?.isArchived == false },
+                tasks: tasks.inLiveProjects(),
+                milestones: milestones.inLiveProjects(),
                 project: nil)
         }
         .navigationTitle("Timeline")

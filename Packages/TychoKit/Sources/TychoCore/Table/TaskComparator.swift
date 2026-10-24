@@ -48,8 +48,7 @@ public struct TaskComparator: SortComparator, Codable, Hashable, Sendable {
     }
 
     private static func estimateKey(_ task: TaskItem) -> String {
-        let text = task.estimate?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-        return text.isEmpty ? "zzz" : text
+        Estimate.normalized(task.estimate) ?? "zzz"
     }
 
     private static func manual(_ lhs: TaskItem, _ rhs: TaskItem) -> ComparisonResult {

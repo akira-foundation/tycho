@@ -106,8 +106,7 @@ struct PropertyGrid: View {
 
     private func commitEstimate() {
         guard !task.isDeleted, task.modelContext != nil else { return }
-        let trimmed = estimate.trimmingCharacters(in: .whitespaces)
-        let value = trimmed.isEmpty ? nil : trimmed
+        let value = Estimate.normalized(estimate)
         guard value != task.estimate else { return }
         edit { $0.estimate = value }
     }

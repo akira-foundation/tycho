@@ -36,7 +36,7 @@ struct TasksView: View {
     @AppStorage("tasks.mode") private var mode = TasksMode.list
 
     var body: some View {
-        let visible = tasks.filter { $0.project?.isArchived == false }
+        let visible = tasks.inLiveProjects()
         VStack(spacing: 0) {
             PageHeader(title: "Tasks", subtitle: TasksMode.subtitle(projectCount: projects.count)) {
                 Picker("View", selection: $mode) {

@@ -5,11 +5,6 @@ import TychoDesign
 
 enum EstimateOptions {
     static let quick = ["30m", "1h", "2h", "4h", "1d", "2d", "3d", "5d", "8d"]
-
-    static func normalized(_ raw: String) -> String? {
-        let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines)
-        return trimmed.isEmpty ? nil : trimmed
-    }
 }
 
 struct DateCell: View {
@@ -119,7 +114,7 @@ struct EstimateCell: View {
     private func commit() {
         guard editing else { return }
         editing = false
-        set(EstimateOptions.normalized(text))
+        set(Estimate.normalized(text))
     }
 
     private func set(_ value: String?) {

@@ -12,8 +12,8 @@ struct DayListPopover: View {
 
     var body: some View {
         let items = CalendarDay.items(
-            on: day, events: events.filter { $0.project?.isArchived == false },
-            tasks: tasks.filter { $0.project?.isArchived == false }, calendar: DateText.gregorian)
+            on: day, events: events.inLiveProjects(),
+            tasks: tasks.inLiveProjects(), calendar: DateText.gregorian)
         VStack(alignment: .leading, spacing: Spacing.s1) {
             Text(dateText.long(day)).tychoFont(.xs, weight: .semibold).foregroundStyle(Token.text3.color)
             ForEach(items) { row($0) }
