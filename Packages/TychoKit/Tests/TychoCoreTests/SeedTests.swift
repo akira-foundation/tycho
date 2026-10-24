@@ -26,6 +26,24 @@ struct SeedTests {
         #expect((workspace.members ?? []).filter(\.isMe).count == 1)
     }
 
+    @Test func demoSeedNamesTheMemberAfterTheTypedOwner() throws {
+        let context = try makeTestContext()
+        let workspace = try DemoSeed.load(
+            into: context, now: referenceNow, calendar: utcCalendar, ownerName: "  Ilda Tavares  ")
+
+        let me = try #require(workspace.me)
+        #expect(me.name == "Ilda Tavares")
+        #expect(me.initials == "IT")
+        #expect(!(workspace.members ?? []).contains { $0.name == "Tanjim Islam" })
+    }
+
+    @Test func demoSeedKeepsTheSeedNameForABlankOwner() throws {
+        let context = try makeTestContext()
+        let workspace = try DemoSeed.load(into: context, now: referenceNow, calendar: utcCalendar, ownerName: "  ")
+
+        #expect(try #require(workspace.me).name == "Tanjim Islam")
+    }
+
     @Test func demoTasksCarryKeysDatesAndCompletion() throws {
         let context = try makeTestContext()
         let workspace = try DemoSeed.load(into: context, now: referenceNow, calendar: utcCalendar)

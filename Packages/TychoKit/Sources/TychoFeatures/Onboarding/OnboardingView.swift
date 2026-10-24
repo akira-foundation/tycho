@@ -39,7 +39,7 @@ struct OnboardingView: View {
                 .disabled(name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 .accessibilityIdentifier("onboarding.empty")
                 Button("Load demo") {
-                    toast.perform { try DemoSeed.load(into: context, now: .now, calendar: .current) }
+                    toast.perform { try DemoSeed.load(into: context, now: .now, calendar: .current, ownerName: name) }
                 }
                 .buttonStyle(.tycho(.secondary, size: .lg))
                 .accessibilityIdentifier("onboarding.demo")
