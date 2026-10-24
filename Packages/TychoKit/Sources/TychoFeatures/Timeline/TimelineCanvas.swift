@@ -19,10 +19,13 @@ struct TimelineCanvas: View {
     let rows: [TimelineRow]
     let layout: TimelineLayout
     let grouping: TimelineGrouping
+    let pins: [MilestonePin]
+    let curves: [DependencyCurve]
 
     var body: some View {
         ZStack(alignment: .topLeading) {
             TimelineBackdrop(rows: rows, layout: layout)
+            TimelineMilestones(pins: pins)
             ForEach(Array(rows.enumerated()), id: \.element.id) { index, row in
                 if case .task(let task) = row, let due = task.due {
                     TimelineBar(
@@ -32,6 +35,7 @@ struct TimelineCanvas: View {
                     .offset(y: Double(index) * TimelineLayout.rowHeight + 7)
                 }
             }
+            TimelineDependencies(curves: curves)
         }
         .frame(
             width: layout.width, height: Double(rows.count) * TimelineLayout.rowHeight + 40, alignment: .topLeading

@@ -6,6 +6,7 @@ import TychoDesign
 struct TimelineView: View {
     @Environment(Router.self) private var router
     @Environment(\.weekStart) private var weekStart
+    @Environment(\.dateText) private var dateText
     @Query(filter: #Predicate<Project> { !$0.isArchived }, sort: \Project.sortOrder) private var projects: [Project]
     @Query(sort: \Member.name) private var members: [Member]
     let tasks: [TaskItem]
@@ -24,7 +25,12 @@ struct TimelineView: View {
             if rows.isEmpty {
                 empty
             } else {
-                TimelinePanes(rows: rows, layout: layout, grouping: grouping, sync: sync)
+                TimelinePanes(
+                    rows: rows, layout: layout, grouping: grouping,
+                    pins: MilestoneLane.pins(
+                        for: MilestoneMark.marks(from: milestones, includeProject: project == nil),
+                        layout: layout, dateText: dateText),
+                    curves: DependencyPath.curves(rows: rows, layout: layout), sync: sync)
             }
         }
         .background(Token.bg.color)

@@ -1,9 +1,14 @@
+import CoreGraphics
 import Testing
 
 @testable import TychoCore
 @testable import TychoFeatures
 
 struct TimelineFeatureTests {
+    @Test func timelinePointsBecomeCanvasPoints() {
+        #expect(TimelinePoint(x: 3, y: 4.5).point == CGPoint(x: 3, y: 4.5))
+    }
+
     @Test func barsUseTheProjectColorOnlyWhenGroupedByStatusOrNothing() {
         #expect(TimelineBarTint.source(for: .status) == .project)
         #expect(TimelineBarTint.source(for: .none) == .project)

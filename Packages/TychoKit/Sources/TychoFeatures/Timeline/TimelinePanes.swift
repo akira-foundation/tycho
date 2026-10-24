@@ -15,6 +15,8 @@ struct TimelinePanes: View {
     let rows: [TimelineRow]
     let layout: TimelineLayout
     let grouping: TimelineGrouping
+    let pins: [MilestonePin]
+    let curves: [DependencyCurve]
     let sync: TimelineScrollSync
 
     var body: some View {
@@ -28,7 +30,7 @@ struct TimelinePanes: View {
                     TimelineHeader(layout: layout)
                     Divider()
                     ScrollView(.vertical) {
-                        TimelineCanvas(rows: rows, layout: layout, grouping: grouping)
+                        TimelineCanvas(rows: rows, layout: layout, grouping: grouping, pins: pins, curves: curves)
                     }
                     .onScrollGeometryChange(for: CGFloat.self) { geometry in
                         geometry.contentOffset.y
