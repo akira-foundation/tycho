@@ -28,8 +28,13 @@ struct CalendarToolbar: View {
             if showsLegend {
                 CalendarLegend(tasks: tasks)
             }
-            TychoSegmented(selection: $router.calendarMode, options: CalendarMode.allCases) { Text($0.title) }
-                .accessibilityIdentifier("calendar.mode")
+            Picker("Mode", selection: $router.calendarMode) {
+                ForEach(CalendarMode.allCases) { Text($0.title).tag($0) }
+            }
+            .pickerStyle(.segmented)
+            .labelsHidden()
+            .fixedSize()
+            .accessibilityIdentifier("calendar.mode")
         }
         .buttonStyle(.borderless)
         .padding(.horizontal, Spacing.s4)

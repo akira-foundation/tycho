@@ -10,8 +10,13 @@ struct TimelineControls: View {
     var body: some View {
         @Bindable var router = router
         HStack(spacing: Spacing.s2) {
-            TychoSegmented(selection: $router.timelineZoom, options: TimelineZoom.allCases) { Text($0.title) }
-                .accessibilityIdentifier("timeline.zoom")
+            Picker("Zoom", selection: $router.timelineZoom) {
+                ForEach(TimelineZoom.allCases) { Text($0.title).tag($0) }
+            }
+            .pickerStyle(.segmented)
+            .labelsHidden()
+            .fixedSize()
+            .accessibilityIdentifier("timeline.zoom")
             Picker("Group by", selection: $router.timelineGrouping) {
                 ForEach(TimelineGrouping.allCases) { Text($0.title).tag($0) }
             }

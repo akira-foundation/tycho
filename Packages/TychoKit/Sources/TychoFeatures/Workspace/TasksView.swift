@@ -39,9 +39,12 @@ struct TasksView: View {
         let visible = tasks.inLiveProjects()
         VStack(spacing: 0) {
             PageHeader(title: "Tasks", subtitle: TasksMode.subtitle(projectCount: projects.count)) {
-                TychoSegmented(selection: $mode, options: TasksMode.allCases) {
-                    Label($0.title, systemImage: $0.symbol)
+                Picker("View", selection: $mode) {
+                    ForEach(TasksMode.allCases) { Label($0.title, systemImage: $0.symbol).tag($0) }
                 }
+                .pickerStyle(.segmented)
+                .labelsHidden()
+                .fixedSize()
                 .accessibilityIdentifier("tasks.mode")
                 Button("New task", systemImage: "plus") { router.newTask() }
                     .buttonStyle(.tycho(.primary))

@@ -25,10 +25,10 @@ struct ProjectDetailView: View {
             .navigationTitle(project.name)
             .toolbar {
                 ToolbarItem {
-                    TychoSegmented(
-                        selection: Binding(get: { tab }, set: { router.openProject(project.id, tab: $0) }),
-                        options: ProjectTab.allCases
-                    ) { Text($0.title) }
+                    Picker("View", selection: Binding(get: { tab }, set: { router.openProject(project.id, tab: $0) })) {
+                        ForEach(ProjectTab.allCases, id: \.self) { Text($0.title).tag($0) }
+                    }
+                    .pickerStyle(.segmented)
                     .accessibilityIdentifier("project.tab")
                 }
                 ToolbarItem { Button("Edit Project", systemImage: "slider.horizontal.3") { editing = true } }

@@ -62,9 +62,10 @@ struct ProjectsView: View {
                 }
             }
             ToolbarItem {
-                TychoSegmented(selection: $layout, options: ProjectLayout.allCases) {
-                    Image(systemName: $0.symbol).accessibilityLabel($0.rawValue)
+                Picker("Layout", selection: $layout) {
+                    ForEach(ProjectLayout.allCases) { Image(systemName: $0.symbol).tag($0) }
                 }
+                .pickerStyle(.segmented)
             }
             ToolbarItem { Button("New Project", systemImage: "plus") { router.newProject() } }
         }
