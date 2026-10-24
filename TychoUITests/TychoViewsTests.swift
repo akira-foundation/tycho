@@ -10,7 +10,9 @@ final class TychoViewsTests: XCTestCase {
         app = XCUIApplication()
         app.launchArguments = ["-uiTesting"]
         app.launch()
-        app.buttons["onboarding.demo"].click()
+        let demo = app.buttons["onboarding.demo"]
+        XCTAssertTrue(demo.waitForExistence(timeout: 10))
+        demo.click()
     }
 
     private func element(_ identifier: String) -> XCUIElement {
@@ -56,6 +58,7 @@ final class TychoViewsTests: XCTestCase {
         let handoff = element("table.title.WEB-124")
         let tokens = element("table.title.WEB-118")
         XCTAssertTrue(handoff.waitForExistence(timeout: 5))
+        XCTAssertTrue(tokens.waitForExistence(timeout: 5))
         let handoffFirst = handoff.frame.minY < tokens.frame.minY
 
         app.tables.firstMatch.buttons["Priority"].firstMatch.click()

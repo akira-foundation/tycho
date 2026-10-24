@@ -35,7 +35,7 @@ Na Fase 2 entraram as dependências entre tarefas (`TaskItem.blockedBy`, muitos-
 
 ## Fluxo das ações
 
-As mutações passam pelas ações do `TychoCore` (`ProjectActions`, `TaskActions`, `SubtaskActions`), que recebem um `ModelContext` e um relógio injetado. Cada ação valida, muta e atualiza `updatedAt`. As vistas leem com `@Query` e nunca escrevem diretamente, exceto bindings simples do inspector, que também passam por `TaskActions.update`.
+As mutações passam pelas ações do `TychoCore` (`ProjectActions`, `TaskActions`, `SubtaskActions`, `DependencyActions`, `FileActions`), que recebem um `ModelContext` e um relógio injetado. Cada ação valida, muta e atualiza `updatedAt`. A ordenação da tabela vive em `TableSort`, também no `TychoCore`. As vistas leem com `@Query` e nunca escrevem diretamente, exceto bindings simples do inspector, que também passam por `TaskActions.update`.
 
 - A ordem usa `Rank` (`Rank.swift`): `Rank.between` devolve o ponto médio entre dois vizinhos, `Rank.insert` posiciona um item entre irmãos e `Rank.appendOrder` calcula a ordem do fim do grupo. Quando o intervalo fica abaixo de `Rank.epsilon`, `Rank.insert` renormaliza o grupo em múltiplos de `Rank.step`.
 - A lógica derivada é feita de funções puras: `Project.progress`, `TaskItem.progress`, `TaskItem.isOverdue(now:)` e `HomeSummary(now:)`.
