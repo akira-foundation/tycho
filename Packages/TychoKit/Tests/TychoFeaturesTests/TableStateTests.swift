@@ -30,10 +30,10 @@ struct TableStateTests {
         #expect(state.sort == [TaskComparator(field: .priority)])
     }
 
-    @Test func aCorruptEntryDoesNotDiscardTheValidOnes() {
+    @Test func aCorruptEntryDoesNotDiscardTheValidOnes() throws {
         var valid = TableViewState(inProject: false)
         valid.sort = [TaskComparator(field: .due, order: .reverse)]
-        let good = String(decoding: try! JSONEncoder().encode(valid), as: UTF8.self)
+        let good = try #require(String(bytes: JSONEncoder().encode(valid), encoding: .utf8))
         let data = Data(#"{"tasks":\#(good),"p:bad":{"hidden":42},"p:worse":"nope"}"#.utf8)
 
         #expect(TableViewStates.state(for: "tasks", inProject: false, in: data) == valid)
@@ -41,7 +41,7 @@ struct TableStateTests {
     }
 
     @Test func anUnknownSortFieldIsDroppedAndKeepsTheRest() throws {
-        let known = String(decoding: try JSONEncoder().encode(TaskComparator(field: .due)), as: UTF8.self)
+        let known = try #require(String(bytes: JSONEncoder().encode(TaskComparator(field: .due)), encoding: .utf8))
         let unknown = known.replacingOccurrences(of: "\"due\"", with: "\"nonsense\"")
         let data = Data(#"{"tasks":{"hidden":["labels"],"sort":[\#(unknown),\#(known)]}}"#.utf8)
 
