@@ -1,0 +1,53 @@
+import Foundation
+
+public struct DateText: Sendable {
+    public static let monthNames = [
+        "January", "February", "March", "April", "May", "June", "July", "August", "September", "October",
+        "November", "December",
+    ]
+    public static let shortMonthNames = [
+        "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+    ]
+    public static let weekdayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+
+    public let format: DateFormatPreference
+    private let now: Date
+    private let calendar: Calendar
+
+    public init(format: DateFormatPreference = .monthDay, now: Date = .now, calendar: Calendar = .current) {
+        self.format = format
+        self.now = now
+        self.calendar = calendar
+    }
+
+    public func short(_ date: Date) -> String { render(date, long: false) }
+
+    public func long(_ date: Date) -> String { render(date, long: true) }
+
+    public func ago(_ date: Date) -> String {
+        let minutes = Int((now.timeIntervalSince(date) / 60).rounded())
+        let hours = Int((Double(minutes) / 60).rounded())
+        let days = Int((Double(hours) / 24).rounded())
+        switch (minutes, hours, days) {
+        case (..<1, _, _): return "just now"
+        case (..<60, _, _): return "\(minutes)m ago"
+        case (_, ..<24, _): return "\(hours)h ago"
+        case (_, _, ..<7): return "\(days)d ago"
+        default: return short(date)
+        }
+    }
+
+    private func render(_ date: Date, long: Bool) -> String {
+        let parts = calendar.dateComponents([.year, .month, .day], from: date)
+        let year = parts.year ?? 0
+        let month = parts.month ?? 1
+        let day = parts.day ?? 1
+        let withYear = long || year != calendar.component(.year, from: now)
+        switch format {
+        case .monthDay: return "\(Self.shortMonthNames[month - 1]) \(day)" + (withYear ? ", \(year)" : "")
+        case .dayMonth: return "\(day)/\(month)" + (withYear ? "/\(year)" : "")
+        case .monthDayNumeric: return "\(month)/\(day)" + (withYear ? "/\(year)" : "")
+        case .iso: return String(format: "%04d-%02d-%02d", year, month, day)
+        }
+    }
+}
