@@ -112,7 +112,7 @@ struct TaskTableView: View {
         VStack(spacing: Spacing.s3) {
             EmptyState(title: "No tasks here", symbol: "tablecells", message: "Add a task to get things moving.")
             Button("Add task") { router.newTask() }
-                .buttonStyle(.borderedProminent)
+                .buttonStyle(.tycho(.primary))
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }

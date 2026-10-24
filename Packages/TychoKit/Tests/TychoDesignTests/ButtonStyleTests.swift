@@ -37,6 +37,6 @@ struct ButtonStyleTests {
     @Test func stylesBuildABody() {
         _ = Button("Save") {}.buttonStyle(TychoButtonStyle(.primary, size: .lg, block: true))
         _ = Toggle("On", isOn: .constant(true)).toggleStyle(TychoToggleStyle())
-        _ = TychoSegmented(selection: .constant(1), options: [1, 2]) { "\($0)" }.body
+        _ = TychoSegmented(selection: .constant(1), options: [1, 2]) { Text("\($0)") }.body
     }
 }

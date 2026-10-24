@@ -76,6 +76,7 @@ struct NewProjectSheet: View {
                         ForEach(members) { Text($0.name).tag(Member?.some($0)) }
                     }
                     Toggle("Start date", isOn: $hasStart)
+                        .toggleStyle(TychoToggleStyle())
                     if hasStart {
                         DatePicker(
                             "Start",
@@ -84,6 +85,7 @@ struct NewProjectSheet: View {
                             displayedComponents: .date)
                     }
                     Toggle("Due date", isOn: $hasDue)
+                        .toggleStyle(TychoToggleStyle())
                     if hasDue {
                         DatePicker(
                             "Due",
@@ -99,9 +101,12 @@ struct NewProjectSheet: View {
             .formStyle(.grouped)
             .navigationTitle(project == nil ? "New project" : "Edit project")
             .toolbar {
-                ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") { dismiss() }.buttonStyle(.tycho(.secondary))
+                }
                 ToolbarItem(placement: .confirmationAction) {
                     Button(project == nil ? "Create" : "Save", action: save)
+                        .buttonStyle(.tycho(.primary))
                         .keyboardShortcut(.return, modifiers: .command)
                         .disabled(project == nil && workspaces.isEmpty)
                         .accessibilityIdentifier("project.save")

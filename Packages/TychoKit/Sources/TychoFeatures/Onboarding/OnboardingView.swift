@@ -35,13 +35,13 @@ struct OnboardingView: View {
                 Button("Start empty") {
                     toast.perform { try EmptySeed.load(into: context, ownerName: name) }
                 }
-                .buttonStyle(.borderedProminent)
+                .buttonStyle(.tycho(.primary, size: .lg))
                 .disabled(name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 .accessibilityIdentifier("onboarding.empty")
                 Button("Load demo") {
                     toast.perform { try DemoSeed.load(into: context, now: .now, calendar: .current) }
                 }
-                .buttonStyle(.bordered)
+                .buttonStyle(.tycho(.secondary, size: .lg))
                 .accessibilityIdentifier("onboarding.demo")
             }
         }

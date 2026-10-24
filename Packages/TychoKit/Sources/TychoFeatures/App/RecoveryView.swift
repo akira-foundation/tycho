@@ -12,8 +12,9 @@ struct RecoveryView: View {
             EmptyState(
                 title: "Tycho couldn't open its data", symbol: "externaldrive.badge.exclamationmark", message: message)
             HStack(spacing: Spacing.s3) {
-                Button("Try again", action: retry).buttonStyle(.borderedProminent)
+                Button("Try again", action: retry).buttonStyle(.tycho(.primary))
                 Button("Reset data", role: .destructive) { confirmingReset = true }
+                    .buttonStyle(.tycho(.secondary))
             }
         }
         .padding(Spacing.s8)

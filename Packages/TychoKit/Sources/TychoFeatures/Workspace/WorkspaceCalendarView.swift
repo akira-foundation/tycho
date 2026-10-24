@@ -12,7 +12,7 @@ struct WorkspaceCalendarView: View {
         VStack(spacing: 0) {
             PageHeader(title: "Calendar", subtitle: "Deadlines and events across every project.") {
                 Button("New task", systemImage: "plus") { router.newTask() }
-                    .buttonStyle(.borderedProminent)
+                    .buttonStyle(.tycho(.primary))
             }
             Divider()
             CalendarView(

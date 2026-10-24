@@ -46,7 +46,7 @@ struct TimelineView: View {
                 title: "Nothing on the timeline", symbol: "chart.bar.xaxis",
                 message: "Give tasks a start and due date to see them here.")
             Button("New task", systemImage: "plus") { router.newTask() }
-                .buttonStyle(.borderedProminent)
+                .buttonStyle(.tycho(.primary))
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }

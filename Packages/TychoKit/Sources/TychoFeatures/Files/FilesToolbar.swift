@@ -27,16 +27,15 @@ struct FilesToolbar: View {
             .labelsHidden()
             .fixedSize()
             Spacer()
-            Picker("Layout", selection: $layout) {
-                Label("grid view", systemImage: "square.grid.2x2").labelStyle(.iconOnly).tag(FileLayout.grid)
-                Label("list view", systemImage: "list.bullet").labelStyle(.iconOnly).tag(FileLayout.list)
+            TychoSegmented(selection: $layout, options: [FileLayout.grid, .list]) {
+                Label(
+                    $0 == .grid ? "grid view" : "list view",
+                    systemImage: $0 == .grid ? "square.grid.2x2" : "list.bullet"
+                )
+                .labelStyle(.iconOnly)
             }
-            .pickerStyle(.segmented)
-            .labelsHidden()
-            .fixedSize()
             Button("Upload", systemImage: "arrow.up.doc", action: onUpload)
-                .buttonStyle(.borderedProminent)
-                .controlSize(.small)
+                .buttonStyle(.tycho(.primary, size: .sm))
         }
         .padding(.horizontal, Spacing.s4)
         .padding(.vertical, Spacing.s2)

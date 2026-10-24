@@ -1,20 +1,20 @@
 import SwiftUI
 
-public struct TychoSegmented<Value: Hashable>: View {
+public struct TychoSegmented<Value: Hashable, Label: View>: View {
     @Binding private var selection: Value
     private let options: [Value]
-    private let title: (Value) -> String
+    private let label: (Value) -> Label
 
-    public init(selection: Binding<Value>, options: [Value], title: @escaping (Value) -> String) {
+    public init(selection: Binding<Value>, options: [Value], @ViewBuilder label: @escaping (Value) -> Label) {
         _selection = selection
         self.options = options
-        self.title = title
+        self.label = label
     }
 
     public var body: some View {
         HStack(spacing: 2) {
             ForEach(options, id: \.self) { option in
-                Segment(title: title(option), isSelected: option == selection) { selection = option }
+                Segment(label: label(option), isSelected: option == selection) { selection = option }
             }
         }
         .padding(2)
@@ -24,7 +24,7 @@ public struct TychoSegmented<Value: Hashable>: View {
     }
 
     private struct Segment: View {
-        let title: String
+        let label: Label
         let isSelected: Bool
         let action: () -> Void
         @State private var hovering = false
@@ -32,7 +32,7 @@ public struct TychoSegmented<Value: Hashable>: View {
         var body: some View {
             let shape = RoundedRectangle(cornerRadius: 5, style: .continuous)
             Button(action: action) {
-                Text(title)
+                label
                     .tychoFont(.xs, weight: .medium)
                     .foregroundStyle(isSelected || hovering ? Token.text.color : Token.text2.color)
                     .padding(.horizontal, 9)

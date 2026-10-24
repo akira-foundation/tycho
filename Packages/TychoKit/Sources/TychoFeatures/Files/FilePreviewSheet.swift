@@ -47,12 +47,14 @@ struct FilePreviewSheet: View {
                     Pasteboard.copy(FileMessages.link(file))
                     toast.show("Link copied")
                 }
+                .buttonStyle(.tycho(.secondary))
                 if file.hasData {
                     Button("Quick Look", systemImage: "eye", action: openQuickLook)
+                        .buttonStyle(.tycho(.secondary))
                 }
                 Spacer()
                 Button("Close") { dismiss() }
-                    .buttonStyle(.borderedProminent)
+                    .buttonStyle(.tycho(.primary))
                     .keyboardShortcut(.defaultAction)
             }
         }

@@ -59,8 +59,7 @@ struct FileRow: View {
                 if let task = file.task {
                     Button(task.key, systemImage: "link") { router.inspect(task.id) }
                         .tychoFont(.xxs, design: .monospaced)
-                        .buttonStyle(.bordered)
-                        .controlSize(.mini)
+                        .buttonStyle(.tycho(.secondary, size: .sm))
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)

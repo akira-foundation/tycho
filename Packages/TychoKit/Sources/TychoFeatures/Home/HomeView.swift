@@ -94,11 +94,7 @@ struct HomeView: View {
 
     private func myTasks(_ summary: HomeSummary) -> some View {
         Panel(title: "My tasks") {
-            Picker("Tasks", selection: $tab) {
-                ForEach(HomeTab.allCases) { Text($0.title).tag($0) }
-            }
-            .pickerStyle(.segmented)
-            .labelsHidden()
+            TychoSegmented(selection: $tab, options: HomeTab.allCases) { Text($0.title) }
             let list = tab.tasks(in: summary)
             if list.isEmpty {
                 Text("Nothing here").tychoFont(.sm).foregroundStyle(Token.text4.color).padding(.vertical, Spacing.s3)
