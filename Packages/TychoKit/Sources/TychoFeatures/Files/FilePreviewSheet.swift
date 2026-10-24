@@ -11,7 +11,6 @@ struct FilePreviewSheet: View {
     @Environment(Router.self) private var router
     @Environment(ToastCenter.self) private var toast
     @Environment(\.dateText) private var dateText
-    @Environment(\.accent) private var accent
     let file: FileRecord
     @State private var quickLookURL: URL?
     @State private var copyURL: URL?
@@ -38,7 +37,7 @@ struct FilePreviewSheet: View {
                         dismiss()
                     }
                     .buttonStyle(.plain)
-                    .foregroundStyle(accent.color)
+                    .foregroundStyle(Color.accentColor)
                 }
                 .tychoFont(.sm)
                 .foregroundStyle(Token.text3.color)

@@ -4,7 +4,6 @@ import TychoDesign
 
 struct TimelineHeader: View {
     static let height: CGFloat = 48
-    @Environment(\.accent) private var accent
     let layout: TimelineLayout
 
     var body: some View {
@@ -24,7 +23,7 @@ struct TimelineHeader: View {
                         .tychoFont(.xxs, weight: cell.isToday ? .semibold : .regular)
                         .monospacedDigit()
                         .lineLimit(1)
-                        .foregroundStyle(cell.isToday ? accent.color : Token.text3.color)
+                        .foregroundStyle(cell.isToday ? Color.accentColor : Token.text3.color)
                         .frame(width: cell.width, height: Self.height / 2)
                 }
             }

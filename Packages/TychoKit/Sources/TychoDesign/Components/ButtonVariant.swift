@@ -8,7 +8,7 @@ public enum ButtonVariant: CaseIterable, Sendable {
     public func foreground(isDark: Bool) -> RGBA {
         let token: Token? =
             switch self {
-            case .primary: .onAccent
+            case .primary: nil
             case .secondary: .text
             case .ghost: .text2
             case .danger: nil

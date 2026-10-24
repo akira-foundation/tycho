@@ -14,7 +14,7 @@ struct DateEnvironmentTests {
 
     @Test func preferenceKeysAreDistinct() {
         let keys = [
-            AppearanceKey.theme, AppearanceKey.accent, AppearanceKey.density, AppearanceKey.motion,
+            AppearanceKey.theme, AppearanceKey.density, AppearanceKey.motion,
             AppearanceKey.weekStart, AppearanceKey.dateFormat,
         ]
         #expect(Set(keys).count == keys.count)

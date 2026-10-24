@@ -8,7 +8,6 @@ struct CalendarDayCell: View {
     @Environment(ToastCenter.self) private var toast
     @Environment(Router.self) private var router
     @Environment(\.dateText) private var dateText
-    @Environment(\.accent) private var accent
     let cell: CalendarCell
     let items: [CalendarItem]
     let tasks: [TaskItem]
@@ -55,7 +54,7 @@ struct CalendarDayCell: View {
             .monospacedDigit()
             .foregroundStyle(numberColor)
             .frame(minWidth: 22, minHeight: 22)
-            .background(cell.isToday ? accent.color : Color.clear, in: Circle())
+            .background(cell.isToday ? Color.accentColor : Color.clear, in: Circle())
             .accessibilityLabel(cell.isToday ? "Today, \(cell.day)" : "\(cell.day)")
             .accessibilityAddTraits(cell.isToday ? .isSelected : [])
     }

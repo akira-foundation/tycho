@@ -14,13 +14,12 @@ public struct TychoToggleStyle: ToggleStyle {
     private struct Track: View {
         let isOn: Bool
         let action: () -> Void
-        @Environment(\.accent) private var accent
         @Environment(\.isEnabled) private var isEnabled
 
         var body: some View {
             Button(action: action) {
                 Capsule()
-                    .fill(isOn ? accent.color : Token.borderStrong.color)
+                    .fill(isOn ? Color.accentColor : Token.borderStrong.color)
                     .frame(width: 30, height: 18)
                     .overlay(alignment: .leading) {
                         Circle().fill(.white).frame(width: 14, height: 14)

@@ -56,14 +56,14 @@ As mutações passam pelas ações do `TychoCore` (`ProjectActions`, `TaskAction
 
 ## Design system
 
-- Cores dinâmicas (light e dark) com os mesmos nomes dos tokens do original, mais cinco cores de status e o accent injetado por `Environment`.
+- Cores dinâmicas (light e dark) com os mesmos nomes dos tokens do original, mais cinco cores de status e o accent do sistema (`Color.accentColor`), sem preferência própria.
 - Espaçamento, raio, métricas dependentes da density, tipografia SF Pro com Dynamic Type, sombras e motion que respeita `accessibilityReduceMotion`.
 - Componentes: `StatusIcon`, `PriorityIcon`, `LabelPill`, `Avatar`, `AvatarStack`, `ProgressRing`, `StatCard`, `ProjectGlyph` e `EmptyState`. Os ícones Lucide do original mapeiam para SF Symbols.
 - Sidebar, toolbar e inspector usam o Liquid Glass nativo do OS 27.
 
 ## Estado e preferências
 
-As preferências (`theme`, `accent`, `density`, `motion`, `weekStart` e `dateFormat`) ficam em `@AppStorage`, por dispositivo e sem sincronização; nas Settings aparecem como "Start week on" e "Date format", e chegam às vistas pelo `Environment` (`\.weekStart` e `\.dateText`). O estado de cada Table (ordenação, colunas escondidas e larguras) fica em `@AppStorage("table.views")`, por chave (`p:<id>` e `tasks`). A rota, a seleção e os grupos colapsados vivem no `Router` e em `@State`.
+As preferências (`theme`, `density`, `motion`, `weekStart` e `dateFormat`) ficam em `@AppStorage`, por dispositivo e sem sincronização; nas Settings aparecem como "Start week on" e "Date format", e chegam às vistas pelo `Environment` (`\.weekStart` e `\.dateText`). O estado de cada Table (ordenação, colunas escondidas e larguras) fica em `@AppStorage("table.views")`, por chave (`p:<id>` e `tasks`). A rota, a seleção e os grupos colapsados vivem no `Router` e em `@State`.
 
 ---
 Anterior: [Índice](00-index.md) · Próximo: [Desenvolvimento](02-development.md)

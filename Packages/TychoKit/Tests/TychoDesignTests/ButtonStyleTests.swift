@@ -5,9 +5,10 @@ import Testing
 
 @MainActor
 struct ButtonStyleTests {
-    @Test func primaryTextUsesTheOnAccentColourOfTheScheme() {
-        #expect(ButtonVariant.primary.foreground(isDark: false) == Token.onAccent.light)
-        #expect(ButtonVariant.primary.foreground(isDark: true) == Token.onAccent.dark)
+    @Test func primaryTextIsWhiteInBothSchemes() {
+        let white = RGBA(hex: 0xFFFFFF)
+        #expect(ButtonVariant.primary.foreground(isDark: false) == white)
+        #expect(ButtonVariant.primary.foreground(isDark: true) == white)
     }
 
     @Test func dangerTextIsWhiteInBothSchemes() {

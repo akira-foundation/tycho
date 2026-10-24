@@ -8,7 +8,6 @@ public struct SettingsView: View {
     @Environment(ToastCenter.self) private var toast
     @Environment(Router.self) private var router
     @AppStorage(AppearanceKey.theme) private var theme = ThemePreference.system
-    @AppStorage(AppearanceKey.accent) private var accent = Accent.indigo
     @AppStorage(AppearanceKey.density) private var density = Density.comfortable
     @AppStorage(AppearanceKey.motion) private var motion = MotionPreference.system
     @AppStorage(AppearanceKey.weekStart) private var weekStart = WeekStart.monday
@@ -27,11 +26,6 @@ public struct SettingsView: View {
             Section("Appearance") {
                 Picker("Theme", selection: $theme) {
                     ForEach(ThemePreference.allCases) { Text($0.title).tag($0) }
-                }
-                Picker("Accent", selection: $accent) {
-                    ForEach(Accent.allCases) { option in
-                        Label(option.title, systemImage: "circle.fill").foregroundStyle(option.color).tag(option)
-                    }
                 }
                 Picker("Density", selection: $density) {
                     ForEach(Density.allCases) { Text($0.title).tag($0) }

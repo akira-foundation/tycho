@@ -21,7 +21,6 @@ public struct TychoButtonStyle: ButtonStyle {
         let size: ButtonSize
         let block: Bool
 
-        @Environment(\.accent) private var accent
         @Environment(\.colorScheme) private var scheme
         @Environment(\.isEnabled) private var isEnabled
         @State private var hovering = false
@@ -55,7 +54,7 @@ public struct TychoButtonStyle: ButtonStyle {
             let pressed = configuration.isPressed
             switch variant {
             case .primary:
-                return accent.color.mix(with: Token.text.color, by: pressed ? 0.22 : hovering ? 0.12 : 0)
+                return Color.accentColor.mix(with: Token.text.color, by: pressed ? 0.22 : hovering ? 0.12 : 0)
             case .secondary:
                 return pressed ? Token.surface3.color : hovering ? Token.surface2.color : Token.surface.color
             case .ghost:
