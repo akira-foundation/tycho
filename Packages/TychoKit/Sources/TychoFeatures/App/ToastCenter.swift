@@ -10,6 +10,9 @@ extension ValidationError {
         case .emptyName: "Name can't be empty."
         case .invalidProjectKey: "Key must be 2 to 5 letters."
         case .duplicateProjectKey: "That key is already in use."
+        case .dependencyOnSelf: "A task can't depend on itself."
+        case .dependencyAcrossProjects: "Dependencies must be in the same project."
+        case .dependencyCycle: "These tasks would block each other."
         }
     }
 }
