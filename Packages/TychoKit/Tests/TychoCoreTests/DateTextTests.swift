@@ -31,6 +31,11 @@ struct DateTextTests {
         #expect(text(.iso).short(date) == "2025-12-31")
     }
 
+    @Test func headerDayUsesFullWeekdayAndMonthNames() {
+        #expect(text(.monthDay).weekdayMonthDay(utcDate(2026, 10, 13, hour: 12)) == "Tuesday, October 13")
+        #expect(text(.iso).weekdayMonthDay(utcDate(2026, 1, 4, hour: 12)) == "Sunday, January 4")
+    }
+
     @Test func longDatesAlwaysShowTheYear() {
         let date = utcDate(2026, 10, 1, hour: 12)
         #expect(text(.monthDay).long(date) == "Oct 1, 2026")

@@ -15,55 +15,18 @@ enum EstimateOptions {
 struct DateCell: View {
     @Environment(\.modelContext) private var context
     @Environment(ToastCenter.self) private var toast
-    @Environment(\.dateText) private var dateText
     let task: TaskItem
     let keyPath: ReferenceWritableKeyPath<TaskItem, Date?>
     let highlightsOverdue: Bool
-    @State private var picking = false
 
     var body: some View {
-        Button {
-            picking = true
-        } label: {
-            Text(task[keyPath: keyPath].map(dateText.short) ?? "—")
-                .monospacedDigit()
-                .foregroundStyle(color)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .contentShape(Rectangle())
-        }
-        .buttonStyle(.plain)
-        .popover(isPresented: $picking) {
-            VStack(alignment: .leading, spacing: Spacing.s2) {
-                DatePicker(
-                    "Date",
-                    selection: Binding(
-                        get: { task[keyPath: keyPath] ?? .now },
-                        set: { value in
-                            edit { $0[keyPath: keyPath] = DayTime.noon(of: value, calendar: DateText.gregorian) }
-                        }),
-                    displayedComponents: .date
-                )
-                .datePickerStyle(.graphical)
-                .labelsHidden()
-                Button("Clear date", role: .destructive) {
-                    edit { $0[keyPath: keyPath] = nil }
-                    picking = false
-                }
-            }
-            .padding(Spacing.s3)
+        DatePill(date: task[keyPath: keyPath], emptyText: "—", color: color) { value in
+            toast.perform { try TaskActions(context: context).edit(task) { $0[keyPath: keyPath] = value } }
         }
     }
 
     private var color: Color {
-        switch (task[keyPath: keyPath] == nil, highlightsOverdue && task.isOverdue(now: .now, calendar: .current)) {
-        case (true, _): Token.text4.color
-        case (false, true): Token.red.color
-        case (false, false): Token.text.color
-        }
-    }
-
-    private func edit(_ change: (TaskItem) -> Void) {
-        toast.perform { try TaskActions(context: context).edit(task, change) }
+        highlightsOverdue && task.isOverdue(now: .now, calendar: .current) ? Token.red.color : Token.text.color
     }
 }
 

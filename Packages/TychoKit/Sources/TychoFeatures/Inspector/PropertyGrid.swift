@@ -49,8 +49,8 @@ struct PropertyGrid: View {
                     ForEach(members) { Text($0.name).tag(Member?.some($0)) }
                 }
             }
-            row("Start") { dateField("Start", \.start) }
-            row("Due") { dateField("Due", \.due) }
+            row("Start") { dateField(\.start) }
+            row("Due") { dateField(\.due) }
             row("Labels") { labelsMenu }
             row("Blocked by") { DependencyPicker(task: task, showsTitles: true, emptyText: "None") }
             row("Estimate") {
@@ -98,28 +98,9 @@ struct PropertyGrid: View {
         .frame(minHeight: 30)
     }
 
-    private func dateField(_ title: String, _ keyPath: ReferenceWritableKeyPath<TaskItem, Date?>) -> some View {
-        HStack {
-            if let date = task[keyPath: keyPath] {
-                DatePicker(
-                    title,
-                    selection: Binding(
-                        get: { date },
-                        set: { value in
-                            edit { $0[keyPath: keyPath] = DayTime.noon(of: value, calendar: DateText.gregorian) }
-                        }),
-                    displayedComponents: .date)
-                Button("Clear", systemImage: "xmark.circle.fill") { edit { $0[keyPath: keyPath] = nil } }
-                    .labelStyle(.iconOnly)
-                    .buttonStyle(.plain)
-                    .foregroundStyle(Token.text4.color)
-            } else {
-                Button("Set date") {
-                    edit { $0[keyPath: keyPath] = DayTime.noon(of: .now, calendar: DateText.gregorian) }
-                }
-                .buttonStyle(.plain)
-                .foregroundStyle(Token.text4.color)
-            }
+    private func dateField(_ keyPath: ReferenceWritableKeyPath<TaskItem, Date?>) -> some View {
+        DatePill(date: task[keyPath: keyPath], emptyText: "Set date") { value in
+            edit { $0[keyPath: keyPath] = value }
         }
     }
 

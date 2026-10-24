@@ -39,9 +39,8 @@ struct NewTaskSheet: View {
                     Text("Unassigned").tag(Member?.none)
                     ForEach(members) { Text($0.name).tag(Member?.some($0)) }
                 }
-                if let due = draft.due {
-                    DatePicker(
-                        "Due", selection: Binding(get: { due }, set: { draft.due = $0 }), displayedComponents: .date)
+                LabeledContent("Due") {
+                    DatePill(date: draft.due, emptyText: "No date") { draft.due = $0 }
                 }
                 if let error {
                     Text(error.userMessage).foregroundStyle(Token.red.color)

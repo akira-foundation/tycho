@@ -5,6 +5,7 @@ import TychoDesign
 
 struct HomeView: View {
     @Environment(Router.self) private var router
+    @Environment(\.dateText) private var dateText
     @Query(sort: \Workspace.createdAt) private var workspaces: [Workspace]
     @Query(sort: \Project.sortOrder) private var projects: [Project]
     @Query private var tasks: [TaskItem]
@@ -52,7 +53,7 @@ struct HomeView: View {
             Text("\(Greeting.text(hour: Calendar.current.component(.hour, from: .now))), \(name)")
                 .tychoFont(.xxl, weight: .semibold)
             Text(
-                "\(Date.now.formatted(.dateTime.weekday(.wide).month(.wide).day())) · Here's what's happening across your workspace."
+                "\(dateText.weekdayMonthDay(.now)) · Here's what's happening across your workspace."
             )
             .tychoFont(.base)
             .foregroundStyle(Token.text3.color)

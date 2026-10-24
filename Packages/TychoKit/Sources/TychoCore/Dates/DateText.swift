@@ -9,6 +9,9 @@ public struct DateText: Sendable {
         "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
     ]
     public static let weekdayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+    public static let longWeekdayNames = [
+        "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday",
+    ]
 
     public let format: DateFormatPreference
     private let now: Date
@@ -29,6 +32,13 @@ public struct DateText: Sendable {
     public func short(_ date: Date) -> String { render(date, withYear: includesYear(date, long: false)) }
 
     public func long(_ date: Date) -> String { render(date, withYear: true) }
+
+    public func weekdayMonthDay(_ date: Date) -> String {
+        let parts = calendar.dateComponents([.weekday, .month, .day], from: date)
+        let weekday = Self.longWeekdayNames[(parts.weekday ?? 1) - 1]
+        let month = Self.monthNames[(parts.month ?? 1) - 1]
+        return "\(weekday), \(month) \(parts.day ?? 1)"
+    }
 
     func withoutYear(_ date: Date) -> String { render(date, withYear: false) }
 
