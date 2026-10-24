@@ -20,9 +20,19 @@ public struct DateText: Sendable {
         self.calendar = calendar
     }
 
-    public func short(_ date: Date) -> String { render(date, long: false) }
+    public func short(_ date: Date) -> String { render(date, withYear: includesYear(date, long: false)) }
 
-    public func long(_ date: Date) -> String { render(date, long: true) }
+    public func long(_ date: Date) -> String { render(date, withYear: true) }
+
+    func withoutYear(_ date: Date) -> String { render(date, withYear: false) }
+
+    var yearSuffixPrefix: String {
+        switch format {
+        case .monthDay: ", "
+        case .dayMonth, .monthDayNumeric: "/"
+        case .iso: ""
+        }
+    }
 
     public func ago(_ date: Date) -> String {
         let minutes = Int((now.timeIntervalSince(date) / 60).rounded())
@@ -37,12 +47,15 @@ public struct DateText: Sendable {
         }
     }
 
-    private func render(_ date: Date, long: Bool) -> String {
+    private func includesYear(_ date: Date, long: Bool) -> Bool {
+        long || calendar.component(.year, from: date) != calendar.component(.year, from: now)
+    }
+
+    private func render(_ date: Date, withYear: Bool) -> String {
         let parts = calendar.dateComponents([.year, .month, .day], from: date)
         let year = parts.year ?? 0
         let month = parts.month ?? 1
         let day = parts.day ?? 1
-        let withYear = long || year != calendar.component(.year, from: now)
         switch format {
         case .monthDay: return "\(Self.shortMonthNames[month - 1]) \(day)" + (withYear ? ", \(year)" : "")
         case .dayMonth: return "\(day)/\(month)" + (withYear ? "/\(year)" : "")

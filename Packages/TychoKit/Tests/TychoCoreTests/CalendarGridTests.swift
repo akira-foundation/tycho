@@ -64,6 +64,15 @@ struct CalendarGridTests {
                 == "Dec 28 – Jan 3, 2027")
     }
 
+    @Test func weekTitlesFollowTheDateFormat() {
+        func title(_ format: DateFormatPreference) -> String {
+            CalendarGrid.title(.week, anchor: referenceNow, weekStart: .monday, format: format, calendar: utcCalendar)
+        }
+        #expect(title(.dayMonth) == "12/10 – 18/10/2026")
+        #expect(title(.monthDayNumeric) == "10/12 – 10/18/2026")
+        #expect(title(.iso) == "2026-10-12 – 2026-10-18")
+    }
+
     @Test func steppingMovesByWholeMonthsAndWeeks() {
         #expect(CalendarGrid.step(referenceNow, mode: .month, by: 1, calendar: utcCalendar) == utcDate(2026, 11, 1))
         #expect(CalendarGrid.step(referenceNow, mode: .month, by: -1, calendar: utcCalendar) == utcDate(2026, 9, 1))

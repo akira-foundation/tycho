@@ -57,16 +57,21 @@ public enum CalendarGrid {
         (0..<7).map { DateText.weekdayNames[(weekStart.weekday - 1 + $0) % 7] }
     }
 
-    public static func title(_ mode: CalendarMode, anchor: Date, weekStart: WeekStart, calendar: Calendar) -> String {
+    public static func title(
+        _ mode: CalendarMode, anchor: Date, weekStart: WeekStart, format: DateFormatPreference = .monthDay,
+        calendar: Calendar
+    ) -> String {
         switch mode {
         case .month:
             let parts = calendar.dateComponents([.year, .month], from: anchor)
             return "\(DateText.monthNames[(parts.month ?? 1) - 1]) \(parts.year ?? 0)"
         case .week:
             let days = week(containing: anchor, weekStart: weekStart, today: anchor, calendar: calendar)
+            let text = DateText(format: format, now: anchor, calendar: calendar)
             let last = days[6].date
-            return
-                "\(monthDay(days[0].date, calendar)) – \(monthDay(last, calendar)), \(calendar.component(.year, from: last))"
+            let year = calendar.component(.year, from: last)
+            let suffix = format == .iso ? "" : "\(text.yearSuffixPrefix)\(year)"
+            return "\(text.withoutYear(days[0].date)) – \(text.withoutYear(last))\(suffix)"
         }
     }
 
@@ -81,11 +86,6 @@ public enum CalendarGrid {
 
     private static func firstOfMonth(_ date: Date, calendar: Calendar) -> Date {
         calendar.date(from: calendar.dateComponents([.year, .month], from: date)) ?? calendar.startOfDay(for: date)
-    }
-
-    private static func monthDay(_ date: Date, _ calendar: Calendar) -> String {
-        let parts = calendar.dateComponents([.month, .day], from: date)
-        return "\(DateText.shortMonthNames[(parts.month ?? 1) - 1]) \(parts.day ?? 1)"
     }
 
     private static func cell(

@@ -19,8 +19,8 @@ struct CalendarDayTests {
             task.project = project
             task.sortOrder = Double(offset)
         }
-        late.due = day(1, hour: 23)
-        early.due = day(1)
+        late.due = day(1, hour: 1)
+        early.due = day(1, hour: 23)
         early.sortOrder = -1
         other.due = day(2)
         let review = CalendarEvent(title: "Review", date: day(1), time: "14:00")
@@ -32,6 +32,20 @@ struct CalendarDayTests {
             calendar: utcCalendar)
 
         #expect(items.map(\.id) == [standup.id, review.id, early.id, late.id])
+    }
+
+    @Test func equalSortKeysFallBackToTitle() throws {
+        let context = try makeTestContext()
+        let beta = TaskItem(number: 1, title: "Beta")
+        let alpha = TaskItem(number: 2, title: "Alpha")
+        for task in [beta, alpha] {
+            context.insert(task)
+            task.due = day(1)
+        }
+
+        let items = CalendarDay.items(on: day(1), events: [], tasks: [beta, alpha], calendar: utcCalendar)
+
+        #expect(items.map(\.id) == [alpha.id, beta.id])
     }
 
     @Test func chipsShowThreeAndCountTheRest() {
