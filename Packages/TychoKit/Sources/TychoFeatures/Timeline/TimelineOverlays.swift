@@ -32,15 +32,16 @@ struct TimelineDependencies: View {
 }
 
 struct TimelineMilestones: View {
+    static let diamondSize: CGFloat = 12
     let pins: [MilestonePin]
 
     var body: some View {
         ZStack(alignment: .topLeading) {
             ForEach(pins) { pin in
-                HStack(spacing: 6) {
-                    Rectangle()
-                        .fill(pin.colorHex.map { Color(hex: $0) } ?? Token.text2.color)
-                        .frame(width: 9, height: 9)
+                HStack(spacing: 8) {
+                    RoundedRectangle(cornerRadius: 2)
+                        .fill(pin.colorHex.map { Color(hex: $0) } ?? Token.text.color)
+                        .frame(width: Self.diamondSize, height: Self.diamondSize)
                         .rotationEffect(.degrees(45))
                     if let label = pin.label {
                         Text(label)
@@ -50,7 +51,9 @@ struct TimelineMilestones: View {
                             .fixedSize(horizontal: pin.labelWidth == nil, vertical: false)
                     }
                 }
-                .offset(x: pin.x - 6, y: 12)
+                .frame(height: 18)
+                .offset(x: pin.x - Self.diamondSize / 2, y: 9)
+                .contentShape(Rectangle())
                 .help(pin.tooltip)
                 .accessibilityElement(children: .ignore)
                 .accessibilityLabel("Milestone: \(pin.tooltip)")
