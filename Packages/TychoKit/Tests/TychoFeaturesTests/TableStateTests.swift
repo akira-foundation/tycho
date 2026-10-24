@@ -21,6 +21,15 @@ struct TableStateTests {
                 == TableViewState(inProject: true))
     }
 
+    @Test func onlyTheFirstSortComparatorIsPersisted() {
+        let sort = [
+            TaskComparator(field: .priority), TaskComparator(field: .title), TaskComparator(field: .due),
+        ]
+        let data = TableViewStates.storingSort(sort, for: "p:1", inProject: true, in: Data())
+        let state = TableViewStates.state(for: "p:1", inProject: true, in: data)
+        #expect(state.sort == [TaskComparator(field: .priority)])
+    }
+
     @Test func projectKeysUseTheProjectID() {
         let id = UUID()
         #expect(TableViewStates.projectKey(id) == "p:\(id.uuidString)")

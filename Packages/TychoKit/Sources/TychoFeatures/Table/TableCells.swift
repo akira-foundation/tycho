@@ -19,7 +19,12 @@ struct TitleCell: View {
                 TextField("Title", text: $text)
                     .textFieldStyle(.plain)
                     .focused($focused)
+                    .onAppear { focused = true }
                     .onSubmit(commit)
+                    .onKeyPress(.escape) {
+                        editing = false
+                        return .handled
+                    }
                     .onChange(of: focused) {
                         if !focused { commit() }
                     }
@@ -41,7 +46,6 @@ struct TitleCell: View {
     private func beginEditing() {
         text = task.title
         editing = true
-        focused = true
     }
 
     private func commit() {

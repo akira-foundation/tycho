@@ -40,6 +40,12 @@ struct TaskTableView: View {
         Binding(get: { state }, set: { stored = TableViewStates.storing($0, for: stateKey, in: stored) })
     }
 
+    private var sortBinding: Binding<[TaskComparator]> {
+        Binding(
+            get: { state.sort },
+            set: { stored = TableViewStates.storingSort($0, for: stateKey, inProject: project != nil, in: stored) })
+    }
+
     private var customization: Binding<TableColumnCustomization<TaskItem>> {
         Binding(
             get: { TableCustomization.make(from: state) },
@@ -66,7 +72,7 @@ struct TaskTableView: View {
             }
             .padding(.horizontal, Spacing.s4)
             .padding(.vertical, Spacing.s2)
-            Table(of: TaskItem.self, sortOrder: stateBinding.sort, columnCustomization: customization) {
+            Table(of: TaskItem.self, sortOrder: sortBinding, columnCustomization: customization) {
                 columns
             } rows: {
                 ForEach(TaskGrouping.byStatus(tasks)) { group in

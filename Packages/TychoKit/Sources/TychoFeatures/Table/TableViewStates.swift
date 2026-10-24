@@ -22,6 +22,12 @@ enum TableViewStates {
         return (try? JSONEncoder().encode(all)) ?? data
     }
 
+    static func storingSort(_ sort: [TaskComparator], for key: String, inProject: Bool, in data: Data) -> Data {
+        var next = state(for: key, inProject: inProject, in: data)
+        next.sort = Array(sort.prefix(1))
+        return storing(next, for: key, in: data)
+    }
+
     private static func decode(_ data: Data) -> [String: TableViewState] {
         (try? JSONDecoder().decode([String: TableViewState].self, from: data)) ?? [:]
     }
