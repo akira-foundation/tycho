@@ -11,6 +11,7 @@ struct FilePreviewSheet: View {
     @Environment(\.dateText) private var dateText
     let file: FileRecord
     @State private var quickLookURL: URL?
+    @State private var copyURL: URL?
     private let logger = Logger(subsystem: "io.akira.tycho", category: "files")
 
     var body: some View {
@@ -57,9 +58,9 @@ struct FilePreviewSheet: View {
         .frame(minWidth: 480)
         .quickLookPreview($quickLookURL)
         .onChange(of: quickLookURL) { _, url in
-            if url == nil { FileQuickLook.cleanUp(file) }
+            if url == nil { removeCopy() }
         }
-        .onDisappear { FileQuickLook.cleanUp(file) }
+        .onDisappear(perform: removeCopy)
         .toastOverlay(toast)
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("file.preview")
@@ -67,10 +68,19 @@ struct FilePreviewSheet: View {
 
     private func openQuickLook() {
         do {
-            quickLookURL = try FileQuickLook.temporaryURL(for: file)
+            removeCopy()
+            let url = try FileQuickLook.temporaryURL(for: file)
+            copyURL = url
+            quickLookURL = url
         } catch {
             logger.error("Quick Look failed: \(error.localizedDescription, privacy: .public)")
             toast.show("Couldn't open preview.")
         }
+    }
+
+    private func removeCopy() {
+        guard let copyURL else { return }
+        FileQuickLook.cleanUp(copyURL)
+        self.copyURL = nil
     }
 }

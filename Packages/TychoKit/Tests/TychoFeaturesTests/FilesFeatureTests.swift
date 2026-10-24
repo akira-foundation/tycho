@@ -84,19 +84,17 @@ struct FilesFeatureTests {
         try FileManager.default.removeItem(at: base)
     }
 
-    @Test func cleanupRemovesOneCopyAndSweepRemovesAll() throws {
-        let first = file("a.pdf", minutesAgo: 1)
-        let second = file("b.pdf", minutesAgo: 2)
-        for record in [first, second] {
-            record.data = Data("x".utf8)
-            record.hasData = true
-        }
+    @Test func cleanupRemovesOnePresentationCopyAndSweepRemovesAll() throws {
+        let record = file("a.pdf", minutesAgo: 1)
+        record.data = Data("x".utf8)
+        record.hasData = true
         let base = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
         defer { try? FileManager.default.removeItem(at: base) }
-        let firstURL = try FileQuickLook.temporaryURL(for: first, in: base)
-        let secondURL = try FileQuickLook.temporaryURL(for: second, in: base)
+        let firstURL = try FileQuickLook.temporaryURL(for: record, in: base)
+        let secondURL = try FileQuickLook.temporaryURL(for: record, in: base)
+        #expect(firstURL.deletingLastPathComponent() != secondURL.deletingLastPathComponent())
 
-        FileQuickLook.cleanUp(first, in: base)
+        FileQuickLook.cleanUp(firstURL)
         #expect(!FileManager.default.fileExists(atPath: firstURL.path(percentEncoded: false)))
         #expect(FileManager.default.fileExists(atPath: secondURL.path(percentEncoded: false)))
 
@@ -106,7 +104,19 @@ struct FilesFeatureTests {
             !FileManager.default.fileExists(atPath: base.appending(path: "tycho-files").path(percentEncoded: false)))
     }
 
-    @Test(arguments: [".", "..", "", "a/b.pdf"])
+    @Test func cleanupIgnoresURLsOutsideTheQuickLookFolder() throws {
+        let directory = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let url = directory.appending(path: "keep.txt")
+        try Data("x".utf8).write(to: url)
+
+        FileQuickLook.cleanUp(url)
+
+        #expect(FileManager.default.fileExists(atPath: url.path(percentEncoded: false)))
+    }
+
+    @Test(arguments: [".", "..", "", "a/b.pdf", "nu\u{0}ll.txt"])
     func temporaryNamesAreSanitised(name: String) throws {
         let record = file("x", minutesAgo: 1)
         record.name = name
@@ -117,8 +127,27 @@ struct FilesFeatureTests {
 
         let url = try FileQuickLook.temporaryURL(for: record, in: base)
 
-        #expect(url.lastPathComponent == (name == "a/b.pdf" ? "a-b.pdf" : "file"))
-        #expect(url.deletingLastPathComponent().lastPathComponent == record.id.uuidString)
+        let expected = ["a/b.pdf": "a-b.pdf", "nu\u{0}ll.txt": "null.txt"][name] ?? "file"
+        #expect(url.lastPathComponent == expected)
+    }
+
+    @Test func longNamesAreTruncatedKeepingTheExtension() throws {
+        let long = String(repeating: "é", count: 200) + ".pdf"
+        let safe = FileQuickLook.safeName(long)
+        #expect(safe.utf8.count <= FileQuickLook.maxNameByteCount)
+        #expect(safe.hasSuffix(".pdf"))
+        #expect(safe.hasPrefix("é"))
+
+        let record = file("x", minutesAgo: 1)
+        record.name = long
+        record.data = Data("x".utf8)
+        record.hasData = true
+        let base = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: base) }
+        let url = try FileQuickLook.temporaryURL(for: record, in: base)
+        #expect(try Data(contentsOf: url) == Data("x".utf8))
+        #expect(FileQuickLook.safeName("short.txt") == "short.txt")
+        #expect(FileQuickLook.safeName(String(repeating: "a", count: 300)).utf8.count == 255)
     }
 
     private func encodedImage(_ type: UTType, side: Int = 400) -> Data {

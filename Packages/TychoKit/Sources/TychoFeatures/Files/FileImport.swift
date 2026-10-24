@@ -10,6 +10,6 @@ enum FileImport {
         let values = try url.resourceValues(forKeys: [.isRegularFileKey, .fileSizeKey])
         guard values.isRegularFile == true else { throw ValidationError.unsupportedFile }
         guard (values.fileSize ?? 0) <= FileActions.maxByteCount else { throw ValidationError.fileTooLarge }
-        return (url.lastPathComponent, try Data(contentsOf: url, options: .mappedIfSafe))
+        return (url.lastPathComponent, try Data(contentsOf: url))
     }
 }
