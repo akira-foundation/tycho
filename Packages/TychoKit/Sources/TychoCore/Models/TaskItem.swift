@@ -21,6 +21,9 @@ public final class TaskItem {
     public var project: Project?
     public var assignee: Member?
     @Relationship(deleteRule: .cascade, inverse: \Subtask.task) public var subtasks: [Subtask]? = []
+    @Relationship(deleteRule: .nullify, inverse: \TaskItem.blocking) public var blockedBy: [TaskItem]? = []
+    public var blocking: [TaskItem]? = []
+    @Relationship(deleteRule: .nullify, inverse: \FileRecord.task) public var attachments: [FileRecord]? = []
 
     public init(number: Int, title: String) {
         self.number = number
@@ -45,4 +48,8 @@ public final class TaskItem {
     public var key: String { "\(project?.key ?? "")-\(number)" }
 
     public var orderedSubtasks: [Subtask] { (subtasks ?? []).sorted { $0.sortOrder < $1.sortOrder } }
+
+    public var orderedBlockedBy: [TaskItem] { (blockedBy ?? []).sorted { $0.number < $1.number } }
+
+    public var orderedAttachments: [FileRecord] { (attachments ?? []).sorted { $0.uploadedAt > $1.uploadedAt } }
 }

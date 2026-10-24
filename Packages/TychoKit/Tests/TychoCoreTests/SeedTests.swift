@@ -93,4 +93,18 @@ struct SeedTests {
         #expect(try context.fetchCount(FetchDescriptor<Project>()) == 7)
         #expect(try context.fetchCount(FetchDescriptor<TaskItem>()) == 49)
     }
+
+    @Test func deleteAllAlsoEmptiesTheScheduleAndFiles() throws {
+        let context = try makeTestContext()
+        context.insert(Milestone(name: "Launch", date: day(1)))
+        context.insert(CalendarEvent(title: "Review", date: day(1), time: "10:00"))
+        context.insert(FileRecord(name: "brief.pdf", byteCount: 1, uploadedAt: referenceNow))
+        try context.save()
+
+        try DataReset.deleteAll(in: context)
+
+        #expect(try context.fetchCount(FetchDescriptor<Milestone>()) == 0)
+        #expect(try context.fetchCount(FetchDescriptor<CalendarEvent>()) == 0)
+        #expect(try context.fetchCount(FetchDescriptor<FileRecord>()) == 0)
+    }
 }
