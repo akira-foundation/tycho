@@ -90,6 +90,20 @@ struct TableStateTests {
         #expect(state.hidden == [.labels])
     }
 
+    @Test func storedColumnPayloadSurvivesStoringAndRebuilding() throws {
+        let payload = #"{"perColumnState":[{"base":{"explicit":{"_0":"title"}}},{"visibility":{"hidden":{}}}]}"#
+        var state = TableViewState(inProject: true)
+        state.columns = Data(payload.utf8)
+
+        let rebuilt = TableCustomization.make(from: state)
+        #expect(rebuilt[visibility: TableColumnID.title.rawValue] == .hidden)
+
+        var stored = TableViewState(inProject: true)
+        TableCustomization.store(rebuilt, into: &stored)
+        #expect(TableCustomization.make(from: stored) == rebuilt)
+        #expect(TableCustomization.make(from: stored)[visibility: TableColumnID.title.rawValue] == .hidden)
+    }
+
     @Test func customizationCarriesTheHiddenColumnsBothWays() {
         let state = TableViewState(inProject: true)
         var customization = TableCustomization.make(from: state)

@@ -43,7 +43,7 @@ struct RescheduleTests {
 
     @Test func rescheduleGivesATaskWithoutDueANoonDue() throws {
         let (task, actions) = try setUp()
-        try actions.reschedule(task, toDue: day(4, hour: 0), calendar: utcCalendar)
+        #expect(try actions.reschedule(task, toDue: day(4, hour: 0), calendar: utcCalendar))
         #expect(task.due == day(4))
     }
 

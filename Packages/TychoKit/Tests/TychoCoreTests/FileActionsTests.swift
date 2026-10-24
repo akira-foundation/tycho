@@ -30,6 +30,13 @@ struct FileActionsTests {
         #expect(project.files?.count == 1)
     }
 
+    @Test func addAcceptsExactlyTheMaximumByteCount() throws {
+        let (_, project, _, me, actions) = try setUp()
+        let file = try actions.add(
+            name: "edge.zip", data: Data(count: FileActions.maxByteCount), to: project, task: nil, by: me)
+        #expect(file.byteCount == FileActions.maxByteCount)
+    }
+
     @Test func addRejectsMoreThan250MegabytesAndBlankNames() throws {
         let (context, project, _, me, actions) = try setUp()
         #expect(FileActions.maxByteCount == 262_144_000)

@@ -34,6 +34,28 @@ struct CalendarDayTests {
         #expect(items.map(\.id) == [standup.id, review.id, early.id, late.id])
     }
 
+    @Test func tasksFromDifferentProjectsFollowTheProjectOrder() throws {
+        let context = try makeTestContext()
+        let first = Project(key: "WEB", name: "Website")
+        let second = Project(key: "MOB", name: "Mobile")
+        context.insert(first)
+        context.insert(second)
+        first.sortOrder = 2
+        second.sortOrder = 1
+        let inFirst = TaskItem(number: 1, title: "A in first")
+        let inSecond = TaskItem(number: 2, title: "Z in second")
+        for (task, project) in [(inFirst, first), (inSecond, second)] {
+            context.insert(task)
+            task.project = project
+            task.due = day(1)
+            task.sortOrder = 0
+        }
+
+        let items = CalendarDay.items(on: day(1), events: [], tasks: [inFirst, inSecond], calendar: utcCalendar)
+
+        #expect(items.map(\.id) == [inSecond.id, inFirst.id])
+    }
+
     @Test func equalSortKeysFallBackToTitle() throws {
         let context = try makeTestContext()
         let beta = TaskItem(number: 1, title: "Beta")

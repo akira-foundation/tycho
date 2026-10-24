@@ -35,6 +35,14 @@ struct DependencyActionsTests {
         #expect(tasks[0].blockedBy?.isEmpty == true)
     }
 
+    @Test func rejectsATaskWithoutAProject() throws {
+        let (context, _, tasks, actions) = try setUp()
+        let loose = TaskItem(number: 9, title: "Loose")
+        context.insert(loose)
+        #expect(throws: ValidationError.dependencyAcrossProjects) { try actions.toggle(tasks[0], for: loose) }
+        #expect(throws: ValidationError.dependencyAcrossProjects) { try actions.toggle(loose, for: tasks[0]) }
+    }
+
     @Test func rejectsATaskFromAnotherProject() throws {
         let (context, _, tasks, actions) = try setUp()
         let other = Project(key: "MOB", name: "Mobile")

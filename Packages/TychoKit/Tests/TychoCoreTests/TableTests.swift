@@ -97,6 +97,17 @@ struct TableTests {
         #expect(TableSort.sorted(try tasks(), by: [TaskComparator(field: field)]).map(\.title) == titles)
     }
 
+    @Test func projectSortOrdersByProjectNameWithManualTieBreak() throws {
+        let all = try tasks()
+        let apps = Project(key: "APP", name: "Apps")
+        context.insert(apps)
+        all[1].project = apps
+        let sorted = TableSort.sorted(all.reversed(), by: [TaskComparator(field: .project)])
+        #expect(sorted.map(\.title) == ["Alpha", "beta", "gamma"])
+        let descending = TableSort.sorted(all.reversed(), by: [TaskComparator(field: .project, order: .reverse)])
+        #expect(descending.map(\.title) == ["beta", "gamma", "Alpha"])
+    }
+
     @Test func reverseInvertsTheWholeOrderIncludingEmpties() throws {
         let sorted = TableSort.sorted(try tasks(), by: [TaskComparator(field: .due, order: .reverse)])
         #expect(sorted.map(\.title) == ["Alpha", "beta", "gamma"])
@@ -106,14 +117,15 @@ struct TableTests {
         let all = try tasks()
         all.forEach { $0.priority = .high }
         #expect(
-            TableSort.sorted(all, by: [TaskComparator(field: .priority)]).map(\.title) == ["beta", "Alpha", "gamma"])
+            TableSort.sorted(all.reversed(), by: [TaskComparator(field: .priority)]).map(\.title)
+                == ["beta", "Alpha", "gamma"])
     }
 
     @Test func blankEstimatesSortLikeMissingOnes() throws {
         let all = try tasks()
         all[0].estimate = ""
         all[1].estimate = "  "
-        let sorted = TableSort.sorted(all, by: [TaskComparator(field: .estimate)])
+        let sorted = TableSort.sorted(all.reversed(), by: [TaskComparator(field: .estimate)])
         #expect(sorted.map(\.title) == ["gamma", "beta", "Alpha"])
     }
 

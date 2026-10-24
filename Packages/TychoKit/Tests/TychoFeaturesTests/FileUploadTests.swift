@@ -25,6 +25,25 @@ struct FileUploadTests {
         return url
     }
 
+    @Test func setsTheUploaderAndAttachesToTheTask() throws {
+        let me = Member(name: "Me", email: "", isMe: true)
+        let workspace = Workspace(name: "Home")
+        context.insert(me)
+        context.insert(workspace)
+        me.workspace = workspace
+        project.workspace = workspace
+        let task = TaskItem(number: 1, title: "Wireframes")
+        context.insert(task)
+        task.project = project
+
+        FileUpload.perform([try write("a.png")], project: project, task: task, context: context, toast: toast)
+
+        let file = try #require(project.files?.first)
+        #expect(file.uploadedBy === me)
+        #expect(file.task === task)
+        #expect(task.orderedAttachments.map(\.name) == ["a.png"])
+    }
+
     @Test func summarisesAnAllSuccessfulBatch() throws {
         let urls = [try write("a.png"), try write("b.png"), try write("c.png")]
         FileUpload.perform(urls, project: project, task: nil, context: context, toast: toast)

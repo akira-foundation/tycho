@@ -41,6 +41,17 @@ struct FileImportTests {
         #expect(throws: ValidationError.fileTooLarge) { try FileImport.read(url) }
     }
 
+    @Test func acceptsAFileOfExactlyTheMaximumSize() throws {
+        let url = directory.appending(path: "edge.zip")
+        FileManager.default.createFile(atPath: url.path(percentEncoded: false), contents: nil)
+        let handle = try FileHandle(forWritingTo: url)
+        try handle.truncate(atOffset: UInt64(FileActions.maxByteCount))
+        try handle.close()
+        let (name, data) = try FileImport.read(url)
+        #expect(name == "edge.zip")
+        #expect(data.count == FileActions.maxByteCount)
+    }
+
     @Test func uploadStoresEachFileAndReportsTheRest() throws {
         let context = ModelContext(try TychoSchema.makeContainer(inMemory: true))
         let project = Project(key: "WEB", name: "Website")
