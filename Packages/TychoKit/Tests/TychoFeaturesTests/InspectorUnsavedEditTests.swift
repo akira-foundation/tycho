@@ -69,5 +69,26 @@ struct InspectorUnsavedEditTests {
         #expect(fixture.task.title == "Typed after reopening")
         fixture.window.orderOut(nil)
     }
+
+    @Test(arguments: [1000.0, 1500.0])
+    func unsavedTitleSurvivesTheWindowClosing(width: Double) throws {
+        let fixture = try InspectorHostFixture(width: width)
+        let root = fixture.window.sheets.first ?? fixture.window
+        try fixture.type(
+            "Unsaved title", into: fixture.titleField(in: root, current: fixture.task.title), submit: false)
+
+        fixture.closeWindow()
+
+        #expect(fixture.task.title == "Unsaved title")
+    }
+
+    @Test(arguments: [1000.0, 1500.0])
+    func closingTheWindowReleasesEveryInspectorFlush(width: Double) throws {
+        let fixture = try InspectorHostFixture(width: width)
+
+        fixture.closeWindow()
+
+        #expect(fixture.router.liveInspectorFlushCount == 0)
+    }
 }
 #endif

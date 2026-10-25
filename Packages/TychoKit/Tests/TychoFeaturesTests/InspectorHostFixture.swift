@@ -35,6 +35,12 @@ struct InspectorHostFixture {
         RunLoop.main.run(until: Date().addingTimeInterval(seconds))
     }
 
+    func closeWindow() {
+        window.contentViewController = nil
+        window.close()
+        settle(1.5)
+    }
+
     func resize(to width: CGFloat) {
         window.setContentSize(NSSize(width: width, height: 800))
         router.updateWindowWidth(width)

@@ -21,7 +21,7 @@ public final class Router {
     public var columnVisibility: NavigationSplitViewVisibility = .automatic
     public private(set) var inspectsInSheet = false
     private var projectTabs: [UUID: ProjectTab] = [:]
-    @ObservationIgnored private var inspectorFlushes: [UUID: () -> Void] = [:]
+    @ObservationIgnored private var inspectorFlushes: [UUID: @MainActor () -> Void] = [:]
 
     public init() {}
 
@@ -87,12 +87,17 @@ public final class Router {
         inspectedTaskID = nil
     }
 
-    func registerInspectorFlush(_ token: UUID, _ flush: @escaping () -> Void) {
+    func registerInspectorFlush(_ token: UUID, _ flush: @escaping @MainActor () -> Void) {
         inspectorFlushes[token] = flush
     }
 
     func unregisterInspectorFlush(_ token: UUID) {
         inspectorFlushes[token] = nil
+    }
+
+    func releaseInspectorFlushes() {
+        flushInspectorEdits()
+        inspectorFlushes.removeAll()
     }
 
     var liveInspectorFlushCount: Int { inspectorFlushes.count }

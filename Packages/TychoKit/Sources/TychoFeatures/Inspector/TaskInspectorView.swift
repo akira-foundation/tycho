@@ -48,7 +48,10 @@ struct TaskInspectorView: View {
             }
             .onChange(of: task.id) { syncTitle(task) }
             .onChange(of: task.title) { syncTitle(task) }
-            .onDisappear { router.unregisterInspectorFlush(flushToken) }
+            .onDisappear {
+                commitTitle(task)
+                router.unregisterInspectorFlush(flushToken)
+            }
             .confirmationDialog("Delete \(task.key)?", isPresented: $confirmingDelete) {
                 Button("Delete task", role: .destructive) {
                     router.closeInspector()

@@ -12,6 +12,7 @@ struct RootView: View {
 
     var body: some View {
         content
+            .onDisappear { router.releaseInspectorFlushes() }
             .onChange(of: workspaces.first?.id) {
                 router.isCreatingTask = false
                 router.isCreatingProject = false

@@ -68,7 +68,10 @@ struct PropertyGrid: View {
         }
         .onChange(of: task.id) { syncEstimate() }
         .onChange(of: task.estimate) { syncEstimate() }
-        .onDisappear { router.unregisterInspectorFlush(flushToken) }
+        .onDisappear {
+            commitEstimate()
+            router.unregisterInspectorFlush(flushToken)
+        }
         .labelsHidden()
         .tychoFont(.base)
     }
