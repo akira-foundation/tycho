@@ -21,6 +21,7 @@ public final class Router {
     public var columnVisibility: NavigationSplitViewVisibility = .automatic
     public private(set) var inspectsInSheet = false
     private var projectTabs: [UUID: ProjectTab] = [:]
+    @ObservationIgnored private var inspectorFlushes: [UUID: () -> Void] = [:]
 
     public init() {}
 
@@ -68,6 +69,7 @@ public final class Router {
     public func updateWindowWidth(_ width: CGFloat) {
         let inSheet = InspectorLayout.presentsAsSheet(windowWidth: width)
         guard inSheet != inspectsInSheet else { return }
+        flushInspectorEdits()
         inspectsInSheet = inSheet
     }
 
@@ -75,8 +77,29 @@ public final class Router {
 
     public var isInspectorColumnPresented: Bool { inspectedTaskID != nil && !inspectsInSheet }
 
-    public func inspect(_ taskID: UUID) { inspectedTaskID = taskID }
-    public func closeInspector() { inspectedTaskID = nil }
+    public func inspect(_ taskID: UUID) {
+        if inspectedTaskID != taskID { flushInspectorEdits() }
+        inspectedTaskID = taskID
+    }
+
+    public func closeInspector() {
+        flushInspectorEdits()
+        inspectedTaskID = nil
+    }
+
+    func registerInspectorFlush(_ token: UUID, _ flush: @escaping () -> Void) {
+        inspectorFlushes[token] = flush
+    }
+
+    func unregisterInspectorFlush(_ token: UUID) {
+        inspectorFlushes[token] = nil
+    }
+
+    var liveInspectorFlushCount: Int { inspectorFlushes.count }
+
+    func flushInspectorEdits() {
+        for flush in inspectorFlushes.values { flush() }
+    }
 
     public func newTask(status: TaskStatus = .todo, due: Date? = nil) {
         draftStatus = status

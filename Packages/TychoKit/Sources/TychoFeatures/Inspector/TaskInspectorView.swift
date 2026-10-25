@@ -9,6 +9,8 @@ struct TaskInspectorView: View {
     @Environment(Router.self) private var router
     @Query private var matches: [TaskItem]
     @State private var title = ""
+    @State private var syncedTitle = ""
+    @State private var flushToken = UUID()
     @State private var confirmingDelete = false
 
     let presentedAsSheet: Bool
@@ -40,10 +42,13 @@ struct TaskInspectorView: View {
             }
             .background(Token.surface.color)
             .toastOverlay(toast, enabled: presentedAsSheet)
-            .onAppear { title = task.title }
-            .onChange(of: task.id) { title = task.title }
-            .onChange(of: task.title) { title = task.title }
-            .onDisappear { commitTitle(task) }
+            .onAppear {
+                syncTitle(task)
+                router.registerInspectorFlush(flushToken) { commitTitle(task) }
+            }
+            .onChange(of: task.id) { syncTitle(task) }
+            .onChange(of: task.title) { syncTitle(task) }
+            .onDisappear { router.unregisterInspectorFlush(flushToken) }
             .confirmationDialog("Delete \(task.key)?", isPresented: $confirmingDelete) {
                 Button("Delete task", role: .destructive) {
                     router.closeInspector()
@@ -85,9 +90,14 @@ struct TaskInspectorView: View {
         .buttonStyle(.borderless)
     }
 
-    private func commitTitle(_ task: TaskItem) {
-        guard !task.isDeleted, task.modelContext != nil, title != task.title else { return }
-        toast.perform { try TaskActions(context: context).rename(task, to: title) }
+    private func syncTitle(_ task: TaskItem) {
         title = task.title
+        syncedTitle = task.title
+    }
+
+    private func commitTitle(_ task: TaskItem) {
+        guard !task.isDeleted, task.modelContext != nil, title != syncedTitle, title != task.title else { return }
+        toast.perform { try TaskActions(context: context).rename(task, to: title) }
+        syncTitle(task)
     }
 }

@@ -8,7 +8,10 @@ struct PropertyGrid: View {
     @Environment(ToastCenter.self) private var toast
     @Query(sort: \Member.name) private var members: [Member]
     let task: TaskItem
+    @Environment(Router.self) private var router
     @State private var estimate = ""
+    @State private var syncedEstimate = ""
+    @State private var flushToken = UUID()
 
     var body: some View {
         Grid(alignment: .leading, horizontalSpacing: Spacing.s4, verticalSpacing: Spacing.s2) {
@@ -59,10 +62,13 @@ struct PropertyGrid: View {
                     .onSubmit(commitEstimate)
             }
         }
-        .onAppear { estimate = task.estimate ?? "" }
-        .onChange(of: task.id) { estimate = task.estimate ?? "" }
-        .onChange(of: task.estimate) { estimate = task.estimate ?? "" }
-        .onDisappear(perform: commitEstimate)
+        .onAppear {
+            syncEstimate()
+            router.registerInspectorFlush(flushToken, commitEstimate)
+        }
+        .onChange(of: task.id) { syncEstimate() }
+        .onChange(of: task.estimate) { syncEstimate() }
+        .onDisappear { router.unregisterInspectorFlush(flushToken) }
         .labelsHidden()
         .tychoFont(.base)
     }
@@ -105,11 +111,17 @@ struct PropertyGrid: View {
         }
     }
 
+    private func syncEstimate() {
+        estimate = task.estimate ?? ""
+        syncedEstimate = estimate
+    }
+
     private func commitEstimate() {
-        guard !task.isDeleted, task.modelContext != nil else { return }
+        guard !task.isDeleted, task.modelContext != nil, estimate != syncedEstimate else { return }
         let value = Estimate.normalized(estimate)
         guard value != task.estimate else { return }
         edit { $0.estimate = value }
+        syncEstimate()
     }
 
     private func edit(_ change: (TaskItem) -> Void) {
