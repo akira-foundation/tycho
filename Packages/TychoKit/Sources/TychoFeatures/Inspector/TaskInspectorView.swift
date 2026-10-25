@@ -65,6 +65,7 @@ struct TaskInspectorView: View {
                 toast.perform { try TaskActions(context: context).toggleFavorite(task) }
             }
             .labelStyle(.iconOnly)
+            .accessibilityIdentifier("inspector.favorite")
             Button(
                 task.status == .done ? "Reopen" : "Mark complete",
                 systemImage: task.status == .done ? "arrow.uturn.backward.circle" : "checkmark.circle"
@@ -72,6 +73,7 @@ struct TaskInspectorView: View {
                 toast.perform { try TaskActions(context: context).toggleDone(task) }
             }
             .labelStyle(.iconOnly)
+            .accessibilityIdentifier("inspector.complete")
             Button("Delete", systemImage: "trash", role: .destructive) { confirmingDelete = true }
                 .labelStyle(.iconOnly)
             Button("Close", systemImage: "xmark") { router.closeInspector() }
