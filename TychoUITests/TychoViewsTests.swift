@@ -9,7 +9,7 @@ final class TychoViewsTests: XCTestCase {
         continueAfterFailure = false
         app = XCUIApplication()
         app.launchArguments = ["-uiTesting"]
-        app.launch()
+        app.launchShowingWindow()
         let demo = app.buttons["onboarding.demo"]
         XCTAssertTrue(demo.waitForExistence(timeout: 10))
         demo.click()

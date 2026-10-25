@@ -5,7 +5,7 @@ final class TychoLaunchTests: XCTestCase {
     func testFirstLaunchShowsOnboarding() {
         let app = XCUIApplication()
         app.launchArguments = ["-uiTesting"]
-        app.launch()
+        app.launchShowingWindow()
         XCTAssertTrue(app.buttons["onboarding.demo"].waitForExistence(timeout: 10))
     }
 }

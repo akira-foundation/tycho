@@ -9,7 +9,7 @@ final class TychoSmokeTests: XCTestCase {
         continueAfterFailure = false
         app = XCUIApplication()
         app.launchArguments = ["-uiTesting"]
-        app.launch()
+        app.launchShowingWindow()
     }
 
     func testDemoBoardMovesACardThroughTheContextMenu() {

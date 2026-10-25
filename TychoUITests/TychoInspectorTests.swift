@@ -12,14 +12,14 @@ final class TychoInspectorTests: XCTestCase {
     }
 
     private func loadDemo() {
-        app.launch()
+        app.launchShowingWindow()
         let demo = app.buttons["onboarding.demo"]
         XCTAssertTrue(demo.waitForExistence(timeout: 10))
         demo.click()
     }
 
     private func startEmptyWithOneTask() {
-        app.launch()
+        app.launchShowingWindow()
         let name = app.textFields["onboarding.name"]
         XCTAssertTrue(name.waitForExistence(timeout: 10))
         name.click()
