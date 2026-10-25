@@ -24,8 +24,10 @@ struct OnboardingView: View {
                     .tychoFont(.md)
                     .foregroundStyle(Token.text3.color)
             }
+            #if os(macOS)
             .focusable()
             .focusEffectDisabled()
+            #endif
             VStack(alignment: .leading, spacing: Spacing.s2) {
                 Text("Your name").tychoFont(.xs, weight: .medium).foregroundStyle(Token.text3.color)
                 TextField("Your name", text: $name)

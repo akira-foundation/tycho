@@ -57,9 +57,16 @@ struct FileRow: View {
                 Image(systemName: file.kind.symbol).foregroundStyle(file.kind.tint).frame(width: 22)
                 Text(file.name).tychoFont(.sm, weight: .medium).lineLimit(1)
                 if let task = file.task {
-                    Button(task.key, systemImage: "link") { router.inspect(task.id) }
-                        .tychoFont(.xxs, design: .monospaced)
-                        .buttonStyle(.tycho(.secondary, size: .sm))
+                    Button {
+                        router.inspect(task.id)
+                    } label: {
+                        Label {
+                            Text(task.key).tychoFont(.xxs, design: .monospaced)
+                        } icon: {
+                            Image(systemName: "link")
+                        }
+                    }
+                    .buttonStyle(.tycho(.secondary, size: .sm))
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
