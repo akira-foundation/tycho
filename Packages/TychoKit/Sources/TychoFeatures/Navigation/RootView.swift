@@ -33,6 +33,13 @@ struct RootView: View {
                 }
             }
             .background(Token.bg.color)
+            #if os(macOS)
+            .onGeometryChange(for: CGFloat.self) {
+                $0.size.width
+            } action: {
+                router.windowWidth = $0
+            }
+            #endif
             .toolbar {
                 ToolbarItem {
                     Button("Inspector", systemImage: "sidebar.right") { router.closeInspector() }
@@ -42,14 +49,31 @@ struct RootView: View {
             }
             .inspector(
                 isPresented: Binding(
-                    get: { router.inspectedTaskID != nil },
-                    set: { if !$0 { router.closeInspector() } }
+                    get: { router.isInspectorColumnPresented },
+                    set: { if !$0 && !router.inspectsInSheet { router.closeInspector() } }
                 )
             ) {
                 if let id = router.inspectedTaskID {
                     TaskInspectorView(taskID: id, presentedAsSheet: inspectorIsSheet)
                         .id(id)
-                        .inspectorColumnWidth(min: 320, ideal: 380, max: 520)
+                        .inspectorColumnWidth(
+                            min: InspectorLayout.minimumColumnWidth,
+                            ideal: InspectorLayout.idealColumnWidth,
+                            max: InspectorLayout.maximumColumnWidth)
+                }
+            }
+            .sheet(
+                isPresented: Binding(
+                    get: { router.isInspectorSheetPresented },
+                    set: { if !$0 && router.inspectsInSheet { router.closeInspector() } }
+                )
+            ) {
+                if let id = router.inspectedTaskID {
+                    TaskInspectorView(taskID: id, presentedAsSheet: true)
+                        .id(id)
+                        .frame(
+                            minWidth: InspectorLayout.minimumColumnWidth, idealWidth: InspectorLayout.idealColumnWidth,
+                            minHeight: 560)
                 }
             }
             .sheet(isPresented: $router.isCreatingProject) { NewProjectSheet(project: nil) }
