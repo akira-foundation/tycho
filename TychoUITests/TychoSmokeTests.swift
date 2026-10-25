@@ -28,21 +28,7 @@ final class TychoSmokeTests: XCTestCase {
         XCTAssertFalse(todo.descendants(matching: .any)["card.WEB-124"].exists)
     }
 
-    func testInspectorRejectsABlankTitle() {
-        app.buttons["onboarding.demo"].click()
-        app.outlines.staticTexts["Website Redesign"].firstMatch.click()
-        app.descendants(matching: .any)["card.WEB-109"].click()
-
-        let title = app.textFields["inspector.title"].firstMatch
-        XCTAssertTrue(title.waitForExistence(timeout: 5))
-        title.click()
-        title.typeKey("a", modifierFlags: .command)
-        title.typeText(" \r")
-
-        XCTAssertTrue(app.staticTexts["Title can't be empty."].waitForExistence(timeout: 5))
-    }
-
-    func testInspectorCloseButtonDismissesThePanel() {
+    private func openFirstBacklogCard() -> XCUIElement {
         app.buttons["onboarding.demo"].click()
         app.outlines.staticTexts["Website Redesign"].firstMatch.click()
         let backlog = app.descendants(matching: .any)["column.backlog"].firstMatch
@@ -55,6 +41,20 @@ final class TychoSmokeTests: XCTestCase {
 
         let title = app.textFields["inspector.title"].firstMatch
         XCTAssertTrue(title.waitForExistence(timeout: 5))
+        return title
+    }
+
+    func testInspectorRejectsABlankTitle() {
+        let title = openFirstBacklogCard()
+        title.click()
+        title.typeKey("a", modifierFlags: .command)
+        title.typeText(" \r")
+
+        XCTAssertTrue(app.staticTexts["Title can't be empty."].waitForExistence(timeout: 5))
+    }
+
+    func testInspectorCloseButtonDismissesThePanel() {
+        let title = openFirstBacklogCard()
         app.buttons["inspector.close"].firstMatch.click()
 
         XCTAssertTrue(title.waitForNonExistence(timeout: 5))
