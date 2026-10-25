@@ -9,7 +9,6 @@ extension XCUIApplication {
     func loadDemoWorkspace() {
         let demo = buttons["onboarding.demo"]
         XCTAssertTrue(demo.waitForExistence(timeout: 10))
-        typeKey(.escape, modifierFlags: [])
         demo.click()
     }
 
