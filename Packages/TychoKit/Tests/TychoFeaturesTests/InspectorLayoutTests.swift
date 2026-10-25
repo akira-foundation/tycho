@@ -48,16 +48,24 @@ struct InspectorLayoutTests {
         ) throws
             -> CGFloat
         {
+            try layout(at: width, showing: destination, inspecting: inspecting).minimumWidth
+        }
+
+        func layout(
+            at width: CGFloat, showing destination: Destination, inspecting: Bool
+        ) throws -> (minimumWidth: CGFloat, sheetCount: Int) {
             let router = Router()
             router.open(try route(destination))
-            router.windowWidth = width
+            router.updateWindowWidth(width)
             if inspecting { router.inspect(task.id) }
             let host = NSHostingController(
                 rootView: RootView().environment(router).environment(ToastCenter()).modelContainer(container))
             let window = NSWindow(contentViewController: host)
             window.setContentSize(NSSize(width: width, height: 800))
-            RunLoop.main.run(until: Date().addingTimeInterval(0.3))
-            return window.contentMinSize.width
+            window.makeKeyAndOrderFront(nil)
+            RunLoop.main.run(until: Date().addingTimeInterval(0.8))
+            defer { window.orderOut(nil) }
+            return (window.contentMinSize.width, window.sheets.count)
         }
     }
 
@@ -65,9 +73,10 @@ struct InspectorLayoutTests {
     func narrowWindowKeepsItsWidthWithTheInspectorOpen(destination: Destination) throws {
         let fixture = try DemoFixture()
 
-        let minimum = try fixture.minimumWindowWidth(at: 900, showing: destination, inspecting: true)
+        let layout = try fixture.layout(at: 900, showing: destination, inspecting: true)
 
-        #expect(minimum <= 900)
+        #expect(layout.minimumWidth <= 900)
+        #expect(layout.sheetCount == 1)
     }
 
     @Test(arguments: Destination.allCases)
@@ -85,26 +94,26 @@ struct InspectorLayoutTests {
     @Test func routerPresentsTheInspectorAsASheetBelowTheThreshold() {
         let router = Router()
         #expect(!router.inspectsInSheet)
-        router.windowWidth = InspectorLayout.minimumWindowWidth - 1
+        router.updateWindowWidth(InspectorLayout.minimumWindowWidth - 1)
         #expect(router.inspectsInSheet)
-        router.windowWidth = InspectorLayout.minimumWindowWidth
+        router.updateWindowWidth(InspectorLayout.minimumWindowWidth)
         #expect(!router.inspectsInSheet)
     }
 
     @Test func crossingTheThresholdKeepsTheSameTaskInExactlyOnePresentation() {
         let router = Router()
         let id = UUID()
-        router.windowWidth = InspectorLayout.minimumWindowWidth
+        router.updateWindowWidth(InspectorLayout.minimumWindowWidth)
         router.inspect(id)
         #expect(router.isInspectorColumnPresented)
         #expect(!router.isInspectorSheetPresented)
 
-        router.windowWidth = 900
+        router.updateWindowWidth(900)
         #expect(router.inspectedTaskID == id)
         #expect(router.isInspectorSheetPresented)
         #expect(!router.isInspectorColumnPresented)
 
-        router.windowWidth = InspectorLayout.minimumWindowWidth
+        router.updateWindowWidth(InspectorLayout.minimumWindowWidth)
         #expect(router.inspectedTaskID == id)
         #expect(router.isInspectorColumnPresented)
 

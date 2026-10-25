@@ -38,6 +38,34 @@ struct RouterTests {
         #expect(router.isCreatingProject)
     }
 
+    @Test func newTaskClosesTheInspectorSheetSoItsSheetOpensAtOnce() {
+        let router = Router()
+        router.updateWindowWidth(900)
+        router.inspect(UUID())
+        router.newTask()
+        #expect(router.isCreatingTask)
+        #expect(router.inspectedTaskID == nil)
+        #expect(!router.isInspectorSheetPresented)
+    }
+
+    @Test func newProjectClosesTheInspectorSheetSoItsSheetOpensAtOnce() {
+        let router = Router()
+        router.updateWindowWidth(900)
+        router.inspect(UUID())
+        router.newProject()
+        #expect(router.isCreatingProject)
+        #expect(router.inspectedTaskID == nil)
+    }
+
+    @Test func newTaskKeepsTheInspectorColumnOpen() {
+        let router = Router()
+        router.updateWindowWidth(InspectorLayout.minimumWindowWidth)
+        let id = UUID()
+        router.inspect(id)
+        router.newTask()
+        #expect(router.inspectedTaskID == id)
+    }
+
     @Test func showsSettings() {
         let router = Router()
         router.showSettings()

@@ -56,7 +56,7 @@ struct InspectorTitleEditTests {
 
     @Test func titleRenamedInTheSheetSurvivesClosingIt() throws {
         let fixture = try Fixture(width: 1000)
-        fixture.router.windowWidth = 1000
+        fixture.router.updateWindowWidth(1000)
         fixture.settle(0.5)
         let sheet = try #require(fixture.window.sheets.first)
 
@@ -70,13 +70,13 @@ struct InspectorTitleEditTests {
 
     @Test func titleRenamedInTheSheetSurvivesWideningAndClosingTheColumn() throws {
         let fixture = try Fixture(width: 1000)
-        fixture.router.windowWidth = 1000
+        fixture.router.updateWindowWidth(1000)
         fixture.settle(0.5)
         let sheet = try #require(fixture.window.sheets.first)
 
         try fixture.rename(in: sheet, to: "Renamed in sheet")
         fixture.window.setContentSize(NSSize(width: 1500, height: 800))
-        fixture.router.windowWidth = 1500
+        fixture.router.updateWindowWidth(1500)
         fixture.settle(1.0)
         fixture.router.closeInspector()
         fixture.settle(1.5)

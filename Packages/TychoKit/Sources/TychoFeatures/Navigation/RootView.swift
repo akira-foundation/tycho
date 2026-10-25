@@ -37,7 +37,7 @@ struct RootView: View {
             .onGeometryChange(for: CGFloat.self) {
                 $0.size.width
             } action: {
-                router.windowWidth = $0
+                router.updateWindowWidth($0)
             }
             #endif
             .toolbar {

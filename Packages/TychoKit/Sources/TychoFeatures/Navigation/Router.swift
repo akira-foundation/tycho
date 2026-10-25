@@ -19,7 +19,7 @@ public final class Router {
     public var timelineGrouping: TimelineGrouping = .status
     public private(set) var hasOpenedWorkspaceTimeline = false
     public var columnVisibility: NavigationSplitViewVisibility = .automatic
-    public var windowWidth: CGFloat?
+    public private(set) var inspectsInSheet = false
     private var projectTabs: [UUID: ProjectTab] = [:]
 
     public init() {}
@@ -65,8 +65,10 @@ public final class Router {
         open(.project(id, tab))
     }
 
-    public var inspectsInSheet: Bool {
-        windowWidth.map(InspectorLayout.presentsAsSheet) ?? false
+    public func updateWindowWidth(_ width: CGFloat) {
+        let inSheet = InspectorLayout.presentsAsSheet(windowWidth: width)
+        guard inSheet != inspectsInSheet else { return }
+        inspectsInSheet = inSheet
     }
 
     public var isInspectorSheetPresented: Bool { inspectedTaskID != nil && inspectsInSheet }
@@ -79,6 +81,7 @@ public final class Router {
     public func newTask(status: TaskStatus = .todo, due: Date? = nil) {
         draftStatus = status
         draftDue = due
+        closeInspectorSheet()
         isCreatingTask = true
     }
 
@@ -88,7 +91,14 @@ public final class Router {
         timelineGrouping = .project
     }
 
-    public func newProject() { isCreatingProject = true }
+    public func newProject() {
+        closeInspectorSheet()
+        isCreatingProject = true
+    }
+
+    private func closeInspectorSheet() {
+        if isInspectorSheetPresented { closeInspector() }
+    }
 
     public func showSettings() { isShowingSettings = true }
 }
