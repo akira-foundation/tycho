@@ -13,9 +13,7 @@ final class TychoInspectorTests: XCTestCase {
 
     private func loadDemo() {
         app.launchShowingWindow()
-        let demo = app.buttons["onboarding.demo"]
-        XCTAssertTrue(demo.waitForExistence(timeout: 10))
-        demo.click()
+        app.loadDemoWorkspace()
     }
 
     private func startEmptyWithOneTask() {
@@ -40,16 +38,11 @@ final class TychoInspectorTests: XCTestCase {
     }
 
     private func element(_ identifier: String) -> XCUIElement {
-        app.descendants(matching: .any)[identifier].firstMatch
+        app.element(identifier)
     }
 
     private func openWebsiteTab(_ tab: String) {
-        let picker = element("project.tab")
-        for _ in 0..<3 where !picker.exists {
-            let project = app.outlines.staticTexts["Website Redesign"].firstMatch
-            if project.waitForExistence(timeout: 5) { project.click() }
-            _ = picker.waitForExistence(timeout: 3)
-        }
+        app.openSidebarItem("Website Redesign", revealing: element("project.tab"))
         openTab(tab)
     }
 

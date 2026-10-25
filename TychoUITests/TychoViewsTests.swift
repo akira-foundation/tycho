@@ -10,24 +10,20 @@ final class TychoViewsTests: XCTestCase {
         app = XCUIApplication()
         app.launchArguments = ["-uiTesting"]
         app.launchShowingWindow()
-        let demo = app.buttons["onboarding.demo"]
-        XCTAssertTrue(demo.waitForExistence(timeout: 10))
-        demo.click()
+        app.loadDemoWorkspace()
     }
 
     private func element(_ identifier: String) -> XCUIElement {
-        app.descendants(matching: .any)[identifier].firstMatch
+        app.element(identifier)
     }
 
-    private func openSidebar(_ title: String) {
-        app.outlines.staticTexts[title].firstMatch.click()
+    private func openSidebar(_ title: String, revealing identifier: String) {
+        app.openSidebarItem(title, revealing: element(identifier))
     }
 
     private func openWebsiteTab(_ tab: String) {
-        openSidebar("Website Redesign")
-        let picker = element("project.tab")
-        XCTAssertTrue(picker.waitForExistence(timeout: 5))
-        picker.descendants(matching: .any)[tab].firstMatch.click()
+        openSidebar("Website Redesign", revealing: "project.tab")
+        element("project.tab").descendants(matching: .any)[tab].firstMatch.click()
     }
 
     private func text(of element: XCUIElement) -> String {
@@ -52,9 +48,8 @@ final class TychoViewsTests: XCTestCase {
             ("Board", "column.todo"), ("List", "group.todo"), ("Table", "table.columns"),
             ("Calendar", "calendar.title"), ("Timeline", "timeline.zoom"), ("Files", "files.search"),
         ]
-        openSidebar("Website Redesign")
+        openSidebar("Website Redesign", revealing: "project.tab")
         let picker = element("project.tab")
-        XCTAssertTrue(picker.waitForExistence(timeout: 5))
         for (tab, marker) in markers {
             picker.descendants(matching: .any)[tab].firstMatch.click()
             XCTAssertTrue(element(marker).waitForExistence(timeout: 5), "\(tab) did not open")
@@ -90,7 +85,7 @@ final class TychoViewsTests: XCTestCase {
     }
 
     func testCalendarMovesBetweenMonthsAndBackToToday() {
-        openSidebar("Calendar")
+        openSidebar("Calendar", revealing: "calendar.title")
         let title = element("calendar.title")
         XCTAssertTrue(title.waitForExistence(timeout: 5))
         let current = text(of: title)
@@ -102,7 +97,7 @@ final class TychoViewsTests: XCTestCase {
     }
 
     func testCalendarOpensTheDayList() {
-        openSidebar("Calendar")
+        openSidebar("Calendar", revealing: "calendar.title")
         let more = app.buttons.matching(NSPredicate(format: "label ENDSWITH %@", "more")).firstMatch
         XCTAssertTrue(more.waitForExistence(timeout: 5))
         more.click()
@@ -110,7 +105,7 @@ final class TychoViewsTests: XCTestCase {
     }
 
     func testTimelineSwitchesToMonths() {
-        openSidebar("Timeline")
+        openSidebar("Timeline", revealing: "timeline.zoom")
         XCTAssertTrue(element("timeline.header.week").waitForExistence(timeout: 5))
         element("timeline.zoom").descendants(matching: .any)["Months"].firstMatch.click()
         XCTAssertTrue(element("timeline.header.month").waitForExistence(timeout: 5))

@@ -12,9 +12,13 @@ final class TychoSmokeTests: XCTestCase {
         app.launchShowingWindow()
     }
 
+    private func openWebsiteBoard() {
+        app.loadDemoWorkspace()
+        app.openSidebarItem("Website Redesign", revealing: app.element("column.backlog"))
+    }
+
     func testDemoBoardMovesACardThroughTheContextMenu() {
-        app.buttons["onboarding.demo"].click()
-        app.outlines.staticTexts["Website Redesign"].firstMatch.click()
+        openWebsiteBoard()
 
         let card = app.descendants(matching: .any)["card.WEB-124"]
         XCTAssertTrue(card.waitForExistence(timeout: 5))
@@ -29,10 +33,8 @@ final class TychoSmokeTests: XCTestCase {
     }
 
     private func openFirstBacklogCard() -> XCUIElement {
-        app.buttons["onboarding.demo"].click()
-        app.outlines.staticTexts["Website Redesign"].firstMatch.click()
-        let backlog = app.descendants(matching: .any)["column.backlog"].firstMatch
-        XCTAssertTrue(backlog.waitForExistence(timeout: 5))
+        openWebsiteBoard()
+        let backlog = app.element("column.backlog")
         let firstCard = backlog.descendants(matching: .any).matching(
             NSPredicate(format: "identifier BEGINSWITH 'card.' AND NOT identifier ENDSWITH '.toggle'")
         ).firstMatch
