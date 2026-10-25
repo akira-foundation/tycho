@@ -112,6 +112,17 @@ struct SeedTests {
         #expect(try context.fetchCount(FetchDescriptor<TaskItem>()) == 49)
     }
 
+    @Test func reloadDemoKeepsTheCurrentOwnerName() throws {
+        let context = try makeTestContext()
+        try DemoSeed.load(into: context, now: referenceNow, calendar: utcCalendar, ownerName: "Ana Costa")
+
+        try DataReset.reloadDemo(in: context, now: referenceNow, calendar: utcCalendar)
+
+        let members = try context.fetch(FetchDescriptor<Member>())
+        let me = try #require(members.first { $0.isMe })
+        #expect(me.name == "Ana Costa")
+    }
+
     @Test func deleteAllAlsoEmptiesTheScheduleAndFiles() throws {
         let context = try makeTestContext()
         context.insert(Milestone(name: "Launch", date: day(1)))

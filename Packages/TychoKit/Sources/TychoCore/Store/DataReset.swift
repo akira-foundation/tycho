@@ -17,7 +17,8 @@ public enum DataReset {
     }
 
     public static func reloadDemo(in context: ModelContext, now: Date, calendar: Calendar) throws {
+        let ownerName = try context.fetch(FetchDescriptor<Member>()).first { $0.isMe }?.name ?? ""
         try deleteAll(in: context)
-        try DemoSeed.load(into: context, now: now, calendar: calendar)
+        try DemoSeed.load(into: context, now: now, calendar: calendar, ownerName: ownerName)
     }
 }
