@@ -1,0 +1,77 @@
+name: Nightly
+
+on:
+  schedule:
+    - cron: "0 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tycho-nightly
+  cancel-in-progress: true
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      recent: ${{ steps.check.outputs.recent }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 50
+      - id: check
+        env:
+          EVENT: ${{ github.event_name }}
+        run: |
+          set -euo pipefail
+          count="$(git rev-list --count --since='24 hours ago' HEAD)"
+          if [ "$EVENT" = "workflow_dispatch" ] || [ "$count" -gt 0 ]; then
+            echo "recent=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "recent=false" >> "$GITHUB_OUTPUT"
+            echo "No commits on main in the last 24 hours; skipping the macOS runner."
+          fi
+
+  apple:
+    needs: changes
+    if: needs.changes.outputs.recent == 'true'
+    runs-on: xcode-27
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - name: Select Xcode 27
+        run: |
+          set -euo pipefail
+          xcode="$(find /Applications -maxdepth 1 -name 'Xcode_27*.app' | sort -V | tail -1)"
+          if [ -n "$xcode" ]; then
+            sudo xcode-select -s "$xcode/Contents/Developer"
+          fi
+          version="$(xcodebuild -version)"
+          echo "$version"
+          major="$(printf '%s\n' "$version" | sed -n '1s/^Xcode \([0-9]*\).*/\1/p')"
+          if [ -z "$major" ] || [ "$major" -lt 27 ]; then
+            echo "::error::Xcode 27 or newer is required, this runner has: $version"
+            exit 1
+          fi
+
+      - name: Build for macOS and the iOS simulator
+        run: make build
+
+      - name: Pick an iPhone simulator
+        id: sim
+        run: |
+          set -euo pipefail
+          name="$(xcrun simctl list devices available -j | python3 -c 'import json,sys; d=json.load(sys.stdin)["devices"]; print(next(x["name"] for r,v in sorted(d.items(), reverse=True) if "iOS" in r for x in v if x["name"].startswith("iPhone")))')"
+          echo "name=$name" >> "$GITHUB_OUTPUT"
+
+      - name: UI smoke test on the iOS simulator
+        env:
+          SIM_NAME: ${{ steps.sim.outputs.name }}
+        run: make test-ios SIM_NAME="$SIM_NAME"
+
+      - name: UI smoke test on macOS
+        run: make test-ui

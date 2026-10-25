@@ -1,0 +1,84 @@
+name: Test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tycho-test-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - name: Lint the workflows
+        env:
+          ACTIONLINT_VERSION: 1.7.7
+        run: |
+          set -euo pipefail
+          url="https://github.com/rhysd/actionlint/releases/download/v${ACTIONLINT_VERSION}"
+          curl -sSfL "$url/actionlint_${ACTIONLINT_VERSION}_linux_amd64.tar.gz" | tar xz actionlint
+          ./actionlint -no-color .github/workflows/*.yml
+
+      - name: Check the shell scripts parse
+        run: |
+          set -euo pipefail
+          command -v zsh >/dev/null || sudo apt-get install -y -qq zsh
+          git ls-files '*.sh' | while read -r script; do
+            zsh -n "$script"
+            echo "ok $script"
+          done
+
+      - name: Lint the Swift
+        env:
+          SWIFTLINT_VERSION: 0.65.1
+        run: |
+          set -euo pipefail
+          command -v zsh >/dev/null || sudo apt-get install -y -qq zsh
+          url="https://github.com/realm/SwiftLint/releases/download/${SWIFTLINT_VERSION}"
+          curl -sSfL -o swiftlint.zip "$url/swiftlint_linux_amd64.zip"
+          mkdir -p swiftlint-bin
+          unzip -q -j swiftlint.zip swiftlint-static -d swiftlint-bin
+          mv swiftlint-bin/swiftlint-static swiftlint-bin/swiftlint
+          chmod +x swiftlint-bin/swiftlint
+          PATH="$PWD/swiftlint-bin:$PATH" ./Tools/swiftlint.sh
+
+  test:
+    needs: lint
+    runs-on: xcode-27
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - name: Select Xcode 27
+        run: |
+          set -euo pipefail
+          xcode="$(find /Applications -maxdepth 1 -name 'Xcode_27*.app' | sort -V | tail -1)"
+          if [ -n "$xcode" ]; then
+            sudo xcode-select -s "$xcode/Contents/Developer"
+          fi
+          version="$(xcodebuild -version)"
+          echo "$version"
+          major="$(printf '%s\n' "$version" | sed -n '1s/^Xcode \([0-9]*\).*/\1/p')"
+          if [ -z "$major" ] || [ "$major" -lt 27 ]; then
+            echo "::error::Xcode 27 or newer is required, this runner has: $version"
+            exit 1
+          fi
+
+      - name: Check formatting
+        run: make format-check
+
+      - name: Run the package suite
+        run: make test
+
+      - name: Build the app for macOS
+        run: xcodebuild build -scheme Tycho -destination 'platform=macOS' CODE_SIGNING_ALLOWED=NO -quiet
