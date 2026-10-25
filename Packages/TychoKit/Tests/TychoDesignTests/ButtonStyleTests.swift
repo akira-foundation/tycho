@@ -5,16 +5,14 @@ import Testing
 
 @MainActor
 struct ButtonStyleTests {
-    @Test func primaryTextIsWhiteInBothSchemes() {
-        let white = RGBA(hex: 0xFFFFFF)
-        #expect(ButtonVariant.primary.foreground(isDark: false) == white)
-        #expect(ButtonVariant.primary.foreground(isDark: true) == white)
+    @Test func primaryTextUsesTheOnAccentToken() {
+        #expect(ButtonVariant.primary.foreground(isDark: false) == Token.onAccent.light)
+        #expect(ButtonVariant.primary.foreground(isDark: true) == Token.onAccent.dark)
     }
 
-    @Test func dangerTextIsWhiteInBothSchemes() {
-        let white = RGBA(hex: 0xFFFFFF)
-        #expect(ButtonVariant.danger.foreground(isDark: false) == white)
-        #expect(ButtonVariant.danger.foreground(isDark: true) == white)
+    @Test func dangerTextUsesTheOnAccentToken() {
+        #expect(ButtonVariant.danger.foreground(isDark: false) == Token.onAccent.light)
+        #expect(ButtonVariant.danger.foreground(isDark: true) == Token.onAccent.dark)
     }
 
     @Test func variantsMapToTheOriginalForegrounds() {

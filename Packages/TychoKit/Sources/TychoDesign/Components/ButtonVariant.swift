@@ -6,15 +6,13 @@ public enum ButtonVariant: CaseIterable, Sendable {
     public var hasBorder: Bool { self == .secondary }
 
     public func foreground(isDark: Bool) -> RGBA {
-        let token: Token? =
+        let token: Token =
             switch self {
-            case .primary: nil
+            case .primary, .danger: .onAccent
             case .secondary: .text
             case .ghost: .text2
-            case .danger: nil
             case .dangerGhost: .red
             }
-        guard let token else { return RGBA(hex: 0xFFFFFF) }
         return isDark ? token.dark : token.light
     }
 }
