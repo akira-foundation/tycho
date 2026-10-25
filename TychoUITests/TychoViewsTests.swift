@@ -96,10 +96,18 @@ final class TychoViewsTests: XCTestCase {
         XCTAssertTrue(eventually { text(of: title) == current })
     }
 
-    func testCalendarOpensTheDayList() {
+    func testCalendarOpensTheDayList() throws {
         openSidebar("Calendar", revealing: "calendar.title")
-        let more = app.buttons.matching(NSPredicate(format: "label ENDSWITH %@", "more")).firstMatch
-        XCTAssertTrue(more.waitForExistence(timeout: 5))
+        let overflow = NSPredicate(format: "label ENDSWITH %@", "more")
+        let overflows = app.buttons.matching(overflow)
+        XCTAssertTrue(overflows.firstMatch.waitForExistence(timeout: 5))
+        let grid = app.scrollViews.containing(overflow).firstMatch
+        var reachable = overflows.allElementsBoundByIndex.first(where: \.isHittable)
+        for delta in [-300.0, 600.0] where reachable == nil {
+            grid.scroll(byDeltaX: 0, deltaY: delta)
+            reachable = overflows.allElementsBoundByIndex.first(where: \.isHittable)
+        }
+        let more = try XCTUnwrap(reachable, "no reachable +N more button")
         more.click()
         XCTAssertTrue(element("calendar.daylist").waitForExistence(timeout: 5))
     }
