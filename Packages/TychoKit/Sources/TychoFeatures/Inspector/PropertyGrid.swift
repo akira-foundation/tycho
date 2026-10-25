@@ -61,6 +61,7 @@ struct PropertyGrid: View {
         }
         .onAppear { estimate = task.estimate ?? "" }
         .onChange(of: task.id) { estimate = task.estimate ?? "" }
+        .onChange(of: task.estimate) { estimate = task.estimate ?? "" }
         .onDisappear(perform: commitEstimate)
         .labelsHidden()
         .tychoFont(.base)

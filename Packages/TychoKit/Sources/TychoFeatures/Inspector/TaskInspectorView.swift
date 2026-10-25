@@ -42,6 +42,7 @@ struct TaskInspectorView: View {
             .toastOverlay(toast, enabled: presentedAsSheet)
             .onAppear { title = task.title }
             .onChange(of: task.id) { title = task.title }
+            .onChange(of: task.title) { title = task.title }
             .onDisappear { commitTitle(task) }
             .confirmationDialog("Delete \(task.key)?", isPresented: $confirmingDelete) {
                 Button("Delete task", role: .destructive) {

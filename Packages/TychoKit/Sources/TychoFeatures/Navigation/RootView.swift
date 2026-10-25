@@ -53,7 +53,7 @@ struct RootView: View {
                     set: { if !$0 && !router.inspectsInSheet { router.closeInspector() } }
                 )
             ) {
-                if let id = router.inspectedTaskID {
+                if router.isInspectorColumnPresented, let id = router.inspectedTaskID {
                     TaskInspectorView(taskID: id, presentedAsSheet: inspectorIsSheet)
                         .id(id)
                         .inspectorColumnWidth(
@@ -68,7 +68,7 @@ struct RootView: View {
                     set: { if !$0 && router.inspectsInSheet { router.closeInspector() } }
                 )
             ) {
-                if let id = router.inspectedTaskID {
+                if router.isInspectorSheetPresented, let id = router.inspectedTaskID {
                     TaskInspectorView(taskID: id, presentedAsSheet: true)
                         .id(id)
                         .frame(
