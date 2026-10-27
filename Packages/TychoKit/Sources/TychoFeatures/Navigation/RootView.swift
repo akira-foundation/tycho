@@ -54,11 +54,11 @@ struct RootView: View {
             }
             .inspector(
                 isPresented: Binding(
-                    get: { router.isInspectorColumnPresented },
-                    set: { if !$0 && !router.inspectsInSheet { router.closeInspector() } }
+                    get: { showsInspectorColumn },
+                    set: { if !$0 && !inspectsInSheet { router.closeInspector() } }
                 )
             ) {
-                if router.isInspectorColumnPresented, let id = router.inspectedTaskID {
+                if showsInspectorColumn, let id = router.inspectedTaskID {
                     TaskInspectorView(taskID: id)
                         .id(id)
                         .inspectorColumnWidth(
@@ -69,11 +69,11 @@ struct RootView: View {
             }
             .sheet(
                 isPresented: Binding(
-                    get: { router.isInspectorSheetPresented },
-                    set: { if !$0 && router.inspectsInSheet { router.closeInspector() } }
+                    get: { showsInspectorSheet },
+                    set: { if !$0 && inspectsInSheet { router.closeInspector() } }
                 )
             ) {
-                if router.isInspectorSheetPresented, let id = router.inspectedTaskID {
+                if showsInspectorSheet, let id = router.inspectedTaskID {
                     TaskInspectorView(taskID: id, presentedAsSheet: true)
                         .id(id)
                         #if os(macOS)
@@ -92,4 +92,16 @@ struct RootView: View {
             }
         }
     }
+
+    private var inspectsInSheet: Bool {
+        #if os(iOS)
+        sizeClass == .compact
+        #else
+        router.inspectsInSheet
+        #endif
+    }
+
+    private var showsInspectorColumn: Bool { router.inspectedTaskID != nil && !inspectsInSheet }
+
+    private var showsInspectorSheet: Bool { router.inspectedTaskID != nil && inspectsInSheet }
 }

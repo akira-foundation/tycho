@@ -57,6 +57,14 @@ struct RouterInspectorFlushTests {
         #expect(counter.count == 3)
     }
 
+    @Test func crossingTheSizeClassFlushesEachTime() {
+        let (router, counter) = routerCountingFlushes()
+        router.updateHorizontalSizeClass(isCompact: true)
+        router.updateHorizontalSizeClass(isCompact: true)
+        router.updateHorizontalSizeClass(isCompact: false)
+        #expect(counter.count == 2)
+    }
+
     @Test func releasingFlushesOnceAndEmptiesTheRegistry() {
         let (router, counter) = routerCountingFlushes()
         router.releaseInspectorFlushes()
