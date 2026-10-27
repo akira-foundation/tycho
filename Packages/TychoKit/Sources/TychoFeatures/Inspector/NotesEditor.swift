@@ -47,7 +47,7 @@ struct NotesEditor: View {
     }
 
     private func commitDraft() {
-        guard editing, TaskActions(context: context).isStored(task), text != task.notes else { return }
+        guard editing, toast.isStored(task, in: context), text != task.notes else { return }
         toast.perform { try TaskActions(context: context).edit(task) { $0.notes = text } }
     }
 

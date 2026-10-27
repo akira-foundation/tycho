@@ -120,7 +120,7 @@ struct PropertyGrid: View {
     }
 
     private func commitEstimate() {
-        guard estimate != syncedEstimate, TaskActions(context: context).isStored(task) else { return }
+        guard estimate != syncedEstimate, toast.isStored(task, in: context) else { return }
         let value = Estimate.normalized(estimate)
         guard value != task.estimate else { return }
         edit { $0.estimate = value }

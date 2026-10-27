@@ -97,11 +97,11 @@ public struct TaskActions {
         try context.saveOrRollback()
     }
 
-    public func isStored(_ task: TaskItem) -> Bool {
+    public func isStored(_ task: TaskItem) throws -> Bool {
         let id = task.persistentModelID
         var descriptor = FetchDescriptor<TaskItem>(predicate: #Predicate { $0.persistentModelID == id })
         descriptor.fetchLimit = 1
-        return ((try? context.fetchCount(descriptor)) ?? 0) > 0
+        return try context.fetchCount(descriptor) > 0
     }
 
     @discardableResult

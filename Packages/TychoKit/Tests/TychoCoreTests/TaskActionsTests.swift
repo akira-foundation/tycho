@@ -106,11 +106,11 @@ struct TaskActionsTests {
         let (context, project, actions) = try setUp()
         let task = try actions.create(TaskDraft(title: "Audit"), in: project)
         try context.save()
-        #expect(actions.isStored(task))
+        #expect(try actions.isStored(task))
 
         try DataReset.deleteAll(in: context)
 
-        #expect(!actions.isStored(task))
+        #expect(try !actions.isStored(task))
     }
 
     @Test func aTaskDeletedThroughTheActionsIsNotStored() throws {
@@ -120,6 +120,6 @@ struct TaskActionsTests {
 
         try actions.delete(task)
 
-        #expect(!actions.isStored(task))
+        #expect(try !actions.isStored(task))
     }
 }

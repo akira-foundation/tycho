@@ -99,7 +99,7 @@ struct TaskInspectorView: View {
     }
 
     private func commitTitle(_ task: TaskItem) {
-        guard title != syncedTitle, TaskActions(context: context).isStored(task), title != task.title else { return }
+        guard title != syncedTitle, toast.isStored(task, in: context), title != task.title else { return }
         toast.perform { try TaskActions(context: context).rename(task, to: title) }
         syncTitle(task)
     }
