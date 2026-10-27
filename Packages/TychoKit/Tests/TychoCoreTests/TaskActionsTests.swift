@@ -101,4 +101,25 @@ struct TaskActionsTests {
         try actions.delete(task)
         #expect(try context.fetchCount(FetchDescriptor<TaskItem>()) == 0)
     }
+
+    @Test func aTaskIsStoredUntilABatchDeleteRemovesIt() throws {
+        let (context, project, actions) = try setUp()
+        let task = try actions.create(TaskDraft(title: "Audit"), in: project)
+        try context.save()
+        #expect(actions.isStored(task))
+
+        try DataReset.deleteAll(in: context)
+
+        #expect(!actions.isStored(task))
+    }
+
+    @Test func aTaskDeletedThroughTheActionsIsNotStored() throws {
+        let (context, project, actions) = try setUp()
+        let task = try actions.create(TaskDraft(title: "Audit"), in: project)
+        try context.save()
+
+        try actions.delete(task)
+
+        #expect(!actions.isStored(task))
+    }
 }
