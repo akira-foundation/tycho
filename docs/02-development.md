@@ -10,7 +10,7 @@ Xcode 27, com alvos iOS 27 e macOS 27. O package usa `swift-tools-version: 6.2` 
 |---|---|
 | `make test` | Corre os testes do package (`swift test` em `Packages/TychoKit`). |
 | `make build` | Compila a app para macOS e para o simulador iOS, sem assinatura. |
-| `make test-ui` | Corre os XCUITests de macOS: o smoke da Fase 1 e os testes das vistas Table, Calendar, Timeline e Files. |
+| `make test-ui` | Corre os XCUITests de macOS: o smoke da Fase 1 (incluindo o toggle do novo projeto), os testes das vistas Table, Calendar, Timeline e Files, e os do inspector (fechar e botões do cabeçalho). |
 | `make test-ios` | Corre o smoke XCUITest no simulador iOS. O simulador por omissão é `iPhone 17`; muda-se com `make test-ios SIM_NAME="iPhone 17 Pro"`. |
 | `make lint` | SwiftLint e swift-format em modo estrito (`swiftlint` e `format-check`). |
 | `make format` | Reescreve as fontes com o swift-format. |

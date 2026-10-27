@@ -51,14 +51,14 @@ As mutações passam pelas ações do `TychoCore` (`ProjectActions`, `TaskAction
 - Ecrãs: primeiro arranque, Home, My Tasks, Tasks (List, Board e Table), Calendar (mês e semana), Timeline (setas de dependência e milestones), Projects, Project (Board, List, Table, Calendar, Timeline e Files), inspector de tarefa (com "Blocked by" e "Attachments"), sheets de criação e Settings.
 - O `Router` guarda também o estado partilhado do Calendar (data e modo) e da Timeline (zoom e agrupamento).
 - Na vista Files os ficheiros chegam por picker ou drop e a pré-visualização usa Quick Look sobre uma cópia temporária, apagada ao fechar. A app é sandboxed e só pede o entitlement de ficheiros escolhidos pelo utilizador em leitura.
-- O detalhe da tarefa usa `.inspector(...)` com `inspectorColumnWidth` e passa a sheet em largura compacta (iPhone) ou, no macOS, quando a janela fica abaixo de `InspectorLayout.minimumWindowWidth`. O `Router` é a única fonte desse estado (`inspectsInSheet`): o macOS atualiza-o pela largura da janela e o iOS pela size class.
+- O detalhe da tarefa usa `.inspector(...)` com `inspectorColumnWidth` e passa a sheet em largura compacta (iPhone) ou, no macOS, quando a janela fica abaixo de `InspectorLayout.minimumWindowWidth`. O `Router` é a única fonte desse estado (`inspectsInSheet`): o macOS atualiza-o pela largura da janela e o iOS pela size class. O `Router` mantém também um registo de flush: o título, a estimativa e a descrição do inspector registam-se nele, e as edições por gravar são guardadas antes de o inspector fechar, trocar de tarefa, mudar entre coluna e sheet, abrir uma sheet de criação ou a janela fechar.
 - Comandos: ⌘N nova tarefa, ⌘⇧N novo projeto, ⌘⇧L alterna light e dark, ⌘, abre as Settings. A sidebar alterna pelo `SidebarCommands()` do sistema (⌃⌘S).
 
 ## Design system
 
 - Cores dinâmicas (light e dark) com os mesmos nomes dos tokens do original, mais cinco cores de status e o accent do sistema (`Color.accentColor`), sem preferência própria.
 - Espaçamento, raio, métricas dependentes da density, tipografia SF Pro com Dynamic Type, sombras e motion que respeita `accessibilityReduceMotion`.
-- Componentes: `StatusIcon`, `PriorityIcon`, `LabelPill`, `Avatar`, `AvatarStack`, `ProgressRing`, `StatCard`, `ProjectGlyph`, `EmptyState`, `TychoButtonStyle`, `TychoToggleStyle` e `TychoSegmented`. Os ícones Lucide do original mapeiam para SF Symbols.
+- Componentes: `StatusIcon`, `PriorityIcon`, `LabelPill`, `Avatar`, `AvatarStack`, `ProgressRing`, `StatCard`, `ProjectGlyph`, `EmptyState`, `TychoButtonStyle` (primary, secondary e danger) e `TychoToggleStyle`. Os ícones Lucide do original mapeiam para SF Symbols.
 - Sidebar, toolbar e inspector usam o Liquid Glass nativo do OS 27.
 
 ## Estado e preferências
