@@ -1,7 +1,7 @@
 import CoreGraphics
 
 public enum ButtonVariant: CaseIterable, Sendable {
-    case primary, secondary, ghost, danger, dangerGhost
+    case primary, secondary, danger
 
     public var hasBorder: Bool { self == .secondary }
 
@@ -10,8 +10,6 @@ public enum ButtonVariant: CaseIterable, Sendable {
             switch self {
             case .primary, .danger: .onAccent
             case .secondary: .text
-            case .ghost: .text2
-            case .dangerGhost: .red
             }
         return isDark ? token.dark : token.light
     }

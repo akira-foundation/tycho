@@ -45,9 +45,7 @@ public struct TychoButtonStyle: ButtonStyle {
 
         private var foreground: Color {
             let value = variant.foreground(isDark: scheme == .dark)
-            let color = Color(.sRGB, red: value.red, green: value.green, blue: value.blue, opacity: value.alpha)
-            guard variant == .ghost, hovering || configuration.isPressed else { return color }
-            return Token.text.color
+            return Color(.sRGB, red: value.red, green: value.green, blue: value.blue, opacity: value.alpha)
         }
 
         private var fill: Color {
@@ -57,12 +55,8 @@ public struct TychoButtonStyle: ButtonStyle {
                 return Color.accentColor.mix(with: Token.text.color, by: pressed ? 0.22 : hovering ? 0.12 : 0)
             case .secondary:
                 return pressed ? Token.surface3.color : hovering ? Token.surface2.color : Token.surface.color
-            case .ghost:
-                return pressed ? Token.surface3.color : hovering ? Token.surface2.color : .clear
             case .danger:
                 return Token.red.color.mix(with: .black, by: hovering || pressed ? 0.12 : 0)
-            case .dangerGhost:
-                return hovering || pressed ? Token.red.soft(0.10) : .clear
             }
         }
 

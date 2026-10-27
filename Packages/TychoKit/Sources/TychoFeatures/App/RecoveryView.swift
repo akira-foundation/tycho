@@ -14,7 +14,7 @@ struct RecoveryView: View {
             HStack(spacing: Spacing.s3) {
                 Button("Try again", action: retry).buttonStyle(.tycho(.primary))
                 Button("Reset data", role: .destructive) { confirmingReset = true }
-                    .buttonStyle(.tycho(.secondary))
+                    .buttonStyle(.tycho(.danger))
             }
         }
         .padding(Spacing.s8)

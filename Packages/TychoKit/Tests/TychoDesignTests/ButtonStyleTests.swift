@@ -15,10 +15,13 @@ struct ButtonStyleTests {
         #expect(ButtonVariant.danger.foreground(isDark: true) == Token.onAccent.dark)
     }
 
-    @Test func variantsMapToTheOriginalForegrounds() {
+    @Test func secondaryTextUsesTheTextToken() {
         #expect(ButtonVariant.secondary.foreground(isDark: false) == Token.text.light)
-        #expect(ButtonVariant.ghost.foreground(isDark: true) == Token.text2.dark)
-        #expect(ButtonVariant.dangerGhost.foreground(isDark: false) == Token.red.light)
+        #expect(ButtonVariant.secondary.foreground(isDark: true) == Token.text.dark)
+    }
+
+    @Test func theVariantsAreTheOnesTheAppUses() {
+        #expect(ButtonVariant.allCases == [.primary, .secondary, .danger])
     }
 
     @Test func onlyTheSecondaryVariantHasABorder() {
