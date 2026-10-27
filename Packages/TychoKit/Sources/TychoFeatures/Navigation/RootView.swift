@@ -40,6 +40,10 @@ struct RootView: View {
             } action: {
                 router.updateWindowWidth($0)
             }
+            #else
+            .onChange(of: sizeClass, initial: true) {
+                router.updateHorizontalSizeClass(isCompact: sizeClass == .compact)
+            }
             #endif
             .toolbar {
                 ToolbarItem {
@@ -55,7 +59,7 @@ struct RootView: View {
                 )
             ) {
                 if router.isInspectorColumnPresented, let id = router.inspectedTaskID {
-                    TaskInspectorView(taskID: id, presentedAsSheet: inspectorIsSheet)
+                    TaskInspectorView(taskID: id)
                         .id(id)
                         .inspectorColumnWidth(
                             min: InspectorLayout.minimumColumnWidth,
@@ -72,9 +76,11 @@ struct RootView: View {
                 if router.isInspectorSheetPresented, let id = router.inspectedTaskID {
                     TaskInspectorView(taskID: id, presentedAsSheet: true)
                         .id(id)
-                        .frame(
-                            minWidth: InspectorLayout.minimumColumnWidth, idealWidth: InspectorLayout.idealColumnWidth,
-                            minHeight: 560)
+                        #if os(macOS)
+                    .frame(
+                        minWidth: InspectorLayout.minimumColumnWidth, idealWidth: InspectorLayout.idealColumnWidth,
+                        minHeight: 560)
+                        #endif
                 }
             }
             .sheet(isPresented: $router.isCreatingProject) { NewProjectSheet(project: nil) }
@@ -85,13 +91,5 @@ struct RootView: View {
                 NavigationStack { SettingsView() }
             }
         }
-    }
-
-    private var inspectorIsSheet: Bool {
-        #if os(iOS)
-        sizeClass == .compact
-        #else
-        false
-        #endif
     }
 }

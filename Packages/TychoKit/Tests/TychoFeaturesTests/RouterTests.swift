@@ -66,6 +66,35 @@ struct RouterTests {
         #expect(router.inspectedTaskID == id)
     }
 
+    @Test func aCompactSizeClassPresentsTheInspectorAsASheet() {
+        let router = Router()
+        router.updateHorizontalSizeClass(isCompact: true)
+        router.inspect(UUID())
+        #expect(router.isInspectorSheetPresented)
+        #expect(!router.isInspectorColumnPresented)
+        router.newTask()
+        #expect(router.inspectedTaskID == nil)
+        #expect(router.isCreatingTask)
+    }
+
+    @Test func aRegularSizeClassPresentsTheInspectorAsAColumn() {
+        let router = Router()
+        router.updateHorizontalSizeClass(isCompact: true)
+        router.updateHorizontalSizeClass(isCompact: false)
+        router.inspect(UUID())
+        #expect(router.isInspectorColumnPresented)
+        #expect(!router.isInspectorSheetPresented)
+    }
+
+    @Test func newProjectKeepsTheInspectorColumnOpen() {
+        let router = Router()
+        router.updateWindowWidth(InspectorLayout.minimumWindowWidth)
+        let id = UUID()
+        router.inspect(id)
+        router.newProject()
+        #expect(router.inspectedTaskID == id)
+    }
+
     @Test func showsSettings() {
         let router = Router()
         router.showSettings()

@@ -67,7 +67,14 @@ public final class Router {
     }
 
     public func updateWindowWidth(_ width: CGFloat) {
-        let inSheet = InspectorLayout.presentsAsSheet(windowWidth: width)
+        updateInspectorPresentation(inSheet: InspectorLayout.presentsAsSheet(windowWidth: width))
+    }
+
+    public func updateHorizontalSizeClass(isCompact: Bool) {
+        updateInspectorPresentation(inSheet: isCompact)
+    }
+
+    private func updateInspectorPresentation(inSheet: Bool) {
         guard inSheet != inspectsInSheet else { return }
         flushInspectorEdits()
         inspectsInSheet = inSheet
