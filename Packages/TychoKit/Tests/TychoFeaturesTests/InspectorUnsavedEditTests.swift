@@ -98,7 +98,7 @@ struct InspectorUnsavedEditTests {
     }
 
     @Test(arguments: [1000.0, 1500.0])
-    func everyDraftEditorRegistersAFlush(width: Double) throws {
+    func titleEstimateAndNotesRegisterFlushes(width: Double) throws {
         let fixture = try InspectorHostFixture(width: width)
 
         #expect(fixture.router.liveInspectorFlushCount == 3)
