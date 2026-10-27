@@ -8,9 +8,7 @@ struct NotesEditor: View {
     @Environment(ToastCenter.self) private var toast
     @Environment(Router.self) private var router
     let task: TaskItem
-    @State private var editing = false
-    @State private var text = ""
-    @State private var syncedNotes = ""
+    @State private var draft = NotesDraft()
     @State private var flushToken = UUID()
 
     var body: some View {
@@ -18,13 +16,13 @@ struct NotesEditor: View {
             HStack {
                 Text("Description").tychoFont(.sm, weight: .semibold)
                 Spacer()
-                Button(editing ? "Done" : "Edit", action: toggleEditing)
+                Button(draft.isEditing ? "Done" : "Edit", action: toggleEditing)
                     .buttonStyle(.borderless)
                     .accessibilityIdentifier("inspector.notes.edit")
             }
-            switch (editing, task.notes.isEmpty) {
+            switch (draft.isEditing, task.notes.isEmpty) {
             case (true, _):
-                TextEditor(text: $text)
+                TextEditor(text: $draft.text)
                     .accessibilityIdentifier("inspector.notes.editor")
                     .frame(minHeight: 120)
                     .scrollContentBackground(.hidden)
@@ -50,21 +48,15 @@ struct NotesEditor: View {
     }
 
     private func commitDraft() {
-        guard editing, text != syncedNotes, toast.isStored(task, in: context) else { return }
-        if text != task.notes {
-            toast.perform { try TaskActions(context: context).edit(task) { $0.notes = text } }
+        guard draft.hasUnsavedText, toast.isStored(task, in: context) else { return }
+        draft.commit(storedNotes: { task.notes }) { notes in
+            toast.perform { try TaskActions(context: context).edit(task) { $0.notes = notes } }
         }
-        syncedNotes = task.notes
     }
 
     private func toggleEditing() {
-        guard editing else {
-            text = task.notes
-            syncedNotes = task.notes
-            editing = true
-            return
-        }
+        guard draft.isEditing else { return draft.begin(with: task.notes) }
         commitDraft()
-        editing = text != syncedNotes
+        draft.finishIfSaved()
     }
 }
