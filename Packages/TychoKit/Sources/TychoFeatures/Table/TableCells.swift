@@ -19,7 +19,7 @@ struct TitleCell: View {
                 TextField("Title", text: $text)
                     .textFieldStyle(.plain)
                     .focused($focused)
-                    .onAppear { focused = true }
+                    .focusedOnceTheTableReleasesTheClick($focused)
                     .onSubmit(commit)
                     .onKeyPress(.escape) {
                         editing = false

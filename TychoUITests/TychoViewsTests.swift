@@ -84,6 +84,39 @@ final class TychoViewsTests: XCTestCase {
             })
     }
 
+    func testTableTitleRenamesInlineAndEscapeCancels() {
+        openWebsiteTab("Table")
+        let title = element("table.title.WEB-118")
+        XCTAssertTrue(title.waitForExistence(timeout: 5))
+
+        title.doubleClick()
+        app.typeKey("a", modifierFlags: .command)
+        app.typeText("Tokens renamed\r")
+        XCTAssertTrue(eventually { title.label.contains("Tokens renamed") })
+
+        title.doubleClick()
+        app.typeKey("a", modifierFlags: .command)
+        app.typeText("Discarded")
+        app.typeKey(.escape, modifierFlags: [])
+        XCTAssertTrue(eventually { title.label.contains("Tokens renamed") && title.label.contains("WEB-118") })
+    }
+
+    func testTableEstimateEditsInline() {
+        openWebsiteTab("Table")
+        for column in ["Status", "Priority", "Assignee", "Due date", "Labels"] {
+            element("table.columns").click()
+            app.menuItems[column].firstMatch.click()
+        }
+        let estimate = element("table.estimate.WEB-118")
+        XCTAssertTrue(estimate.waitForExistence(timeout: 5))
+
+        estimate.click()
+        app.typeKey("a", modifierFlags: .command)
+        app.typeText("5d\r")
+
+        XCTAssertTrue(eventually { text(of: element("table.estimate.WEB-118")) == "5d" })
+    }
+
     func testCalendarMovesBetweenMonthsAndBackToToday() {
         openSidebar("Calendar", revealing: "calendar.title")
         let title = element("calendar.title")

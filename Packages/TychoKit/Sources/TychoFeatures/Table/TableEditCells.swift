@@ -72,7 +72,7 @@ struct EstimateCell: View {
                 TextField("e.g. 2d", text: $text)
                     .textFieldStyle(.plain)
                     .focused($focused)
-                    .onAppear { focused = true }
+                    .focusedOnceTheTableReleasesTheClick($focused)
                     .onSubmit(commit)
                     .onKeyPress(.escape) {
                         editing = false
@@ -88,6 +88,7 @@ struct EstimateCell: View {
                     .contentShape(Rectangle())
                     .onTapGesture(perform: beginEditing)
                     .help("Click to edit")
+                    .accessibilityIdentifier("table.estimate.\(task.key)")
             }
             Menu {
                 ForEach(EstimateOptions.quick, id: \.self) { option in
