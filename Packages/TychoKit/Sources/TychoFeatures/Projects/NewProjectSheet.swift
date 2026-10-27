@@ -77,12 +77,15 @@ struct NewProjectSheet: View {
                     }
                     Toggle("Start date", isOn: $hasStart)
                         .toggleStyle(TychoToggleStyle())
+                        .accessibilityIdentifier("project.hasStart")
                     if hasStart {
                         DatePicker(
                             "Start",
                             selection: Binding(
                                 get: { draft.start ?? .now }, set: { draft.start = DatePill.normalized($0) }),
-                            displayedComponents: .date)
+                            displayedComponents: .date
+                        )
+                        .accessibilityIdentifier("project.start")
                     }
                     Toggle("Due date", isOn: $hasDue)
                         .toggleStyle(TychoToggleStyle())

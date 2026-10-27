@@ -61,5 +61,21 @@ final class TychoSmokeTests: XCTestCase {
 
         XCTAssertTrue(title.waitForNonExistence(timeout: 5))
     }
+
+    func testNewProjectStartDateToggleRevealsThePicker() {
+        app.loadDemoWorkspace()
+        app.typeKey("n", modifierFlags: [.command, .shift])
+
+        let toggle = app.element("project.hasStart")
+        let picker = app.element("project.start")
+        XCTAssertTrue(toggle.waitForExistence(timeout: 5))
+        XCTAssertFalse(picker.exists)
+
+        toggle.click()
+        XCTAssertTrue(picker.waitForExistence(timeout: 5))
+
+        toggle.click()
+        XCTAssertTrue(picker.waitForNonExistence(timeout: 5))
+    }
 }
 #endif
