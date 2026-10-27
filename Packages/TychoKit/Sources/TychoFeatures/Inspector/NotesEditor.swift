@@ -6,9 +6,11 @@ import TychoDesign
 struct NotesEditor: View {
     @Environment(\.modelContext) private var context
     @Environment(ToastCenter.self) private var toast
+    @Environment(Router.self) private var router
     let task: TaskItem
     @State private var editing = false
     @State private var text = ""
+    @State private var flushToken = UUID()
 
     var body: some View {
         VStack(alignment: .leading, spacing: Spacing.s2) {
@@ -32,7 +34,11 @@ struct NotesEditor: View {
             }
         }
         .tychoFont(.base)
-        .onDisappear(perform: commitDraft)
+        .onAppear { router.registerInspectorFlush(flushToken, commitDraft) }
+        .onDisappear {
+            commitDraft()
+            router.unregisterInspectorFlush(flushToken)
+        }
     }
 
     private var rendered: AttributedString {

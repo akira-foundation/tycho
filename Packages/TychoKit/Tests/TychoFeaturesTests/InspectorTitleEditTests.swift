@@ -36,7 +36,7 @@ struct InspectorTitleEditTests {
         let columnFields = fixture.editableFields(in: fixture.window)
 
         #expect(!columnFields.contains { $0.stringValue == fixture.task.title })
-        #expect(fixture.router.liveInspectorFlushCount == 2)
+        #expect(fixture.router.liveInspectorFlushCount == 3)
         fixture.window.orderOut(nil)
     }
 

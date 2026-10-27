@@ -83,6 +83,17 @@ struct InspectorUnsavedEditTests {
     }
 
     @Test(arguments: [1000.0, 1500.0])
+    func everyDraftEditorRegistersAFlush(width: Double) throws {
+        let fixture = try InspectorHostFixture(width: width)
+
+        #expect(fixture.router.liveInspectorFlushCount == 3)
+        fixture.router.closeInspector()
+        fixture.settle(1.0)
+        #expect(fixture.router.liveInspectorFlushCount == 0)
+        fixture.window.orderOut(nil)
+    }
+
+    @Test(arguments: [1000.0, 1500.0])
     func closingTheWindowReleasesEveryInspectorFlush(width: Double) throws {
         let fixture = try InspectorHostFixture(width: width)
 
