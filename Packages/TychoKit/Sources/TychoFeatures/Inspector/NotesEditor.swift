@@ -51,17 +51,20 @@ struct NotesEditor: View {
 
     private func commitDraft() {
         guard editing, text != syncedNotes, toast.isStored(task, in: context) else { return }
-        toast.perform { try TaskActions(context: context).edit(task) { $0.notes = text } }
-        syncedNotes = text
+        if text != task.notes {
+            toast.perform { try TaskActions(context: context).edit(task) { $0.notes = text } }
+        }
+        syncedNotes = task.notes
     }
 
     private func toggleEditing() {
-        if editing {
-            commitDraft()
-        } else {
+        guard editing else {
             text = task.notes
             syncedNotes = task.notes
+            editing = true
+            return
         }
-        editing.toggle()
+        commitDraft()
+        editing = text != syncedNotes
     }
 }
