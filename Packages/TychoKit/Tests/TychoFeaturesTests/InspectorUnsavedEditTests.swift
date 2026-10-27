@@ -83,6 +83,21 @@ struct InspectorUnsavedEditTests {
     }
 
     @Test(arguments: [1000.0, 1500.0])
+    func closingDoesNotRevertAnEditMadeElsewhere(width: Double) throws {
+        let fixture = try InspectorHostFixture(width: width)
+        let actions = TaskActions(context: fixture.container.mainContext)
+        try actions.rename(fixture.task, to: "Elsewhere")
+        try actions.edit(fixture.task) { $0.estimate = "5d" }
+
+        fixture.router.closeInspector()
+        fixture.settle(1.0)
+
+        #expect(fixture.task.title == "Elsewhere")
+        #expect(fixture.task.estimate == "5d")
+        fixture.window.orderOut(nil)
+    }
+
+    @Test(arguments: [1000.0, 1500.0])
     func everyDraftEditorRegistersAFlush(width: Double) throws {
         let fixture = try InspectorHostFixture(width: width)
 
