@@ -101,7 +101,19 @@ struct RootView: View {
         #endif
     }
 
-    private var showsInspectorColumn: Bool { router.inspectedTaskID != nil && !inspectsInSheet }
+    private var showsInspectorColumn: Bool {
+        #if os(iOS)
+        router.inspectedTaskID != nil && !inspectsInSheet
+        #else
+        router.isInspectorColumnPresented
+        #endif
+    }
 
-    private var showsInspectorSheet: Bool { router.inspectedTaskID != nil && inspectsInSheet }
+    private var showsInspectorSheet: Bool {
+        #if os(iOS)
+        router.inspectedTaskID != nil && inspectsInSheet
+        #else
+        router.isInspectorSheetPresented
+        #endif
+    }
 }
