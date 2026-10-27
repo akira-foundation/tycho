@@ -75,6 +75,61 @@ final class TychoInspectorTests: XCTestCase {
         XCTAssertTrue(title.waitForNonExistence(timeout: 5))
     }
 
+    private func typeUnsavedNotes(_ notes: String) {
+        mouseClick("inspector.notes.edit")
+        let editor = element("inspector.notes.editor")
+        XCTAssertTrue(editor.waitForExistence(timeout: 5))
+        editor.click()
+        editor.typeText(notes)
+    }
+
+    private func reopenedNotesShow(_ notes: String) -> Bool {
+        _ = openInspector(from: element("task.WEB-118"))
+        return app.staticTexts[notes].firstMatch.waitForExistence(timeout: 5)
+    }
+
+    func testUnsavedNotesSurviveClosingTheInspector() {
+        loadDemo()
+        openWebsiteTab("List")
+        _ = openInspector(from: element("task.WEB-118"))
+        typeUnsavedNotes("Unsaved notes")
+
+        mouseClick("inspector.close")
+
+        XCTAssertTrue(reopenedNotesShow("Unsaved notes"))
+    }
+
+    func testUnsavedNotesInTheColumnSurviveClosingTheWindow() {
+        loadDemo()
+        app.menuBars.menuBarItems["Window"].click()
+        app.menuItems["Zoom"].firstMatch.click()
+        openWebsiteTab("List")
+        _ = openInspector(from: element("task.WEB-118"))
+        XCTAssertTrue(app.sheets.count == 0, "the inspector should be a column in a zoomed window")
+        typeUnsavedNotes("Unsaved notes")
+
+        app.windows.firstMatch.buttons[XCUIIdentifierCloseWindow].click()
+        XCTAssertTrue(app.windows.firstMatch.waitForNonExistence(timeout: 5))
+        app.reopenWindow()
+        XCTAssertTrue(app.windows.firstMatch.waitForExistence(timeout: 10))
+        openWebsiteTab("List")
+
+        XCTAssertTrue(reopenedNotesShow("Unsaved notes"))
+    }
+
+    func testUnsavedNotesSurviveOpeningANewTask() {
+        loadDemo()
+        openWebsiteTab("List")
+        _ = openInspector(from: element("task.WEB-118"))
+        typeUnsavedNotes("Unsaved notes")
+
+        app.typeKey("n", modifierFlags: .command)
+        XCTAssertTrue(element("task.title").waitForExistence(timeout: 5))
+        app.typeKey(.escape, modifierFlags: [])
+
+        XCTAssertTrue(reopenedNotesShow("Unsaved notes"))
+    }
+
     func testCloseButtonDismissesTheInspectorOpenedFromTheTable() {
         loadDemo()
         openWebsiteTab("Table")

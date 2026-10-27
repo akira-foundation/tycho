@@ -7,6 +7,10 @@ import AppKit
 extension XCUIApplication {
     func launchShowingWindow() {
         launch()
+        reopenWindow()
+    }
+
+    func reopenWindow() {
         #if os(macOS)
         let launched = NSRunningApplication.runningApplications(withBundleIdentifier: "io.akira.tycho")
             .max { ($0.launchDate ?? .distantPast) < ($1.launchDate ?? .distantPast) }

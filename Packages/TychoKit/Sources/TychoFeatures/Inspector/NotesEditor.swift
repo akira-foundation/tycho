@@ -10,6 +10,7 @@ struct NotesEditor: View {
     let task: TaskItem
     @State private var editing = false
     @State private var text = ""
+    @State private var syncedNotes = ""
     @State private var flushToken = UUID()
 
     var body: some View {
@@ -19,10 +20,12 @@ struct NotesEditor: View {
                 Spacer()
                 Button(editing ? "Done" : "Edit", action: toggleEditing)
                     .buttonStyle(.borderless)
+                    .accessibilityIdentifier("inspector.notes.edit")
             }
             switch (editing, task.notes.isEmpty) {
             case (true, _):
                 TextEditor(text: $text)
+                    .accessibilityIdentifier("inspector.notes.editor")
                     .frame(minHeight: 120)
                     .scrollContentBackground(.hidden)
                     .background(Token.sunken.color, in: RoundedRectangle(cornerRadius: Radius.md))
@@ -47,15 +50,17 @@ struct NotesEditor: View {
     }
 
     private func commitDraft() {
-        guard editing, toast.isStored(task, in: context), text != task.notes else { return }
+        guard editing, text != syncedNotes, toast.isStored(task, in: context) else { return }
         toast.perform { try TaskActions(context: context).edit(task) { $0.notes = text } }
+        syncedNotes = text
     }
 
     private func toggleEditing() {
         if editing {
-            toast.perform { try TaskActions(context: context).edit(task) { $0.notes = text } }
+            commitDraft()
         } else {
             text = task.notes
+            syncedNotes = task.notes
         }
         editing.toggle()
     }
