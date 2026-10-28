@@ -62,7 +62,8 @@ jobs:
       - name: Select Xcode 27
         run: |
           set -euo pipefail
-          xcode="$(find /Applications -maxdepth 1 -name 'Xcode_27*.app' | sort -V | tail -1)"
+          find /Applications -maxdepth 1 -name 'Xcode*.app' | sort -V
+          xcode="$(find /Applications -maxdepth 1 -name 'Xcode_27*.app' ! -iname '*beta*' ! -iname '*release_candidate*' | sort -V | tail -1)"
           if [ -n "$xcode" ]; then
             sudo xcode-select -s "$xcode/Contents/Developer"
           fi
@@ -79,7 +80,7 @@ jobs:
 
       - name: Run the package suite
         env:
-          SWIFT_BACKTRACE: enable=yes,interactive=no,style=full
+          SWIFT_BACKTRACE: enable=yes,interactive=no
         run: make test
 
       - name: Print crash reports
