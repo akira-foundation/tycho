@@ -79,7 +79,13 @@ struct InspectorLayoutTests {
         #expect(layout.sheetCount == 1)
     }
 
-    @Test(arguments: Destination.allCases)
+    @Test(
+        .enabled("needs a screen at least as wide as the inspector threshold") {
+            await MainActor.run {
+                (NSScreen.main?.visibleFrame.width ?? 0) >= InspectorLayout.minimumWindowWidth
+            }
+        },
+        arguments: Destination.allCases)
     func inspectorColumnFitsAtTheThreshold(destination: Destination) throws {
         let fixture = try DemoFixture()
         let threshold = InspectorLayout.minimumWindowWidth
