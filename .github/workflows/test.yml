@@ -78,7 +78,20 @@ jobs:
         run: make format-check
 
       - name: Run the package suite
+        env:
+          SWIFT_BACKTRACE: enable=yes,interactive=no,style=full
         run: make test
+
+      - name: Print crash reports
+        if: failure()
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          for report in "$HOME"/Library/Logs/DiagnosticReports/*.ips; do
+            echo "::group::$report"
+            cat "$report"
+            echo "::endgroup::"
+          done
 
       - name: Build the app for macOS
         run: xcodebuild build -scheme Tycho -destination 'platform=macOS' CODE_SIGNING_ALLOWED=NO -quiet
