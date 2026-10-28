@@ -62,6 +62,9 @@ jobs:
       - name: Select Xcode 27
         run: ./Tools/select-xcode.sh
 
+      - name: Show the display
+        run: system_profiler SPDisplaysDataType | grep -E 'Resolution|UI Looks like' || true
+
       - name: Check formatting
         run: make format-check
 
