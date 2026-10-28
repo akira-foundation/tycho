@@ -235,19 +235,7 @@ jobs:
           persist-credentials: false
 
       - name: Select Xcode 27
-        run: |
-          set -euo pipefail
-          xcode="$(find /Applications -maxdepth 1 -name 'Xcode_27*.app' ! -iname '*beta*' ! -iname '*release_candidate*' | sort -V | tail -1)"
-          if [ -n "$xcode" ]; then
-            sudo xcode-select -s "$xcode/Contents/Developer"
-          fi
-          version="$(xcodebuild -version)"
-          echo "$version"
-          major="$(printf '%s\n' "$version" | sed -n '1s/^Xcode \([0-9]*\).*/\1/p')"
-          if [ -z "$major" ] || [ "$major" -lt 27 ]; then
-            echo "::error::Xcode 27 or newer is required, this runner has: $version"
-            exit 1
-          fi
+        run: ./Tools/select-xcode.sh
 
       - name: Archive without signing
         run: xcodebuild archive -scheme Tycho -destination 'generic/platform=macOS' -archivePath "$RUNNER_TEMP/Tycho.xcarchive" CODE_SIGNING_ALLOWED=NO -quiet
