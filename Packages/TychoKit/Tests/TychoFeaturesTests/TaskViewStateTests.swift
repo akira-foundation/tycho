@@ -201,4 +201,30 @@ struct TaskViewStateTests {
             [TaskViewStates.myTasksKey, TaskViewStates.calendarKey, TaskViewStates.timelineKey]
                 == ["mytasks", "cal", "tl"])
     }
+
+    @Test func phase2TableViewsSurviveMigration() throws {
+        let suiteName = "tycho.migration.\(UUID().uuidString)"
+        let defaults = try #require(UserDefaults(suiteName: suiteName))
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+        let projectKey = TaskViewStates.projectKey(UUID())
+        let widths = Data(#"{"perColumnState":[{"base":{"explicit":{"_0":"title"}}}]}"#.utf8)
+        let comparator = try JSONSerialization.jsonObject(
+            with: JSONEncoder().encode(TaskComparator(field: .due, order: .reverse)))
+        let legacy: [String: Any] = [
+            projectKey: ["sort": [comparator], "hidden": ["labels"], "columns": widths.base64EncodedString()],
+            "tasks": 42,
+        ]
+        defaults.set(try JSONSerialization.data(withJSONObject: legacy), forKey: TaskViewStates.legacyKey)
+
+        TaskViewStates.migrateStoredDefaults(defaults)
+
+        let migrated = try #require(defaults.data(forKey: TaskViewStates.storageKey))
+        let state = TaskViewStates.state(for: projectKey, inProject: true, in: migrated)
+        #expect(state.sort == [TaskComparator(field: .due, order: .reverse)])
+        #expect(state.columns == widths)
+        #expect(state.hidden == [.labels])
+        #expect(
+            TaskViewStates.state(for: TaskViewStates.tasksKey, inProject: false, in: migrated)
+                == TaskViewState(inProject: false))
+    }
 }
