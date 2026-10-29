@@ -38,6 +38,20 @@ struct PaletteKeysTests {
         #expect(empty.mode == .commands)
     }
 
+    @Test func keyScopeOnlyAcceptsThePaletteKeyWindowWithoutASheet() {
+        let palette = NSObject()
+        let other = NSObject()
+        #expect(
+            PaletteKeyScope.shouldHandle(eventWindow: palette, paletteWindow: palette, isKey: true, hasSheet: false))
+        #expect(!PaletteKeyScope.shouldHandle(eventWindow: other, paletteWindow: palette, isKey: true, hasSheet: false))
+        #expect(
+            !PaletteKeyScope.shouldHandle(eventWindow: palette, paletteWindow: palette, isKey: false, hasSheet: false))
+        #expect(
+            !PaletteKeyScope.shouldHandle(eventWindow: palette, paletteWindow: palette, isKey: true, hasSheet: true))
+        #expect(!PaletteKeyScope.shouldHandle(eventWindow: nil, paletteWindow: palette, isKey: true, hasSheet: false))
+        #expect(!PaletteKeyScope.shouldHandle(eventWindow: palette, paletteWindow: nil, isKey: true, hasSheet: false))
+    }
+
     #if os(macOS)
     @Test func monitorRoutesTheNavigationKeyCodes() {
         #expect(PaletteKeyMonitor.key(forKeyCode: 125) == .downArrow)
