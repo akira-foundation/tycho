@@ -18,7 +18,9 @@ extension View {
         #if os(macOS)
         modifier(
             WindowKeyMonitor { event, _ in
-                guard let key = PaletteKeyMonitor.key(forKeyCode: event.keyCode) else { return false }
+                guard event.modifierFlags.isDisjoint(with: [.command, .option, .control]),
+                    let key = PaletteKeyMonitor.key(forKeyCode: event.keyCode)
+                else { return false }
                 return handle(key) == .handled
             })
         #else

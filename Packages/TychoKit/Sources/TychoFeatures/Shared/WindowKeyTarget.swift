@@ -52,8 +52,7 @@ final class WindowKeyTarget {
         guard let window,
             KeyWindowScope.shouldHandle(
                 eventWindow: event.window, targetWindow: window, isKey: window.isKeyWindow,
-                hasSheet: window.attachedSheet != nil),
-            event.modifierFlags.isDisjoint(with: [.command, .option, .control])
+                hasSheet: window.attachedSheet != nil)
         else { return false }
         return handle?(event, window) ?? false
     }

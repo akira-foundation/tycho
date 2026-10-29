@@ -24,7 +24,7 @@ struct PaletteInput: View {
                     .fixedSize()
             }
             TextField(placeholder, text: $state.query)
-                .marksTextEditing()
+                .marksTextEditing(isFocused: isFocused)
                 .textFieldStyle(.plain)
                 .tychoFont(.md)
                 .autocorrectionDisabled()

@@ -6,6 +6,10 @@ extension Router {
             || isInspectorSheetPresented
     }
 
+    public var blocksNavigationCommands: Bool {
+        palette == nil && hasModalPresentation
+    }
+
     public func toggleSidebar() {
         columnVisibility = columnVisibility == .detailOnly ? .all : .detailOnly
     }

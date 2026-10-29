@@ -21,7 +21,7 @@ struct RenameViewSheet: View {
         NavigationStack {
             Form {
                 TextField("View name", text: $name)
-                    .marksTextEditing()
+                    .marksTextEditing(isFocused: isNameFocused)
                     .focused($isNameFocused)
                     .onSubmit(save)
                     .accessibilityIdentifier("renameView.name")

@@ -36,7 +36,7 @@ struct FilesView: View {
         .fileUploader(isPresented: $importing, project: project)
         .filePreview(item: $previewing)
         .alert("Rename file", isPresented: isRenaming) {
-            TextField("File name", text: $renameText)
+            TextField("File name", text: $renameText).marksTextEditing()
             Button("Rename", action: commitRename)
             Button("Cancel", role: .cancel) { renaming = nil }
         }

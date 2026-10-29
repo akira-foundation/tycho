@@ -1,6 +1,6 @@
 import Foundation
 
-public enum ShortcutAction: Equatable {
+public enum ShortcutAction: Equatable, Sendable {
     case palette
     case search
     case newTask
@@ -9,6 +9,13 @@ public enum ShortcutAction: Equatable {
     case toggleSidebar
     case go(AppRoute)
     case settings
+}
+
+struct ShortcutKeyResult: Equatable, Sendable {
+    static let passThrough = ShortcutKeyResult(action: nil, consumes: false)
+
+    let action: ShortcutAction?
+    let consumes: Bool
 }
 
 struct KeyChord {
@@ -32,6 +39,29 @@ struct KeyChord {
             return nil
         }
         return Self.single(key)
+    }
+
+    mutating func receive(
+        _ key: Character, hasOption: Bool, at time: Date, isEditingText: Bool, hasSheet: Bool
+    ) -> ShortcutKeyResult {
+        guard Self.isPrintable(key) else {
+            armedAt = nil
+            return .passThrough
+        }
+        guard !hasOption || key == "[" else { return .passThrough }
+        let wasArmed = isArmed(at: time)
+        let action = handle(key, at: time, isEditingText: isEditingText, hasSheet: hasSheet)
+        guard !isEditingText, !hasSheet else { return .passThrough }
+        return ShortcutKeyResult(action: action, consumes: action != nil || wasArmed || isArmed(at: time))
+    }
+
+    static func isPrintable(_ key: Character) -> Bool {
+        key.unicodeScalars.allSatisfy { scalar in
+            switch scalar.properties.generalCategory {
+            case .control, .privateUse, .format, .surrogate, .unassigned: false
+            default: true
+            }
+        }
     }
 
     private static func single(_ key: Character) -> ShortcutAction? {

@@ -24,7 +24,7 @@ public struct TychoCommands: Commands {
         CommandMenu("Go") {
             Button("Command Menu") { router?.perform(.palette) }
                 .keyboardShortcut("k")
-                .disabled(router == nil)
+                .disabled(isNavigationUnavailable)
             item("Search", hint: "/", action: .search)
             Divider()
             item("Home", hint: "G then H", action: .go(.home))
@@ -45,6 +45,10 @@ public struct TychoCommands: Commands {
             Text(title)
             Text(hint)
         }
-        .disabled(router == nil)
+        .disabled(isNavigationUnavailable)
+    }
+
+    private var isNavigationUnavailable: Bool {
+        router?.blocksNavigationCommands ?? true
     }
 }
