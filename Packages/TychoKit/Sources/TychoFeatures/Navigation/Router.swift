@@ -23,7 +23,14 @@ public final class Router {
     private var projectTabs: [UUID: ProjectTab] = [:]
     @ObservationIgnored private var inspectorFlushes: [UUID: @MainActor () -> Void] = [:]
 
-    public init() {}
+    public var palette: PaletteState?
+    public var isShowingShortcuts = false
+    public var isEditingText = false
+    @ObservationIgnored private let defaults: UserDefaults
+
+    public init(defaults: UserDefaults = .standard) {
+        self.defaults = defaults
+    }
 
     public var sidebarItem: SidebarItem? {
         get {
@@ -35,6 +42,7 @@ public final class Router {
             case .timeline: .timeline
             case .projects: .projects
             case .project(let id, _): .project(id)
+            case .search: nil
             }
         }
         set {
@@ -64,6 +72,30 @@ public final class Router {
 
     public func openProject(_ id: UUID, tab: ProjectTab) {
         open(.project(id, tab))
+    }
+
+    public func openTasks(preset: TasksPreset) {
+        let data = defaults.data(forKey: TaskViewStates.storageKey) ?? Data()
+        var state = TaskViewStates.state(for: TaskViewStates.tasksKey, inProject: false, in: data)
+        state.filters = preset.filters
+        state.query = ""
+        state.mode = "list"
+        let stored = TaskViewStates.storing(state, for: TaskViewStates.tasksKey, in: data)
+        defaults.set(stored, forKey: TaskViewStates.storageKey)
+        open(.tasks)
+    }
+
+    public func openPalette(mode: PaletteMode) {
+        palette = PaletteState(mode: mode)
+    }
+
+    public func togglePalette() {
+        guard palette == nil else { return closePalette() }
+        openPalette(mode: .commands)
+    }
+
+    public func closePalette() {
+        palette = nil
     }
 
     public func updateWindowWidth(_ width: CGFloat) {

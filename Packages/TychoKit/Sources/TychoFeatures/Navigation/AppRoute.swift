@@ -1,6 +1,6 @@
 import Foundation
 
-public enum ProjectTab: String, CaseIterable, Hashable, Sendable {
+public enum ProjectBuiltInTab: String, CaseIterable, Hashable, Sendable {
     case board
     case list
     case table
@@ -20,6 +20,23 @@ public enum ProjectTab: String, CaseIterable, Hashable, Sendable {
     }
 }
 
+public enum ProjectTab: Hashable, Sendable {
+    case builtIn(ProjectBuiltInTab)
+    case savedView(UUID)
+
+    public static let board = ProjectTab.builtIn(.board)
+    public static let list = ProjectTab.builtIn(.list)
+    public static let table = ProjectTab.builtIn(.table)
+    public static let calendar = ProjectTab.builtIn(.calendar)
+    public static let timeline = ProjectTab.builtIn(.timeline)
+    public static let files = ProjectTab.builtIn(.files)
+
+    public var builtIn: ProjectBuiltInTab? {
+        guard case .builtIn(let tab) = self else { return nil }
+        return tab
+    }
+}
+
 public enum AppRoute: Hashable, Sendable {
     case home
     case myTasks
@@ -28,6 +45,7 @@ public enum AppRoute: Hashable, Sendable {
     case timeline
     case projects
     case project(UUID, ProjectTab)
+    case search
 }
 
 public enum SidebarItem: Hashable, Sendable {

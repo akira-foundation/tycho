@@ -1,4 +1,5 @@
 import SwiftUI
+import TychoDesign
 
 struct RouteDetail: View {
     let route: AppRoute
@@ -19,6 +20,8 @@ struct RouteDetail: View {
             ProjectsView()
         case .project(let id, let tab):
             ProjectDetailView(projectID: id, tab: tab)
+        case .search:
+            EmptyState(title: "Search", symbol: "magnifyingglass", message: "Search is coming soon.")
         }
     }
 }

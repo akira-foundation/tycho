@@ -26,7 +26,7 @@ struct ProjectDetailView: View {
             .toolbar {
                 ToolbarItem {
                     Picker("View", selection: Binding(get: { tab }, set: { router.openProject(project.id, tab: $0) })) {
-                        ForEach(ProjectTab.allCases, id: \.self) { Text($0.title).tag($0) }
+                        ForEach(ProjectBuiltInTab.allCases, id: \.self) { Text($0.title).tag(ProjectTab.builtIn($0)) }
                     }
                     .pickerStyle(.segmented)
                     .accessibilityIdentifier("project.tab")
@@ -67,7 +67,7 @@ struct ProjectTabContent: View {
     let tab: ProjectTab
 
     var body: some View {
-        switch tab {
+        switch tab.builtIn ?? .board {
         case .board:
             BoardView(tasks: project.tasks ?? [], project: project)
         case .list:

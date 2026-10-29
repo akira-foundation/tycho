@@ -137,4 +137,47 @@ struct RouterTests {
         #expect(router.timelineGrouping == .assignee)
         #expect(router.hasOpenedWorkspaceTimeline)
     }
+
+    @Test func openTasksAppliesEachPreset() throws {
+        let suite = "router-presets-\(UUID().uuidString)"
+        let defaults = try #require(UserDefaults(suiteName: suite))
+        defer { defaults.removePersistentDomain(forName: suite) }
+        let router = Router(defaults: defaults)
+        let expected: [(TasksPreset, [TaskFilter])] = [
+            (.open, [TaskFilter(field: .status, op: .isNot, values: ["done"])]),
+            (
+                .done,
+                [
+                    TaskFilter(field: .status, op: .is, values: ["done"]),
+                    TaskFilter(field: .updated, op: .is, values: ["7"]),
+                ]
+            ),
+            (.overdue, [TaskFilter(field: .due, op: .is, values: ["overdue"])]),
+        ]
+        for (preset, filters) in expected {
+            router.openTasks(preset: preset)
+            let data = defaults.data(forKey: TaskViewStates.storageKey) ?? Data()
+            let state = TaskViewStates.state(for: TaskViewStates.tasksKey, inProject: false, in: data)
+            #expect(router.route == .tasks)
+            #expect(state.filters == filters)
+            #expect(state.query.isEmpty)
+            #expect(state.mode == "list")
+        }
+    }
+
+    @Test func paletteTogglesAndCloses() {
+        let router = Router()
+        #expect(router.palette == nil)
+        router.togglePalette()
+        #expect(router.palette?.mode == .commands)
+        router.palette?.query = "x"
+        router.palette?.highlight = 3
+        router.togglePalette()
+        #expect(router.palette == nil)
+        router.openPalette(mode: .search)
+        #expect(router.palette == PaletteState(mode: .search))
+        router.closePalette()
+        #expect(router.palette == nil)
+        #expect(!router.isShowingShortcuts && !router.isEditingText)
+    }
 }
