@@ -90,6 +90,14 @@ final class TaskViewModel {
         state = next
     }
 
+    func setField(at index: Int, to field: TaskFilterField) {
+        updateFilter(at: index) {
+            guard $0.field != field else { return }
+            $0.field = field
+            $0.values = []
+        }
+    }
+
     func removeFilter(at index: Int) {
         var next = state
         guard next.filters.indices.contains(index) else { return }

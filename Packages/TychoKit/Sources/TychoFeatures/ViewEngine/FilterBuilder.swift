@@ -52,19 +52,17 @@ struct FilterBuilder: View {
     }
 
     private var footer: some View {
-        HStack(spacing: Spacing.s2) {
+        HStack(alignment: .top, spacing: Spacing.s2) {
             Text("Add filter:")
                 .tychoFont(.xs)
                 .foregroundStyle(Token.text3.color)
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: Spacing.s1) {
-                    ForEach(TaskFilterField.allCases, id: \.self) { field in
-                        Button(field.title, systemImage: field.symbol) {
-                            openIndex = model.addFilter(field)
-                        }
-                        .buttonStyle(.tycho(.secondary, size: .sm))
-                        .accessibilityIdentifier("filter.add.\(field.rawValue)")
+            FlowLayout(spacing: Spacing.s1) {
+                ForEach(TaskFilterField.allCases, id: \.self) { field in
+                    Button(field.title, systemImage: field.symbol) {
+                        openIndex = model.addFilter(field)
                     }
+                    .buttonStyle(.tycho(.secondary, size: .sm))
+                    .accessibilityIdentifier("filter.add.\(field.rawValue)")
                 }
             }
         }

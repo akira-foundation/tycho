@@ -31,10 +31,13 @@ struct FilterRow: View {
             .accessibilityIdentifier("filter.op.\(index)")
             valuesButton(options: options)
             Spacer(minLength: 0)
-            Button("Remove filter", systemImage: "xmark") { model.removeFilter(at: index) }
-                .labelStyle(.iconOnly)
-                .buttonStyle(.plain)
-                .accessibilityIdentifier("filter.remove.\(index)")
+            Button("Remove filter", systemImage: "xmark") {
+                openIndex = nil
+                model.removeFilter(at: index)
+            }
+            .labelStyle(.iconOnly)
+            .buttonStyle(.plain)
+            .accessibilityIdentifier("filter.remove.\(index)")
         }
     }
 
@@ -48,12 +51,7 @@ struct FilterRow: View {
                 .frame(maxWidth: 160, alignment: .leading)
         }
         .buttonStyle(.tycho(.secondary, size: .sm))
-        .popover(
-            isPresented: Binding(
-                get: { openIndex == index },
-                set: { if !$0, openIndex == index { openIndex = nil } }
-            )
-        ) {
+        .popover(isPresented: .open($openIndex, at: index)) {
             FilterValueList(model: model, index: index, options: options)
         }
         .accessibilityIdentifier("filter.values.button.\(index)")
@@ -64,10 +62,7 @@ struct FilterRow: View {
             get: { filter.field },
             set: { field in
                 guard field != filter.field else { return }
-                model.updateFilter(at: index) {
-                    $0.field = field
-                    $0.values = []
-                }
+                model.setField(at: index, to: field)
                 openIndex = index
             }
         )

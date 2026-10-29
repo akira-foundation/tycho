@@ -51,3 +51,12 @@ struct FilterValueList: View {
         }
     }
 }
+
+extension Binding where Value == Bool {
+    static func open(_ openIndex: Binding<Int?>, at index: Int) -> Binding<Bool> {
+        Binding(
+            get: { openIndex.wrappedValue == index },
+            set: { if !$0, openIndex.wrappedValue == index { openIndex.wrappedValue = nil } }
+        )
+    }
+}

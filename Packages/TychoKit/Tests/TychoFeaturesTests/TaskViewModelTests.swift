@@ -69,6 +69,17 @@ struct TaskViewModelTests {
         #expect(model.state.filters.isEmpty)
     }
 
+    @Test func setFieldClearsValuesOnlyWhenTheFieldChanges() throws {
+        let model = try makeModel()
+        _ = model.addFilter(.status)
+        model.updateFilter(at: 0) { $0.values = ["done"] }
+        model.setField(at: 0, to: .status)
+        #expect(model.state.filters == [TaskFilter(field: .status, values: ["done"])])
+
+        model.setField(at: 0, to: .priority)
+        #expect(model.state.filters == [TaskFilter(field: .priority)])
+    }
+
     @Test func changesPersistUnderTheViewKey() throws {
         let defaults = try makeDefaults()
         let model = try makeModel(key: "p:abc", inProject: true, defaults: defaults)
