@@ -162,7 +162,7 @@ struct PalettePanel: View {
 
     private func hint(keys: [String], label: String) -> some View {
         HStack(spacing: 5) {
-            ForEach(keys, id: \.self) { PaletteKeyChip($0) }
+            ForEach(keys, id: \.self) { ShortcutKeyChip($0) }
             Text(label).tychoFont(.xs).foregroundStyle(Token.text3.color)
         }
     }

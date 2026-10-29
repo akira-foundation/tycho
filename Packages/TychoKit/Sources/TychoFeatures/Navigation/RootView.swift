@@ -90,6 +90,7 @@ struct RootView: View {
             .sheet(isPresented: $router.isCreatingTask) {
                 NewTaskSheet(status: router.draftStatus, due: router.draftDue)
             }
+            .sheet(isPresented: $router.isShowingShortcuts) { ShortcutsSheet() }
             .sheet(isPresented: $router.isShowingSettings) {
                 NavigationStack { SettingsView() }
             }

@@ -39,7 +39,7 @@ struct PaletteRow: View {
             case .command:
                 HStack(spacing: 4) {
                     ForEach(Array(text.split(separator: " ").enumerated()), id: \.offset) { _, key in
-                        PaletteKeyChip(String(key))
+                        ShortcutKeyChip(String(key))
                     }
                 }
             default:
@@ -67,26 +67,6 @@ struct PaletteVisualIcon: View {
         case nil:
             Image(systemName: "circle").foregroundStyle(Token.text2.color)
         }
-    }
-}
-
-struct PaletteKeyChip: View {
-    private let key: String
-
-    init(_ key: String) {
-        self.key = key
-    }
-
-    var body: some View {
-        Text(key)
-            .tychoFont(.xxs, weight: .medium)
-            .foregroundStyle(Token.text3.color)
-            .padding(.horizontal, 5)
-            .frame(minWidth: 18, minHeight: 18)
-            .background(Token.surface2.color, in: RoundedRectangle(cornerRadius: Radius.xs, style: .continuous))
-            .overlay(
-                RoundedRectangle(cornerRadius: Radius.xs, style: .continuous)
-                    .strokeBorder(Token.border.color, lineWidth: 1))
     }
 }
 

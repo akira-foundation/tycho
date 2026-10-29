@@ -97,7 +97,7 @@ struct PaletteToolbarButton: View {
                 Image(systemName: "magnifyingglass").foregroundStyle(Token.text3.color)
                 Text("Search or jump to…").tychoFont(.sm).foregroundStyle(Token.text3.color)
                 Spacer(minLength: 12)
-                PaletteKeyChip("⌘K")
+                ShortcutKeyChip("⌘K")
             }
             .padding(.horizontal, 8)
             .frame(minWidth: 240)

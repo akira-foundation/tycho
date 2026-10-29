@@ -35,7 +35,7 @@ struct PaletteInput: View {
                 }
                 .onSubmit { onRun() }
                 .onChange(of: state.query) { state.highlight = 0 }
-            PaletteKeyChip("Esc")
+            ShortcutKeyChip("Esc")
         }
         .padding(.horizontal, 14)
         .frame(height: 50)
