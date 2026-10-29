@@ -16,14 +16,15 @@ struct ProjectDetailView: View {
 
     var body: some View {
         if let project = matches.first {
+            let target = ProjectTabTarget(tab: tab, in: project)
             VStack(spacing: 0) {
                 header(project)
                 Divider()
-                ProjectTabContent(project: project, tab: tab)
-                    .id(project.id)
+                ProjectTabContent(project: project, target: target)
+                    .id(target.stateKey)
             }
             .background(Token.bg.color)
-            .navigationTitle(project.name)
+            .navigationTitle(target.title)
             .toolbar {
                 ToolbarItem {
                     Picker("View", selection: Binding(get: { tab }, set: { router.openProject(project.id, tab: $0) })) {
@@ -32,6 +33,7 @@ struct ProjectDetailView: View {
                     .pickerStyle(.segmented)
                     .accessibilityIdentifier("project.tab")
                 }
+                ToolbarItem { SavedViewTabs(project: project, tab: tab) }
                 ToolbarItem { Button("Edit Project", systemImage: "slider.horizontal.3") { editing = true } }
                 ToolbarItem { Button("New Task", systemImage: "plus") { router.newTask() } }
             }

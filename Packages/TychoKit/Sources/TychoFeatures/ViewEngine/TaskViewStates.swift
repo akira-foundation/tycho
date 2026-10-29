@@ -32,6 +32,10 @@ enum TaskViewStates {
         return stored
     }
 
+    static func contains(_ key: String, in data: Data) -> Bool {
+        decode(data)[key] != nil
+    }
+
     static func storing(
         _ state: TaskViewState, for key: String, in data: Data, liveProjectIDs: Set<UUID>? = nil,
         liveSavedViewIDs: Set<UUID>? = nil

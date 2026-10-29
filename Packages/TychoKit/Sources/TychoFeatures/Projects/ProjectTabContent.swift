@@ -8,12 +8,12 @@ struct ProjectTabContent: View {
     @Query(filter: #Predicate<Project> { !$0.isArchived }, sort: \Project.sortOrder) private var projects: [Project]
     @State private var model: TaskViewModel
     let project: Project
-    let tab: ProjectTab
+    let layout: ProjectBuiltInTab
 
-    init(project: Project, tab: ProjectTab) {
+    init(project: Project, target: ProjectTabTarget) {
         self.project = project
-        self.tab = tab
-        _model = State(initialValue: TaskViewModel.project(project.id))
+        layout = target.layout
+        _model = State(initialValue: target.savedView.map { TaskViewModel.savedView($0) } ?? .project(project.id))
     }
 
     var body: some View {
@@ -23,7 +23,7 @@ struct ProjectTabContent: View {
     @ViewBuilder private var content: some View {
         let source = project.tasks ?? []
         let engine = TaskViewEngine(model: model, members: members, projects: projects)
-        switch tab.builtIn ?? .board {
+        switch layout {
         case .board:
             VStack(spacing: 0) {
                 TaskViewHeader(engine: engine)
