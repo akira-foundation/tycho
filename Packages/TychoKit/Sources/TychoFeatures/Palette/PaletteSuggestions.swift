@@ -8,10 +8,10 @@ public enum PaletteSuggestions {
     public static func items(projects: [Project], savedViews: [SavedView]) -> [PaletteItem] {
         var items = [
             PaletteItem(
-                id: "suggest-overdue", title: "Overdue tasks", symbol: "clock.badge.exclamationmark",
+                id: "suggest-overdue", title: "Overdue tasks", visual: .symbol("clock.badge.exclamationmark"),
                 kind: .suggestion, action: .tasksPreset(.overdue)),
             PaletteItem(
-                id: "suggest-mine", title: "Tasks assigned to me", symbol: "person",
+                id: "suggest-mine", title: "Tasks assigned to me", visual: .symbol("person"),
                 kind: .suggestion, action: .go(.myTasks)),
         ]
         guard let website = projects.first(where: { $0.key == websiteKey }) else { return items }
@@ -21,12 +21,12 @@ public enum PaletteSuggestions {
             items.append(
                 PaletteItem(
                     id: "suggest-high", title: "High priority in Website Redesign",
-                    symbol: "cellularbars", kind: .suggestion,
+                    visual: .symbol("cellularbars"), kind: .suggestion,
                     action: .go(.project(website.id, .savedView(view.id)))))
         }
         items.append(
             PaletteItem(
-                id: "suggest-files", title: "Files in Website Redesign", symbol: "paperclip",
+                id: "suggest-files", title: "Files in Website Redesign", visual: .symbol("paperclip"),
                 kind: .suggestion, action: .go(.project(website.id, .files))))
         return items
     }

@@ -14,7 +14,12 @@ public enum RecentSearches {
         guard let data = defaults.data(forKey: key),
             let list = try? JSONDecoder().decode([String].self, from: data)
         else { return [] }
-        return list
+        return deduplicated(list)
+    }
+
+    public static func deduplicated(_ list: [String]) -> [String] {
+        var seen = Set<String>()
+        return list.filter { seen.insert($0).inserted }
     }
 
     public static func save(_ list: [String], to defaults: UserDefaults) {

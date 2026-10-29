@@ -99,7 +99,7 @@ struct PaletteSectionsTests {
             state(.search, query: "task"), results: SearchResults(tasks: makeTasks(1)))
         let withoutResults = sections(state(.search, query: "zzz"))
         #expect(withResults.last?.items.last?.title == "View all results for “task”")
-        #expect(withResults.last?.items.last?.action == .viewAll("task"))
+        #expect(withResults.last?.items.last?.action == .viewAll("task", .all))
         #expect(withoutResults.count == 1)
         #expect(withoutResults[0].items[0].kind == .viewAll)
     }
@@ -155,5 +155,34 @@ struct PaletteSectionsTests {
         #expect(full[3].action == .go(.project(website.id, .files)))
         #expect(noView.map(\.title) == ["Overdue tasks", "Tasks assigned to me", "Files in Website Redesign"])
         #expect(none.map(\.title) == ["Overdue tasks", "Tasks assigned to me"])
+    }
+
+    @Test func itemsCarryTheirVisuals() {
+        let project = Project(key: "WEB", name: "Website Redesign")
+        project.symbol = "globe"
+        project.colorRaw = ProjectColor.indigo.rawValue
+        let task = makeTasks(1)[0]
+        task.statusRaw = TaskStatus.done.rawValue
+        let file = FileRecord(name: "a.png", byteCount: 1, uploadedAt: .now)
+        file.typeRaw = FileKind.img.rawValue
+        let results = SearchResults(tasks: [task], projects: [project], files: [file])
+        let result = sections(state(.search, query: "a"), results: results)
+        #expect(result[0].items[0].visual == .status(.done))
+        #expect(result[1].items[0].visual == .project(symbol: "globe", color: .indigo))
+        #expect(result[2].items[0].visual == .file(.img))
+    }
+
+    @Test func viewAllCarriesTheScopeAndNavigationFollowsGoActions() {
+        let scoped = sections(state(.search, query: "q", scope: .files))
+        let typed = sections(state(.commands, query: "q"))
+        #expect(scoped.last?.items.last?.action == .viewAll("q", .files))
+        #expect(typed.last?.items.last?.action == .viewAll("q", .all))
+        let navigation = sections(state(.commands))[1]
+        #expect(navigation.items.allSatisfy { if case .go = $0.action { true } else { false } })
+    }
+
+    @Test func duplicateRecentSearchesKeepIdsUnique() {
+        let result = sections(state(.search), recentSearches: ["a", "a", "b"])
+        #expect(result[0].items.map(\.id) == ["recent-a", "recent-b"])
     }
 }

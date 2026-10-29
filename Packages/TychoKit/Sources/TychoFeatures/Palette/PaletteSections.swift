@@ -24,12 +24,13 @@ public enum PaletteSections {
                 items: matches.prefix(commandLimit).map(PaletteItem.init))
             let groups = PaletteEntityItems.groups(scope: .all, results: results)
             return withViewAll(
-                ([commandSection].filter { !$0.items.isEmpty }) + groups, text: text)
+                ([commandSection].filter { !$0.items.isEmpty }) + groups, text: text, scope: .all)
         case (.search, true):
             return emptySearchSections(recentSearches: recentSearches, suggestions: suggestions)
         case (.search, false):
             return withViewAll(
-                PaletteEntityItems.groups(scope: state.scope, results: results), text: text)
+                PaletteEntityItems.groups(scope: state.scope, results: results), text: text,
+                scope: state.scope)
         }
     }
 
@@ -55,7 +56,7 @@ public enum PaletteSections {
                 items: recent.map(PaletteEntityItems.task)),
             PaletteSection(
                 id: "navigation", title: "Navigation",
-                items: commands.filter { $0.title.hasPrefix("Go to") }.map(PaletteItem.init)),
+                items: commands.filter(\.isNavigation).map(PaletteItem.init)),
         ]
         return sections.filter { !$0.items.isEmpty }
     }
@@ -63,9 +64,9 @@ public enum PaletteSections {
     private static func emptySearchSections(
         recentSearches: [String], suggestions: [PaletteItem]
     ) -> [PaletteSection] {
-        let recent = recentSearches.prefix(RecentSearches.limit).map { query in
+        let recent = RecentSearches.deduplicated(recentSearches).prefix(RecentSearches.limit).map { query in
             PaletteItem(
-                id: "recent-\(query)", title: query, symbol: "clock.arrow.circlepath",
+                id: "recent-\(query)", title: query, visual: .symbol("clock.arrow.circlepath"),
                 kind: .recentSearch, action: .fillQuery(query))
         }
         let sections = [
@@ -75,10 +76,10 @@ public enum PaletteSections {
         return sections.filter { !$0.items.isEmpty }
     }
 
-    private static func withViewAll(_ groups: [PaletteSection], text: String) -> [PaletteSection] {
+    private static func withViewAll(_ groups: [PaletteSection], text: String, scope: SearchScope) -> [PaletteSection] {
         let item = PaletteItem(
-            id: "view-all", title: "View all results for “\(text)”", symbol: "magnifyingglass",
-            kind: .viewAll, action: .viewAll(text))
+            id: "view-all", title: "View all results for “\(text)”", visual: .symbol("magnifyingglass"),
+            kind: .viewAll, action: .viewAll(text, scope))
         return groups + [PaletteSection(id: "view-all", title: "", items: [item])]
     }
 }

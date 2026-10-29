@@ -1,4 +1,5 @@
 import Foundation
+import TychoCore
 
 public enum PaletteAction: Equatable {
     case newTask
@@ -14,7 +15,7 @@ public enum PaletteAction: Equatable {
     case openProject(UUID)
     case openFile(UUID)
     case fillQuery(String)
-    case viewAll(String)
+    case viewAll(String, SearchScope)
     case tasksPreset(TasksPreset)
 }
 
@@ -31,6 +32,13 @@ public struct PaletteCommand: Identifiable {
         self.symbol = symbol
         self.hint = hint
         self.action = action
+    }
+}
+
+extension PaletteCommand {
+    var isNavigation: Bool {
+        guard case .go = action else { return false }
+        return true
     }
 }
 

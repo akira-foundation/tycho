@@ -4,19 +4,20 @@ enum PaletteEntityItems {
     static func task(_ task: TaskItem) -> PaletteItem {
         PaletteItem(
             id: "task-\(task.id)", title: task.title, subtitle: task.project?.name,
-            trailing: task.key, symbol: "circle", kind: .task, action: .openTask(task.id))
+            trailing: task.key, visual: .status(task.status), kind: .task, action: .openTask(task.id))
     }
 
     static func project(_ project: Project) -> PaletteItem {
         PaletteItem(
             id: "project-\(project.id)", title: project.name, subtitle: project.status.title,
-            symbol: project.symbol, kind: .project, action: .openProject(project.id))
+            visual: .project(symbol: project.symbol, color: project.color), kind: .project,
+            action: .openProject(project.id))
     }
 
     static func file(_ file: FileRecord) -> PaletteItem {
         PaletteItem(
             id: "file-\(file.id)", title: file.name, subtitle: file.project?.name,
-            trailing: ByteCountText.format(file.byteCount), symbol: "doc",
+            trailing: ByteCountText.format(file.byteCount), visual: .file(file.kind),
             kind: .file, action: .openFile(file.id))
     }
 
