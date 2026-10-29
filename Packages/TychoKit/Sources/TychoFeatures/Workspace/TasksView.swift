@@ -3,71 +3,69 @@ import SwiftUI
 import TychoCore
 import TychoDesign
 
-enum TasksMode: String, CaseIterable, Identifiable {
-    case list
-    case board
-    case table
-
-    var id: String { rawValue }
-
-    var title: String {
-        switch self {
-        case .list: "List"
-        case .board: "Board"
-        case .table: "Table"
-        }
-    }
-
-    var symbol: String {
-        switch self {
-        case .list: "list.bullet"
-        case .board: "rectangle.split.3x1"
-        case .table: "tablecells"
-        }
-    }
-
-    static func subtitle(projectCount: Int) -> String { "Every task across \(projectCount) projects." }
-}
-
 struct TasksView: View {
     @Environment(Router.self) private var router
     @Query private var tasks: [TaskItem]
-    @Query(filter: #Predicate<Project> { !$0.isArchived }) private var projects: [Project]
-    @AppStorage("tasks.mode") private var mode = TasksMode.list
-    @State private var viewModel = TaskViewModel(key: TaskViewStates.tasksKey, inProject: false)
+    @Query(sort: \Member.name) private var members: [Member]
+    @Query(filter: #Predicate<Project> { !$0.isArchived }, sort: \Project.sortOrder) private var projects: [Project]
+    @State private var model: TaskViewModel
+
+    init() {
+        TasksMode.migrateLegacyPreference(.standard)
+        _model = State(initialValue: TaskViewModel(key: TaskViewStates.tasksKey, inProject: false))
+    }
 
     var body: some View {
-        let visible = tasks.inLiveProjects()
+        let source = tasks.inLiveProjects()
+        let mode = TasksMode(state: model.state)
         VStack(spacing: 0) {
-            PageHeader(title: "Tasks", subtitle: TasksMode.subtitle(projectCount: projects.count)) {
-                Picker("View", selection: $mode) {
-                    ForEach(TasksMode.allCases) { Label($0.title, systemImage: $0.symbol).tag($0) }
-                }
-                .pickerStyle(.segmented)
-                .labelsHidden()
-                .fixedSize()
-                .accessibilityIdentifier("tasks.mode")
-                Button("New task", systemImage: "plus") { router.newTask() }
-                    .buttonStyle(.tycho(.primary))
-            }
+            PageHeader(title: "Tasks", subtitle: TasksMode.subtitle(projectCount: projects.count)) {}
             Divider()
+            TaskViewHeader(
+                engine: TaskViewEngine(model: model, members: members, projects: projects),
+                showsGroup: mode != .board, showsColumns: mode == .table
+            ) { extras(mode) }
             switch mode {
             case .list:
-                TaskListView(tasks: visible, project: nil)
+                list(source)
             case .board:
-                BoardView(tasks: visible, project: nil)
+                BoardView(tasks: visible(source), project: nil)
             case .table:
-                HStack {
-                    Spacer()
-                    TableColumnsMenu(model: viewModel)
-                }
-                .padding(.horizontal, Spacing.s4)
-                .padding(.vertical, Spacing.s2)
-                TaskTableView(tasks: visible, model: viewModel)
+                TaskTableView(tasks: source, model: model)
             }
         }
         .background(Token.bg.color)
-        .tracksLiveProjects(viewModel)
+        .tracksLiveProjects(model)
         .navigationTitle("Tasks")
+    }
+
+    @ViewBuilder private func extras(_ mode: TasksMode) -> some View {
+        Picker("View", selection: Binding(get: { mode }, set: { model.state.mode = $0.rawValue })) {
+            ForEach(TasksMode.allCases) { Label($0.title, systemImage: $0.symbol).tag($0) }
+        }
+        .pickerStyle(.segmented)
+        .labelsHidden()
+        .fixedSize()
+        .accessibilityIdentifier("tasks.mode")
+        Button("New task", systemImage: "plus") { router.newTask() }
+            .buttonStyle(.tycho(.primary))
+    }
+
+    private func visible(_ source: [TaskItem]) -> [TaskItem] {
+        model.apply(source, now: .now, calendar: DateText.gregorian)
+    }
+
+    @ViewBuilder private func list(_ source: [TaskItem]) -> some View {
+        let shown = visible(source)
+        let state = model.state
+        if FilteredEmptyState.applies(source: source.count, visible: shown.count) {
+            FilteredEmptyState { model.clearFilters() }
+        } else {
+            TaskListView(
+                groups: model.groups(
+                    of: shown, members: members, projects: projects, now: .now, calendar: DateText.gregorian),
+                grouping: state.grouping, project: nil,
+                allowsReorder: ListDropPolicy.allowsReorder(sort: state.sort, grouping: state.grouping))
+        }
     }
 }

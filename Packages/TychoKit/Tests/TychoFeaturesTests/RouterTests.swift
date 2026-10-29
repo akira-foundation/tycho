@@ -142,6 +142,15 @@ struct RouterTests {
         let suite = "router-presets-\(UUID().uuidString)"
         let defaults = try #require(UserDefaults(suiteName: suite))
         defer { defaults.removePersistentDomain(forName: suite) }
+        var previous = TaskViewState(inProject: false)
+        previous.mode = "board"
+        previous.query = "login"
+        var other = TaskViewState(inProject: false)
+        other.query = "kept"
+        let seeded = TaskViewStates.storing(other, for: TaskViewStates.myTasksKey, in: Data())
+        defaults.set(
+            TaskViewStates.storing(previous, for: TaskViewStates.tasksKey, in: seeded),
+            forKey: TaskViewStates.storageKey)
         let router = Router(defaults: defaults)
         let expected: [(TasksPreset, [TaskFilter])] = [
             (.open, [TaskFilter(field: .status, op: .isNot, values: ["done"])]),
@@ -162,6 +171,7 @@ struct RouterTests {
             #expect(state.filters == filters)
             #expect(state.query.isEmpty)
             #expect(state.mode == "list")
+            #expect(TaskViewStates.state(for: TaskViewStates.myTasksKey, inProject: false, in: data) == other)
         }
     }
 

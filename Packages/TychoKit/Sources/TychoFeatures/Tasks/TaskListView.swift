@@ -12,11 +12,15 @@ struct TaskListView: View {
     let allowsReorder: Bool
     @State private var collapsed: Set<String> = []
 
-    init(groups: [TaskViewGroup], grouping: TaskViewGrouping, project: Project?, allowsReorder: Bool) {
+    init(
+        groups: [TaskViewGroup], grouping: TaskViewGrouping, project: Project?, allowsReorder: Bool,
+        initiallyCollapsed: Set<String> = []
+    ) {
         self.groups = groups
         self.grouping = grouping
         self.project = project
         self.allowsReorder = allowsReorder
+        _collapsed = State(initialValue: initiallyCollapsed)
     }
 
     init(tasks: [TaskItem], project: Project?) {
