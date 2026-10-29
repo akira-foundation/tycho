@@ -74,7 +74,7 @@ struct ProjectTabContent: View {
             TaskListView(tasks: project.tasks ?? [], project: project)
         case .table:
             TaskTableView(
-                tasks: project.tasks ?? [], project: project, stateKey: TableViewStates.projectKey(project.id))
+                tasks: project.tasks ?? [], project: project, stateKey: TaskViewStates.projectKey(project.id))
         case .calendar:
             CalendarView(tasks: project.tasks ?? [], events: project.events ?? [], project: project)
         case .timeline:

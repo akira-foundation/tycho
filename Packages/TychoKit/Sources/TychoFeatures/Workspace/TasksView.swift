@@ -56,7 +56,7 @@ struct TasksView: View {
             case .board:
                 BoardView(tasks: visible, project: nil)
             case .table:
-                TaskTableView(tasks: visible, project: nil, stateKey: TableViewStates.workspaceKey)
+                TaskTableView(tasks: visible, project: nil, stateKey: TaskViewStates.tasksKey)
             }
         }
         .background(Token.bg.color)

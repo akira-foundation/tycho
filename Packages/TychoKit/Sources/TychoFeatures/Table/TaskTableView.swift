@@ -6,7 +6,7 @@ import TychoDesign
 struct TaskTableView: View {
     @Environment(Router.self) var router
     @Environment(ToastCenter.self) var toast
-    @AppStorage(TableViewStates.storageKey) private var stored = Data()
+    @AppStorage(TaskViewStates.storageKey) private var stored = Data()
     @Query(sort: \Member.name) var members: [Member]
     @Query private var projects: [Project]
     #if os(iOS)
@@ -36,21 +36,21 @@ struct TaskTableView: View {
 
     private var liveProjectIDs: Set<UUID> { Set(projects.map(\.id)) }
 
-    private var state: TableViewState {
-        TableViewStates.state(for: stateKey, inProject: project != nil, in: stored)
+    private var state: TaskViewState {
+        TaskViewStates.state(for: stateKey, inProject: project != nil, in: stored)
     }
 
-    private var stateBinding: Binding<TableViewState> {
+    private var stateBinding: Binding<TaskViewState> {
         Binding(
             get: { state },
-            set: { stored = TableViewStates.storing($0, for: stateKey, in: stored, liveProjectIDs: liveProjectIDs) })
+            set: { stored = TaskViewStates.storing($0, for: stateKey, in: stored, liveProjectIDs: liveProjectIDs) })
     }
 
     private var sortBinding: Binding<[TaskComparator]> {
         Binding(
             get: { state.sort },
             set: {
-                stored = TableViewStates.storingSort(
+                stored = TaskViewStates.storingSort(
                     $0, for: stateKey, inProject: project != nil, in: stored, liveProjectIDs: liveProjectIDs)
             })
     }
@@ -61,7 +61,7 @@ struct TaskTableView: View {
             set: { value in
                 var next = state
                 TableCustomization.store(value, into: &next)
-                stored = TableViewStates.storing(next, for: stateKey, in: stored, liveProjectIDs: liveProjectIDs)
+                stored = TaskViewStates.storing(next, for: stateKey, in: stored, liveProjectIDs: liveProjectIDs)
             })
     }
 

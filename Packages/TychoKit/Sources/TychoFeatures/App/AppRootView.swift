@@ -8,6 +8,7 @@ public struct AppRootView: View {
 
     public init(loader: StoreLoader) {
         self.loader = loader
+        TaskViewStates.migrateStoredDefaults()
     }
 
     public var body: some View {

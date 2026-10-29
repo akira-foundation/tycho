@@ -3,7 +3,7 @@ import SwiftUI
 import TychoCore
 
 enum TableCustomization {
-    static func make(from state: TableViewState) -> TableColumnCustomization<TaskItem> {
+    static func make(from state: TaskViewState) -> TableColumnCustomization<TaskItem> {
         var customization =
             state.columns.flatMap { try? JSONDecoder().decode(TableColumnCustomization<TaskItem>.self, from: $0) }
             ?? TableColumnCustomization<TaskItem>()
@@ -13,7 +13,7 @@ enum TableCustomization {
         return customization
     }
 
-    static func store(_ customization: TableColumnCustomization<TaskItem>, into state: inout TableViewState) {
+    static func store(_ customization: TableColumnCustomization<TaskItem>, into state: inout TaskViewState) {
         state.columns = try? JSONEncoder().encode(customization)
         state.hidden = Set(
             TableColumnID.allCases.filter { $0.isHideable && customization[visibility: $0.rawValue] == .hidden })

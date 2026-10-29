@@ -2,7 +2,7 @@ import SwiftUI
 import TychoCore
 
 struct TableColumnsMenu: View {
-    @Binding var state: TableViewState
+    @Binding var state: TaskViewState
 
     var body: some View {
         Menu("Columns", systemImage: "tablecells") {
