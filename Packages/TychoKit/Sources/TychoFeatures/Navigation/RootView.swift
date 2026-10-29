@@ -45,7 +45,9 @@ struct RootView: View {
                 router.updateHorizontalSizeClass(isCompact: sizeClass == .compact)
             }
             #endif
+            .overlay { PaletteOverlay() }
             .toolbar {
+                ToolbarItem(placement: .principal) { PaletteToolbarButton() }
                 ToolbarItem {
                     Button("Inspector", systemImage: "sidebar.right") { router.closeInspector() }
                         .disabled(router.inspectedTaskID == nil)

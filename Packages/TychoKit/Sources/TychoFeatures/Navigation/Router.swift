@@ -24,6 +24,8 @@ public final class Router {
     @ObservationIgnored private var inspectorFlushes: [UUID: @MainActor () -> Void] = [:]
 
     public var palette: PaletteState?
+    public var searchQuery = ""
+    public var searchScope: SearchScope = .all
     public var isShowingShortcuts = false
     public var isEditingText = false
     @ObservationIgnored private let defaults: UserDefaults

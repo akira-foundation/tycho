@@ -18,7 +18,7 @@ public struct TychoCommands: Commands {
                 .disabled(router == nil)
         }
         CommandGroup(after: .sidebar) {
-            Button("Toggle Dark Mode") { theme = theme == .dark ? .light : .dark }
+            Button("Toggle Dark Mode") { theme = .toggled(isDark: theme.resolvesDark) }
                 .keyboardShortcut("l", modifiers: [.command, .shift])
         }
     }
