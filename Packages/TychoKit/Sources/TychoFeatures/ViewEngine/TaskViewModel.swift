@@ -11,6 +11,8 @@ final class TaskViewModel {
     @ObservationIgnored private let defaults: UserDefaults
     @ObservationIgnored private var lastData: Data
     @ObservationIgnored private nonisolated(unsafe) var observer: (any NSObjectProtocol)?
+    @ObservationIgnored var liveProjectIDs: Set<UUID>?
+    @ObservationIgnored var liveSavedViewIDs: Set<UUID>?
     private var cached: TaskViewState
 
     init(key: String, inProject: Bool, defaults: UserDefaults = .standard) {
@@ -45,7 +47,8 @@ final class TaskViewModel {
         set {
             guard newValue != cached else { return }
             let stored = defaults.data(forKey: TaskViewStates.storageKey) ?? Data()
-            let next = TaskViewStates.storing(newValue, for: key, in: stored)
+            let next = TaskViewStates.storing(
+                newValue, for: key, in: stored, liveProjectIDs: liveProjectIDs, liveSavedViewIDs: liveSavedViewIDs)
             cached = newValue
             lastData = next
             defaults.set(next, forKey: TaskViewStates.storageKey)
@@ -125,19 +128,8 @@ final class TaskViewModel {
     }
 
     func groups(
-        _ tasks: [TaskItem], members: [Member], projects: [Project], now: Date, calendar: Calendar
+        of visible: [TaskItem], members: [Member], projects: [Project], now: Date, calendar: Calendar
     ) -> [TaskViewGroup] {
-        state.grouping.groups(
-            apply(tasks, now: now, calendar: calendar), members: members, projects: projects, now: now,
-            calendar: calendar)
-    }
-
-    func prune(liveProjectIDs: Set<UUID>) {
-        let stored = defaults.data(forKey: TaskViewStates.storageKey) ?? Data()
-        guard !stored.isEmpty else { return }
-        let next = TaskViewStates.storing(cached, for: key, in: stored, liveProjectIDs: liveProjectIDs)
-        guard next != stored else { return }
-        lastData = next
-        defaults.set(next, forKey: TaskViewStates.storageKey)
+        state.grouping.groups(visible, members: members, projects: projects, now: now, calendar: calendar)
     }
 }

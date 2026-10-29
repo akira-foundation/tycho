@@ -9,16 +9,18 @@ struct TaskListView: View {
     let groups: [TaskViewGroup]
     let grouping: TaskViewGrouping
     let project: Project?
+    let allowsReorder: Bool
     @State private var collapsed: Set<String> = []
 
-    init(groups: [TaskViewGroup], grouping: TaskViewGrouping, project: Project?) {
+    init(groups: [TaskViewGroup], grouping: TaskViewGrouping, project: Project?, allowsReorder: Bool) {
         self.groups = groups
         self.grouping = grouping
         self.project = project
+        self.allowsReorder = allowsReorder
     }
 
     init(tasks: [TaskItem], project: Project?) {
-        self.init(groups: TaskGrouping.statusGroups(tasks), grouping: .status, project: project)
+        self.init(groups: TaskGrouping.statusGroups(tasks), grouping: .status, project: project, allowsReorder: true)
     }
 
     private var tasks: [TaskItem] { groups.flatMap(\.tasks) }
@@ -30,13 +32,7 @@ struct TaskListView: View {
                 Section {
                     if !collapsed.contains(group.id) {
                         ForEach(group.tasks) { task in
-                            TaskRow(task: task, showsProject: project == nil)
-                                .draggable(TaskTransfer(id: task.id))
-                                .dropDestination(for: TaskTransfer.self) { items, _ in
-                                    guard let status else { return false }
-                                    return drop(items, into: status, before: task)
-                                }
-                                .contextMenu { TaskMenu(task: task) }
+                            row(task, status: status)
                         }
                         if let project, let status {
                             InlineComposer(placeholder: "Add task") { title in
@@ -61,8 +57,23 @@ struct TaskListView: View {
         .tychoAnimation(value: tasks.movementSignature)
     }
 
+    @ViewBuilder private func row(_ task: TaskItem, status: TaskStatus?) -> some View {
+        let base = TaskRow(task: task, showsProject: project == nil).contextMenu { TaskMenu(task: task) }
+        switch (status, allowsReorder) {
+        case (nil, _):
+            base
+        case (_, false):
+            base.draggable(TaskTransfer(id: task.id))
+        case (let status?, true):
+            base.draggable(TaskTransfer(id: task.id))
+                .dropDestination(for: TaskTransfer.self) { items, _ in
+                    return drop(items, into: status, before: task)
+                }
+        }
+    }
+
     private func statusOf(_ group: TaskViewGroup) -> TaskStatus? {
-        guard grouping == .status else { return nil }
+        guard ListDropPolicy.allowsStatusChange(grouping: grouping) else { return nil }
         return TaskStatus(rawValue: group.id)
     }
 

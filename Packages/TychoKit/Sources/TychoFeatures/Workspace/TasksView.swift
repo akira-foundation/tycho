@@ -67,6 +67,7 @@ struct TasksView: View {
             }
         }
         .background(Token.bg.color)
+        .tracksLiveProjects(viewModel)
         .navigationTitle("Tasks")
     }
 }

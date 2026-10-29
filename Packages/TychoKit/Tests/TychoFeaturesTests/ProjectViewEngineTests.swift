@@ -45,7 +45,8 @@ struct ProjectViewEngineTests {
         model.setGrouping(.priority)
         model.setQuery("ship")
 
-        let groups = model.groups([urgent, low, hidden], members: [], projects: [], now: Date(), calendar: calendar)
+        let visible = model.apply([urgent, low, hidden], now: Date(), calendar: calendar)
+        let groups = model.groups(of: visible, members: [], projects: [], now: Date(), calendar: calendar)
 
         #expect(groups.map(\.title) == ["Urgent", "High", "Medium", "Low", "No priority"])
         #expect(groups[0].tasks == [urgent])
@@ -60,7 +61,8 @@ struct ProjectViewEngineTests {
         let first = TaskItem(number: 2, title: "a")
         first.sortOrder = 1
 
-        let groups = model.groups([second, first], members: [], projects: [], now: Date(), calendar: calendar)
+        let visible = model.apply([second, first], now: Date(), calendar: calendar)
+        let groups = model.groups(of: visible, members: [], projects: [], now: Date(), calendar: calendar)
 
         #expect(groups.map(\.id) == TaskStatus.allCases.map(\.rawValue))
         #expect(groups.first { $0.id == first.status.rawValue }?.tasks == [first, second])
@@ -96,20 +98,51 @@ struct ProjectViewEngineTests {
         #expect(model.state.columns == nil)
     }
 
-    @Test func pruningDropsEntriesOfDeletedProjects() throws {
+    @Test func writesDropEntriesOfDeletedProjects() throws {
         let defaults = try makeDefaults()
         let alive = UUID()
         let dead = TaskViewModel.project(UUID(), defaults: defaults)
         dead.setQuery("gone")
         let model = TaskViewModel.project(alive, defaults: defaults)
-        model.setQuery("kept")
+        model.liveProjectIDs = [alive]
 
-        model.prune(liveProjectIDs: [alive])
+        model.setQuery("kept")
 
         let data = try #require(defaults.data(forKey: TaskViewStates.storageKey))
         let object = try #require(try JSONSerialization.jsonObject(with: data) as? [String: Any])
         #expect(object.keys.sorted() == [TaskViewStates.projectKey(alive)])
         #expect(model.state.query == "kept")
+    }
+
+    @Test func writesKeepEveryEntryUntilLiveProjectsAreKnown() throws {
+        let defaults = try makeDefaults()
+        let other = TaskViewModel.project(UUID(), defaults: defaults)
+        other.setQuery("other")
+        let model = TaskViewModel.project(UUID(), defaults: defaults)
+
+        model.setQuery("mine")
+
+        let data = try #require(defaults.data(forKey: TaskViewStates.storageKey))
+        let object = try #require(try JSONSerialization.jsonObject(with: data) as? [String: Any])
+        #expect(object.count == 2)
+    }
+
+    @Test(arguments: [
+        (TaskSortField?.none, TaskViewGrouping.status, true, true),
+        (.manual, .status, true, true),
+        (.priority, .status, false, true),
+        (.due, .status, false, true),
+        (.manual, .priority, false, false),
+        (.title, .assignee, false, false),
+        (nil, .none, false, false),
+    ])
+    func listDropsFollowSortAndGrouping(
+        field: TaskSortField?, grouping: TaskViewGrouping, reorders: Bool, changesStatus: Bool
+    ) {
+        let sort = field.map { [TaskComparator(field: $0)] } ?? []
+
+        #expect(ListDropPolicy.allowsReorder(sort: sort, grouping: grouping) == reorders)
+        #expect(ListDropPolicy.allowsStatusChange(grouping: grouping) == changesStatus)
     }
 
     @Test func filteredEmptyStateNeedsTasksHiddenByTheView() {

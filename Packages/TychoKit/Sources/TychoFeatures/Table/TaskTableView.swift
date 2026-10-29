@@ -7,7 +7,7 @@ struct TaskTableView: View {
     @Environment(Router.self) var router
     @Environment(ToastCenter.self) var toast
     @Query(sort: \Member.name) var members: [Member]
-    @Query private var projects: [Project]
+    @Query(filter: #Predicate<Project> { !$0.isArchived }, sort: \Project.sortOrder) private var projects: [Project]
     #if os(iOS)
     @Environment(\.horizontalSizeClass) private var sizeClass
     #endif
@@ -20,27 +20,20 @@ struct TaskTableView: View {
     }
 
     var body: some View {
-        let groups = model.groups(
-            tasks, members: members, projects: projects, now: .now, calendar: DateText.gregorian)
-        content(groups)
+        content(model.apply(tasks, now: .now, calendar: DateText.gregorian))
             .background(Token.bg.color)
-            .onAppear(perform: prune)
     }
 
-    @ViewBuilder private func content(_ groups: [TaskViewGroup]) -> some View {
-        let visible = model.apply(tasks, now: .now, calendar: DateText.gregorian)
+    @ViewBuilder private func content(_ visible: [TaskItem]) -> some View {
         switch (tasks.isEmpty, FilteredEmptyState.applies(source: tasks.count, visible: visible.count), isCompact) {
         case (true, _, _): empty
         case (false, true, _): FilteredEmptyState { model.clearFilters() }
         case (false, false, true): TableCardList(tasks: visible)
-        case (false, false, false): grid(groups)
+        case (false, false, false):
+            grid(
+                model.groups(
+                    of: visible, members: members, projects: projects, now: .now, calendar: DateText.gregorian))
         }
-    }
-
-    private func prune() {
-        let live = Set(projects.map(\.id))
-        guard !live.isEmpty else { return }
-        model.prune(liveProjectIDs: live)
     }
 
     private var sortBinding: Binding<[TaskComparator]> {

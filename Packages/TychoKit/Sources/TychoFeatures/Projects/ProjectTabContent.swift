@@ -17,6 +17,10 @@ struct ProjectTabContent: View {
     }
 
     var body: some View {
+        content.tracksLiveProjects(model)
+    }
+
+    @ViewBuilder private var content: some View {
         let source = project.tasks ?? []
         let engine = TaskViewEngine(model: model, members: members, projects: projects)
         switch tab.builtIn ?? .board {
@@ -50,12 +54,16 @@ struct ProjectTabContent: View {
     }
 
     @ViewBuilder private func list(_ source: [TaskItem]) -> some View {
-        let groups = model.groups(
-            source, members: members, projects: projects, now: .now, calendar: DateText.gregorian)
-        if FilteredEmptyState.applies(source: source.count, visible: visible(source).count) {
+        let shown = visible(source)
+        let state = model.state
+        if FilteredEmptyState.applies(source: source.count, visible: shown.count) {
             FilteredEmptyState { model.clearFilters() }
         } else {
-            TaskListView(groups: groups, grouping: model.state.grouping, project: project)
+            TaskListView(
+                groups: model.groups(
+                    of: shown, members: members, projects: projects, now: .now, calendar: DateText.gregorian),
+                grouping: state.grouping, project: project,
+                allowsReorder: ListDropPolicy.allowsReorder(sort: state.sort, grouping: state.grouping))
         }
     }
 }
