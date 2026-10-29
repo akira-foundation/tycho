@@ -5,6 +5,7 @@ public enum TychoSchema {
     public static let models: [any PersistentModel.Type] = [
         Workspace.self, Member.self, Team.self, Project.self, TaskItem.self, Subtask.self,
         Milestone.self, CalendarEvent.self, FileRecord.self,
+        SavedView.self,
     ]
 
     public static func configuration(inMemory: Bool) -> ModelConfiguration {

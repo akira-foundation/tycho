@@ -58,6 +58,14 @@ public enum DemoSeed {
             project.lead = members[seed.lead]
             project.members = seed.members.compactMap { members[$0] }
             projects[seed.ref] = project
+            if seed.key == "WEB" {
+                let view = SavedView(
+                    name: "High priority", layout: .list,
+                    filters: [TaskFilter(field: .priority, op: .is, values: ["urgent", "high"])])
+                view.sortOrder = Rank.step
+                context.insert(view)
+                view.project = project
+            }
         }
 
         var countByProject: [String: Int] = [:]

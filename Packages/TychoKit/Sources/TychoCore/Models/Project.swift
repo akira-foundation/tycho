@@ -27,6 +27,8 @@ public final class Project {
     @Relationship(deleteRule: .cascade, inverse: \CalendarEvent.project) public var events: [CalendarEvent]? = []
     @Relationship(deleteRule: .cascade, inverse: \FileRecord.project) public var files: [FileRecord]? = []
 
+    @Relationship(deleteRule: .cascade, inverse: \SavedView.project) public var savedViews: [SavedView]? = []
+
     public init(key: String, name: String) {
         self.key = key
         self.name = name

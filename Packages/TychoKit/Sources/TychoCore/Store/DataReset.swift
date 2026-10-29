@@ -9,6 +9,7 @@ public enum DataReset {
         try context.delete(model: Milestone.self)
         try context.delete(model: Subtask.self)
         try context.delete(model: TaskItem.self)
+        try context.delete(model: SavedView.self)
         try context.delete(model: Project.self)
         try context.delete(model: Member.self)
         try context.delete(model: Team.self)
