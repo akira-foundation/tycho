@@ -31,6 +31,10 @@ final class TaskViewModel {
         }
     }
 
+    static func project(_ id: UUID, defaults: UserDefaults = .standard) -> TaskViewModel {
+        TaskViewModel(key: TaskViewStates.projectKey(id), inProject: true, defaults: defaults)
+    }
+
     deinit {
         guard let observer else { return }
         NotificationCenter.default.removeObserver(observer)
@@ -64,6 +68,10 @@ final class TaskViewModel {
     func setSort(field: TaskSortField) {
         let order = state.sort.first?.order ?? .forward
         state.sort = [TaskComparator(field: field, order: order)]
+    }
+
+    func setSort(_ comparators: [TaskComparator]) {
+        state.sort = Array(comparators.prefix(1))
     }
 
     func setSortOrder(_ order: SortOrder) {
@@ -114,5 +122,22 @@ final class TaskViewModel {
 
     func apply(_ tasks: [TaskItem], now: Date, calendar: Calendar) -> [TaskItem] {
         state.viewQuery.apply(tasks, now: now, calendar: calendar)
+    }
+
+    func groups(
+        _ tasks: [TaskItem], members: [Member], projects: [Project], now: Date, calendar: Calendar
+    ) -> [TaskViewGroup] {
+        state.grouping.groups(
+            apply(tasks, now: now, calendar: calendar), members: members, projects: projects, now: now,
+            calendar: calendar)
+    }
+
+    func prune(liveProjectIDs: Set<UUID>) {
+        let stored = defaults.data(forKey: TaskViewStates.storageKey) ?? Data()
+        guard !stored.isEmpty else { return }
+        let next = TaskViewStates.storing(cached, for: key, in: stored, liveProjectIDs: liveProjectIDs)
+        guard next != stored else { return }
+        lastData = next
+        defaults.set(next, forKey: TaskViewStates.storageKey)
     }
 }

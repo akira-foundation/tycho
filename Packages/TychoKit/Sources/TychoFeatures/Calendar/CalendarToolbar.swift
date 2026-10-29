@@ -37,8 +37,6 @@ struct CalendarToolbar: View {
             .accessibilityIdentifier("calendar.mode")
         }
         .buttonStyle(.borderless)
-        .padding(.horizontal, Spacing.s4)
-        .padding(.vertical, Spacing.s2)
     }
 
     private var title: String {

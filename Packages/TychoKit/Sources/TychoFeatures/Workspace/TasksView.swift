@@ -34,6 +34,7 @@ struct TasksView: View {
     @Query private var tasks: [TaskItem]
     @Query(filter: #Predicate<Project> { !$0.isArchived }) private var projects: [Project]
     @AppStorage("tasks.mode") private var mode = TasksMode.list
+    @State private var viewModel = TaskViewModel(key: TaskViewStates.tasksKey, inProject: false)
 
     var body: some View {
         let visible = tasks.inLiveProjects()
@@ -56,7 +57,13 @@ struct TasksView: View {
             case .board:
                 BoardView(tasks: visible, project: nil)
             case .table:
-                TaskTableView(tasks: visible, project: nil, stateKey: TaskViewStates.tasksKey)
+                HStack {
+                    Spacer()
+                    TableColumnsMenu(model: viewModel)
+                }
+                .padding(.horizontal, Spacing.s4)
+                .padding(.vertical, Spacing.s2)
+                TaskTableView(tasks: visible, model: viewModel)
             }
         }
         .background(Token.bg.color)

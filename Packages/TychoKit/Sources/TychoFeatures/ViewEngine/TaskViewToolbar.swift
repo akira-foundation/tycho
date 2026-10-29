@@ -50,7 +50,7 @@ struct TaskViewToolbar<Trailing: View>: View {
                     .accessibilityIdentifier("view.group")
             }
             if showsColumns {
-                TableColumnsMenu(state: Binding(get: { model.state }, set: { model.state = $0 }))
+                TableColumnsMenu(model: model)
             }
             Spacer()
             trailing

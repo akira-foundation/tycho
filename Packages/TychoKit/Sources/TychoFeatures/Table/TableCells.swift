@@ -157,13 +157,16 @@ struct ProjectCell: View {
 }
 
 struct TableGroupHeader: View {
-    let status: TaskStatus
+    let title: String
     let count: Int
+    let status: TaskStatus?
 
     var body: some View {
         HStack(spacing: Spacing.s2) {
-            StatusIcon(glyph: status.glyph, color: status.tint)
-            Text(status.title).tychoFont(.sm, weight: .semibold)
+            if let status {
+                StatusIcon(glyph: status.glyph, color: status.tint)
+            }
+            Text(title).tychoFont(.sm, weight: .semibold)
             Text("\(count)").tychoFont(.xs).foregroundStyle(Token.text4.color)
         }
     }

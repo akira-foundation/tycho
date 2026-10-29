@@ -44,15 +44,6 @@ enum TaskViewStates {
         return (try? JSONEncoder().encode(all)) ?? data
     }
 
-    static func storingSort(
-        _ sort: [TaskComparator], for key: String, inProject: Bool, in data: Data, liveProjectIDs: Set<UUID>? = nil,
-        liveSavedViewIDs: Set<UUID>? = nil
-    ) -> Data {
-        var next = state(for: key, inProject: inProject, in: data)
-        next.sort = Array(sort.prefix(1))
-        return storing(next, for: key, in: data, liveProjectIDs: liveProjectIDs, liveSavedViewIDs: liveSavedViewIDs)
-    }
-
     private struct Entry: Decodable {
         let state: TaskViewState?
 

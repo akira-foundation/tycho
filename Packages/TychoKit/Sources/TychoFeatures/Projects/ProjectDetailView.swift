@@ -20,6 +20,7 @@ struct ProjectDetailView: View {
                 header(project)
                 Divider()
                 ProjectTabContent(project: project, tab: tab)
+                    .id(project.id)
             }
             .background(Token.bg.color)
             .navigationTitle(project.name)
@@ -59,28 +60,5 @@ struct ProjectDetailView: View {
         }
         .padding(.horizontal, Spacing.s6)
         .padding(.vertical, Spacing.s4)
-    }
-}
-
-struct ProjectTabContent: View {
-    let project: Project
-    let tab: ProjectTab
-
-    var body: some View {
-        switch tab.builtIn ?? .board {
-        case .board:
-            BoardView(tasks: project.tasks ?? [], project: project)
-        case .list:
-            TaskListView(tasks: project.tasks ?? [], project: project)
-        case .table:
-            TaskTableView(
-                tasks: project.tasks ?? [], project: project, stateKey: TaskViewStates.projectKey(project.id))
-        case .calendar:
-            CalendarView(tasks: project.tasks ?? [], events: project.events ?? [], project: project)
-        case .timeline:
-            TimelineView(tasks: project.tasks ?? [], milestones: project.milestones ?? [], project: project)
-        case .files:
-            FilesView(project: project)
-        }
     }
 }

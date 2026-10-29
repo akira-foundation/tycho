@@ -21,15 +21,6 @@ struct TaskViewStateTests {
                 == TaskViewState(inProject: true))
     }
 
-    @Test func onlyTheFirstSortComparatorIsPersisted() {
-        let sort = [
-            TaskComparator(field: .priority), TaskComparator(field: .title), TaskComparator(field: .due),
-        ]
-        let data = TaskViewStates.storingSort(sort, for: "p:1", inProject: true, in: Data())
-        let state = TaskViewStates.state(for: "p:1", inProject: true, in: data)
-        #expect(state.sort == [TaskComparator(field: .priority)])
-    }
-
     @Test func aCorruptEntryDoesNotDiscardTheValidOnes() throws {
         var valid = TaskViewState(inProject: false)
         valid.sort = [TaskComparator(field: .due, order: .reverse)]

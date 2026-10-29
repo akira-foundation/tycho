@@ -1,3 +1,4 @@
+import Foundation
 import TychoCore
 
 struct TaskGroup: Identifiable {
@@ -8,10 +9,14 @@ struct TaskGroup: Identifiable {
 }
 
 enum TaskGrouping {
+    static func statusGroups(_ tasks: [TaskItem]) -> [TaskViewGroup] {
+        TaskViewGrouping.status.groups(
+            TableSort.sorted(tasks, by: []), members: [], projects: [], now: .now, calendar: DateText.gregorian)
+    }
+
     static func byStatus(_ tasks: [TaskItem]) -> [TaskGroup] {
-        TaskStatus.allCases.map { status in
-            TaskGroup(
-                status: status, tasks: tasks.filter { $0.status == status }.sorted { $0.sortOrder < $1.sortOrder })
+        statusGroups(tasks).compactMap { group in
+            TaskStatus(rawValue: group.id).map { TaskGroup(status: $0, tasks: group.tasks) }
         }
     }
 }
