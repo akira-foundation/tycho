@@ -82,10 +82,11 @@ struct PaletteRunnerTests {
         let runner = runner { toggled += 1 }
         runner.run(.toggleTheme, router: router)
         runner.run(.shortcuts, router: router)
-        runner.run(.openProject(UUID()), router: router)
+        let projectID = UUID()
+        runner.run(.openProject(projectID), router: router)
         #expect(toggled == 1)
         #expect(router.isShowingShortcuts)
-        #expect(router.currentProjectID != nil)
+        #expect(router.route == .project(projectID, .board))
         router.columnVisibility = .all
         runner.run(.toggleSidebar, router: router)
         #expect(router.columnVisibility == .detailOnly)

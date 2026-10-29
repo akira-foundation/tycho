@@ -32,11 +32,13 @@ struct PaletteInput: View {
                 .onKeyPress(keys: [.upArrow, .downArrow, .return, .tab, .escape, .delete], phases: .down) {
                     handle($0.key)
                 }
+                .onSubmit { onRun() }
                 .onChange(of: state.query) { state.highlight = 0 }
             PaletteKeyChip("Esc")
         }
         .padding(.horizontal, 14)
         .frame(height: 50)
+        .paletteKeyMonitor { handle($0) }
         .onAppear { isFocused = true }
     }
 
@@ -48,18 +50,37 @@ struct PaletteInput: View {
     }
 
     private func handle(_ key: KeyEquivalent) -> KeyPress.Result {
+        switch PaletteKeys.apply(key, to: &state, itemCount: itemCount) {
+        case .ignored: return .ignored
+        case .handled: break
+        case .run: onRun()
+        case .close: onClose()
+        }
+        return .handled
+    }
+}
+
+enum PaletteKeyOutcome: Equatable {
+    case ignored
+    case handled
+    case run
+    case close
+}
+
+enum PaletteKeys {
+    static func apply(_ key: KeyEquivalent, to state: inout PaletteState, itemCount: Int) -> PaletteKeyOutcome {
         switch key {
         case .upArrow:
             state.highlight = PaletteSections.moved(state.highlight, by: -1, count: itemCount)
         case .downArrow:
             state.highlight = PaletteSections.moved(state.highlight, by: 1, count: itemCount)
         case .return:
-            onRun()
+            return .run
         case .tab:
             state.mode = state.mode == .commands ? .search : .commands
             state.highlight = 0
         case .escape:
-            onClose()
+            return .close
         case .delete:
             guard state.query.isEmpty, state.mode != .commands else { return .ignored }
             state.mode = .commands

@@ -4,19 +4,18 @@ import SwiftUI
 import TychoCore
 
 @MainActor
-public struct PaletteRunner {
+struct PaletteRunner {
     let context: ModelContext
     let defaults: UserDefaults
     let toggleTheme: @MainActor () -> Void
 
-    public init(context: ModelContext, defaults: UserDefaults = .standard, toggleTheme: @escaping @MainActor () -> Void)
-    {
+    init(context: ModelContext, defaults: UserDefaults = .standard, toggleTheme: @escaping @MainActor () -> Void) {
         self.context = context
         self.defaults = defaults
         self.toggleTheme = toggleTheme
     }
 
-    public func run(_ action: PaletteAction, router: Router) {
+    func run(_ action: PaletteAction, router: Router) {
         let previous = router.palette
         router.closePalette()
         switch action {

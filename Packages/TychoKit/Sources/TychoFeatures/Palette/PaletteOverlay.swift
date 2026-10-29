@@ -5,6 +5,17 @@ import TychoDesign
 
 struct PaletteOverlay: View {
     @Environment(Router.self) private var router
+
+    var body: some View {
+        if let state = router.palette {
+            PaletteContent(state: state)
+        }
+    }
+}
+
+private struct PaletteContent: View {
+    let state: PaletteState
+    @Environment(Router.self) private var router
     @Environment(\.modelContext) private var context
     @Environment(\.colorScheme) private var colorScheme
     @AppStorage(AppearanceKey.theme) private var theme = ThemePreference.system
@@ -16,26 +27,24 @@ struct PaletteOverlay: View {
     static let searchLimit = 12
 
     var body: some View {
-        if let state = router.palette {
-            GeometryReader { proxy in
-                ZStack(alignment: .top) {
-                    Token.overlay.color
-                        .ignoresSafeArea()
-                        .contentShape(Rectangle())
-                        .onTapGesture { router.closePalette() }
-                        .accessibilityHidden(true)
-                    PalettePanel(
-                        state: binding, sections: sections(for: state), onRun: run,
-                        onClose: { router.closePalette() }
-                    )
-                    .frame(maxWidth: min(640, max(proxy.size.width - 32, 0)))
-                    .frame(maxHeight: proxy.size.height * 0.7, alignment: .top)
-                    .padding(.top, proxy.size.height * 0.12)
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
+        GeometryReader { proxy in
+            ZStack(alignment: .top) {
+                Token.overlay.color
+                    .ignoresSafeArea()
+                    .contentShape(Rectangle())
+                    .onTapGesture { router.closePalette() }
+                    .accessibilityHidden(true)
+                PalettePanel(
+                    state: binding, sections: sections, onRun: run,
+                    onClose: { router.closePalette() }
+                )
+                .frame(maxWidth: min(640, max(proxy.size.width - 32, 0)))
+                .frame(maxHeight: proxy.size.height * 0.7, alignment: .top)
+                .padding(.top, proxy.size.height * 0.12)
             }
-            .onChange(of: state.query, initial: true) { search(state.query) }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
+        .onChange(of: state.query, initial: true) { search(state.query) }
     }
 
     private var binding: Binding<PaletteState> {
@@ -45,7 +54,7 @@ struct PaletteOverlay: View {
         )
     }
 
-    private func sections(for state: PaletteState) -> [PaletteSection] {
+    private var sections: [PaletteSection] {
         PaletteSections.sections(
             for: state,
             commands: PaletteCommands.all(isDark: colorScheme == .dark),
