@@ -10,7 +10,28 @@ public enum TaskSortField: String, Codable, Sendable {
     case start
     case estimate
     case created
+    case updated
     case project
+
+    public static let menuOrder: [TaskSortField] = [
+        .manual, .priority, .due, .start, .title, .status, .assignee, .created, .updated,
+    ]
+
+    public var title: String {
+        switch self {
+        case .manual: "Manual"
+        case .title: "Title"
+        case .status: "Status"
+        case .priority: "Priority"
+        case .assignee: "Assignee"
+        case .due: "Due date"
+        case .start: "Start date"
+        case .estimate: "Estimate"
+        case .created: "Created"
+        case .updated: "Last updated"
+        case .project: "Project"
+        }
+    }
 }
 
 public struct TaskComparator: SortComparator, Codable, Hashable, Sendable {
@@ -43,6 +64,7 @@ public struct TaskComparator: SortComparator, Codable, Hashable, Sendable {
         case .start: Self.rank(lhs.start ?? .distantFuture, rhs.start ?? .distantFuture)
         case .estimate: Self.rank(Self.estimateKey(lhs), Self.estimateKey(rhs))
         case .created: Self.rank(rhs.createdAt, lhs.createdAt)
+        case .updated: Self.rank(rhs.updatedAt, lhs.updatedAt)
         case .project: Self.rank(lhs.project?.name ?? "", rhs.project?.name ?? "")
         }
     }
