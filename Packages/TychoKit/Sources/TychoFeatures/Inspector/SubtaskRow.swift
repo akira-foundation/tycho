@@ -19,6 +19,7 @@ struct SubtaskRow: View {
             }
             .buttonStyle(.plain)
             TextField("Subtask", text: $title)
+                .marksTextEditing()
                 .textFieldStyle(.plain)
                 .strikethrough(subtask.isDone)
                 .onSubmit(commit)

@@ -42,14 +42,14 @@ struct PaletteKeysTests {
         let palette = NSObject()
         let other = NSObject()
         #expect(
-            PaletteKeyScope.shouldHandle(eventWindow: palette, paletteWindow: palette, isKey: true, hasSheet: false))
-        #expect(!PaletteKeyScope.shouldHandle(eventWindow: other, paletteWindow: palette, isKey: true, hasSheet: false))
+            KeyWindowScope.shouldHandle(eventWindow: palette, targetWindow: palette, isKey: true, hasSheet: false))
+        #expect(!KeyWindowScope.shouldHandle(eventWindow: other, targetWindow: palette, isKey: true, hasSheet: false))
         #expect(
-            !PaletteKeyScope.shouldHandle(eventWindow: palette, paletteWindow: palette, isKey: false, hasSheet: false))
+            !KeyWindowScope.shouldHandle(eventWindow: palette, targetWindow: palette, isKey: false, hasSheet: false))
         #expect(
-            !PaletteKeyScope.shouldHandle(eventWindow: palette, paletteWindow: palette, isKey: true, hasSheet: true))
-        #expect(!PaletteKeyScope.shouldHandle(eventWindow: nil, paletteWindow: palette, isKey: true, hasSheet: false))
-        #expect(!PaletteKeyScope.shouldHandle(eventWindow: palette, paletteWindow: nil, isKey: true, hasSheet: false))
+            !KeyWindowScope.shouldHandle(eventWindow: palette, targetWindow: palette, isKey: true, hasSheet: true))
+        #expect(!KeyWindowScope.shouldHandle(eventWindow: nil, targetWindow: palette, isKey: true, hasSheet: false))
+        #expect(!KeyWindowScope.shouldHandle(eventWindow: palette, targetWindow: nil, isKey: true, hasSheet: false))
     }
 
     #if os(macOS)

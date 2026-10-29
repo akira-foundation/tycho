@@ -12,6 +12,7 @@ struct FilesToolbar: View {
     var body: some View {
         HStack(spacing: Spacing.s2) {
             TextField("Search files", text: $search)
+                .marksTextEditing()
                 .textFieldStyle(.roundedBorder)
                 .frame(maxWidth: 220)
                 .accessibilityIdentifier("files.search")

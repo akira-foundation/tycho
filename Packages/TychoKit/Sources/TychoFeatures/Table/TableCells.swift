@@ -17,6 +17,7 @@ struct TitleCell: View {
             StatusIcon(glyph: task.status.glyph, color: task.status.tint, size: 13)
             if editing {
                 TextField("Title", text: $text)
+                    .marksTextEditing()
                     .textFieldStyle(.plain)
                     .focused($focused)
                     .focusedOnceTheTableReleasesTheClick($focused)

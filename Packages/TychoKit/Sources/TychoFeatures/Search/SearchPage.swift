@@ -33,6 +33,7 @@ struct SearchPage: View {
         HStack(spacing: Spacing.s2) {
             Image(systemName: "magnifyingglass").foregroundStyle(Token.text3.color)
             TextField("Search tasks, projects, and files", text: text)
+                .marksTextEditing()
                 .textFieldStyle(.plain)
                 .tychoFont(.base)
                 .accessibilityIdentifier("search.field")

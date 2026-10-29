@@ -70,6 +70,7 @@ struct EstimateCell: View {
         HStack(spacing: Spacing.s1) {
             if editing {
                 TextField("e.g. 2d", text: $text)
+                    .marksTextEditing()
                     .textFieldStyle(.plain)
                     .focused($focused)
                     .focusedOnceTheTableReleasesTheClick($focused)

@@ -46,6 +46,7 @@ struct RootView: View {
             }
             #endif
             .overlay { PaletteOverlay() }
+            .shortcutReceiver()
             .toolbar {
                 ToolbarItem(placement: .principal) { PaletteToolbarButton() }
                 ToolbarItem {

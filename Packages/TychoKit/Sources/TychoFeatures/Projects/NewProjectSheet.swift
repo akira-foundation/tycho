@@ -30,6 +30,7 @@ struct NewProjectSheet: View {
             Form {
                 Section {
                     TextField("Name", text: $draft.name)
+                        .marksTextEditing()
                         .accessibilityIdentifier("project.name")
                         .onChange(of: draft.name) { _, name in
                             error = nil
@@ -43,8 +44,9 @@ struct NewProjectSheet: View {
                                 draft.key = $0; keyEdited = true
                             })
                     )
+                    .marksTextEditing()
                     .accessibilityIdentifier("project.key")
-                    TextField("Description", text: $draft.summary, axis: .vertical).lineLimit(2...4)
+                    TextField("Description", text: $draft.summary, axis: .vertical).lineLimit(2...4).marksTextEditing()
                 }
                 Section("Appearance") {
                     Picker("Color", selection: $draft.color) {

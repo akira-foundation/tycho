@@ -23,6 +23,7 @@ struct NotesEditor: View {
             switch (draft.isEditing, task.notes.isEmpty) {
             case (true, _):
                 TextEditor(text: $draft.text)
+                    .marksTextEditing()
                     .accessibilityIdentifier("inspector.notes.editor")
                     .frame(minHeight: 120)
                     .scrollContentBackground(.hidden)

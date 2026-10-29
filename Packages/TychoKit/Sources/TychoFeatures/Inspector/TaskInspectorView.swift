@@ -26,6 +26,7 @@ struct TaskInspectorView: View {
                 VStack(alignment: .leading, spacing: Spacing.s5) {
                     header(task)
                     TextField("Title", text: $title)
+                        .marksTextEditing()
                         .tychoFont(.xl, weight: .semibold)
                         .textFieldStyle(.plain)
                         .onSubmit { commitTitle(task) }

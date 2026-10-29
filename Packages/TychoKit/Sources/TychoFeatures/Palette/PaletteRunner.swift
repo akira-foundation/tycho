@@ -25,8 +25,8 @@ struct PaletteRunner {
         case .go(let route): router.open(route)
         case .settings, .appearanceSettings: router.showSettings()
         case .toggleTheme: toggleTheme()
-        case .toggleSidebar: router.columnVisibility = router.columnVisibility == .detailOnly ? .all : .detailOnly
-        case .shortcuts: router.isShowingShortcuts = true
+        case .toggleSidebar: router.toggleSidebar()
+        case .shortcuts: router.showShortcuts()
         case .openTask(let id): router.inspect(id)
         case .openProject(let id): router.openProject(id, tab: .board)
         case .openFile(let id): openFile(id, router: router)

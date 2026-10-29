@@ -35,6 +35,7 @@ struct TaskViewToolbar<Trailing: View>: View {
                 "Search tasks",
                 text: Binding(get: { state.query }, set: { model.setQuery($0) })
             )
+            .marksTextEditing()
             .textFieldStyle(.roundedBorder)
             .frame(maxWidth: 220)
             .accessibilityIdentifier("view.search")

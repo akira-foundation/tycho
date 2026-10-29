@@ -28,6 +28,7 @@ struct SaveViewSheet: View {
             Form {
                 Section {
                     TextField("View name", text: $name, prompt: Text("e.g. Design review queue"))
+                        .marksTextEditing()
                         .focused($isNameFocused)
                         .onSubmit(save)
                         .accessibilityIdentifier("saveView.name")

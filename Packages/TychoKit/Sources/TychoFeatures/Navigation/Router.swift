@@ -27,7 +27,7 @@ public final class Router {
     public var searchQuery = ""
     public var searchScope: SearchScope = .all
     public var isShowingShortcuts = false
-    public var isEditingText = false
+    @ObservationIgnored private var editingFields: Set<UUID> = []
     @ObservationIgnored private let defaults: UserDefaults
 
     public init(defaults: UserDefaults = .standard) {
@@ -170,6 +170,16 @@ public final class Router {
     }
 
     public func showSettings() { isShowingSettings = true }
+
+    public var isEditingText: Bool { !editingFields.isEmpty }
+
+    func markEditing(_ field: UUID, _ isEditing: Bool) {
+        if isEditing {
+            editingFields.insert(field)
+        } else {
+            editingFields.remove(field)
+        }
+    }
 }
 
 extension FocusedValues {
