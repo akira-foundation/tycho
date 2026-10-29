@@ -17,7 +17,7 @@ struct TasksView: View {
 
     var body: some View {
         let source = tasks.inLiveProjects()
-        let mode = TasksMode(state: model.state)
+        let mode = TasksMode.current(in: model)
         VStack(spacing: 0) {
             PageHeader(title: "Tasks", subtitle: TasksMode.subtitle(projectCount: projects.count)) {}
             Divider()

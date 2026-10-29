@@ -12,6 +12,11 @@ enum TasksMode: String, CaseIterable, Identifiable {
         self = state.mode.flatMap(TasksMode.init(rawValue:)) ?? .list
     }
 
+    @MainActor
+    static func current(in model: TaskViewModel) -> TasksMode {
+        TasksMode(state: model.state)
+    }
+
     var id: String { rawValue }
 
     var title: String {

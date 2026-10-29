@@ -21,7 +21,8 @@ struct MyTasksView: View {
     }
 
     @ViewBuilder private func content(_ mine: [TaskItem]) -> some View {
-        let shown = MyTaskGroups.query(for: model.state).apply(mine, now: .now, calendar: DateText.gregorian)
+        let now = Date.now
+        let shown = MyTaskGroups.query(for: model.state).apply(mine, now: now, calendar: DateText.gregorian)
         switch (mine.isEmpty, FilteredEmptyState.applies(source: mine.count, visible: shown.count)) {
         case (true, _):
             EmptyState(
@@ -31,7 +32,7 @@ struct MyTasksView: View {
             FilteredEmptyState { model.clearFilters() }
         case (false, false):
             TaskListView(
-                groups: MyTaskGroups.groups(shown, now: .now, calendar: DateText.gregorian),
+                groups: MyTaskGroups.groups(shown, now: now, calendar: DateText.gregorian),
                 grouping: .none, project: nil, allowsReorder: false,
                 initiallyCollapsed: MyTaskGroups.initiallyCollapsed)
         }

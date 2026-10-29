@@ -35,6 +35,24 @@ struct TasksModeTests {
         #expect(TasksMode(state: state) == .list)
     }
 
+    @MainActor
+    @Test func theViewModeFollowsTheStoredStateAndHomePresets() throws {
+        let defaults = try makeDefaults()
+        var board = TaskViewState(inProject: false)
+        board.mode = "board"
+        defaults.set(
+            TaskViewStates.storing(board, for: TaskViewStates.tasksKey, in: Data()),
+            forKey: TaskViewStates.storageKey)
+        let model = TaskViewModel(key: TaskViewStates.tasksKey, inProject: false, defaults: defaults)
+
+        #expect(TasksMode.current(in: model) == .board)
+
+        Router(defaults: defaults).openTasks(preset: .overdue)
+
+        #expect(TasksMode.current(in: model) == .list)
+        #expect(model.state.filters == TasksPreset.overdue.filters)
+    }
+
     @Test func tasksModeMigratesFromTheOldPreference() throws {
         let defaults = try makeDefaults()
         defaults.set("board", forKey: TasksMode.legacyKey)
