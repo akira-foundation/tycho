@@ -7,6 +7,8 @@ struct ProjectDetailView: View {
     @Environment(Router.self) private var router
     @Query private var matches: [Project]
     @State private var editing = false
+    @State private var isSavingView = false
+    @State private var renamingView: SavedView?
     private let tab: ProjectTab
 
     init(projectID: UUID, tab: ProjectTab) {
@@ -27,20 +29,34 @@ struct ProjectDetailView: View {
             .navigationTitle(target.title)
             .toolbar {
                 ToolbarItem {
-                    Picker("View", selection: Binding(get: { tab }, set: { router.openProject(project.id, tab: $0) })) {
-                        ForEach(ProjectBuiltInTab.allCases, id: \.self) { Text($0.title).tag(ProjectTab.builtIn($0)) }
+                    Picker("View", selection: builtInSelection(project)) {
+                        ForEach(ProjectBuiltInTab.allCases, id: \.self) { Text($0.title).tag(Optional($0)) }
                     }
                     .pickerStyle(.segmented)
                     .accessibilityIdentifier("project.tab")
                 }
-                ToolbarItem { SavedViewTabs(project: project, tab: tab) }
+                ToolbarItem {
+                    SavedViewTabs(
+                        project: project, tab: tab, onSave: { isSavingView = true }, onRename: { renamingView = $0 })
+                }
                 ToolbarItem { Button("Edit Project", systemImage: "slider.horizontal.3") { editing = true } }
                 ToolbarItem { Button("New Task", systemImage: "plus") { router.newTask() } }
             }
             .sheet(isPresented: $editing) { NewProjectSheet(project: project) }
+            .sheet(isPresented: $isSavingView) { SaveViewSheet(project: project) }
+            .sheet(item: $renamingView) { RenameViewSheet(view: $0) }
         } else {
             EmptyState(title: "Project not found", symbol: "questionmark.folder", message: "It may have been deleted.")
         }
+    }
+
+    private func builtInSelection(_ project: Project) -> Binding<ProjectBuiltInTab?> {
+        Binding(
+            get: { ProjectTabTarget.pickerSelection(for: tab) },
+            set: { selection in
+                guard let selection else { return }
+                router.openProject(project.id, tab: .builtIn(selection))
+            })
     }
 
     private func header(_ project: Project) -> some View {

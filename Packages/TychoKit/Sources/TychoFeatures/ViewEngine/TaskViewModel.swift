@@ -37,6 +37,13 @@ final class TaskViewModel {
         TaskViewModel(key: TaskViewStates.projectKey(id), inProject: true, defaults: defaults)
     }
 
+    func seedFiltersIfUnsaved(_ filters: [TaskFilter]) {
+        guard !TaskViewStates.contains(key, in: defaults.data(forKey: TaskViewStates.storageKey) ?? Data()) else {
+            return
+        }
+        state.filters = filters
+    }
+
     deinit {
         guard let observer else { return }
         NotificationCenter.default.removeObserver(observer)

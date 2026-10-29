@@ -20,6 +20,10 @@ struct ProjectTabTarget {
         title = view == nil ? project.name : "Saved view · \(project.name)"
     }
 
+    static func pickerSelection(for tab: ProjectTab) -> ProjectBuiltInTab? {
+        tab.builtIn
+    }
+
     private static func layout(for layout: SavedViewLayout) -> ProjectBuiltInTab {
         switch layout {
         case .list: .list

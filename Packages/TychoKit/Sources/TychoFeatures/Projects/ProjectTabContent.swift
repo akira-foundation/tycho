@@ -9,15 +9,19 @@ struct ProjectTabContent: View {
     @State private var model: TaskViewModel
     let project: Project
     let layout: ProjectBuiltInTab
+    private let savedView: SavedView?
 
     init(project: Project, target: ProjectTabTarget) {
         self.project = project
         layout = target.layout
-        _model = State(initialValue: target.savedView.map { TaskViewModel.savedView($0) } ?? .project(project.id))
+        savedView = target.savedView
+        _model = State(initialValue: target.savedView.map { TaskViewModel.savedView($0.id) } ?? .project(project.id))
     }
 
     var body: some View {
-        content.tracksLiveProjects(model)
+        content
+            .tracksLiveProjects(model)
+            .onAppear { savedView.map { model.seedFiltersIfUnsaved($0.filters) } }
     }
 
     @ViewBuilder private var content: some View {

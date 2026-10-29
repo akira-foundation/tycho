@@ -42,11 +42,7 @@ struct SavedViewFlow {
 }
 
 extension TaskViewModel {
-    static func savedView(_ view: SavedView, defaults: UserDefaults = .standard) -> TaskViewModel {
-        let key = TaskViewStates.savedViewKey(view.id)
-        let isNew = !TaskViewStates.contains(key, in: defaults.data(forKey: TaskViewStates.storageKey) ?? Data())
-        let model = TaskViewModel(key: key, inProject: true, defaults: defaults)
-        if isNew { model.state.filters = view.filters }
-        return model
+    static func savedView(_ id: UUID, defaults: UserDefaults = .standard) -> TaskViewModel {
+        TaskViewModel(key: TaskViewStates.savedViewKey(id), inProject: true, defaults: defaults)
     }
 }

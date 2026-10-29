@@ -38,7 +38,8 @@ struct SavedViewFlowTests {
         base.addFilter(.status)
         base.updateFilter(at: 0) { $0.values = ["done"] }
         let open = try makeView("High priority", filters: [TaskFilter(field: .priority, values: ["high"])])
-        let openModel = TaskViewModel.savedView(open, defaults: defaults)
+        let openModel = TaskViewModel.savedView(open.id, defaults: defaults)
+        openModel.seedFiltersIfUnsaved(open.filters)
         openModel.addFilter(.assignee)
         router.openProject(project.id, tab: .savedView(open.id))
 
@@ -56,11 +57,14 @@ struct SavedViewFlowTests {
         let stored = [TaskFilter(field: .priority, values: ["urgent", "high"])]
         let view = try makeView("High priority", filters: stored)
 
-        let first = TaskViewModel.savedView(view, defaults: defaults)
+        let first = TaskViewModel.savedView(view.id, defaults: defaults)
+        #expect(first.state.filters.isEmpty)
+        first.seedFiltersIfUnsaved(view.filters)
         #expect(first.state.filters == stored)
         first.removeFilter(at: 0)
 
-        let reopened = TaskViewModel.savedView(view, defaults: defaults)
+        let reopened = TaskViewModel.savedView(view.id, defaults: defaults)
+        reopened.seedFiltersIfUnsaved(view.filters)
         #expect(reopened.state.filters.isEmpty)
         #expect(view.filters == stored)
     }
@@ -104,6 +108,11 @@ struct SavedViewFlowTests {
         #expect(SaveViewSheet.filterSummary(count: 0).hasPrefix("No filters are active."))
     }
 
+    @Test func thePickerSelectsOnlyBuiltInTabs() {
+        #expect(ProjectTabTarget.pickerSelection(for: .table) == .table)
+        #expect(ProjectTabTarget.pickerSelection(for: .savedView(UUID())) == nil)
+    }
+
     @Test func aMissingSavedViewRouteShowsTheBoard() {
         let missing = ProjectTabTarget(tab: .savedView(UUID()), in: project)
 
@@ -134,8 +143,8 @@ struct SavedViewFlowTests {
     @Test func writesDropEntriesOfDeletedSavedViews() throws {
         let kept = try makeView("Kept")
         let gone = try makeView("Gone")
-        TaskViewModel.savedView(gone, defaults: defaults).setQuery("gone")
-        let model = TaskViewModel.savedView(kept, defaults: defaults)
+        TaskViewModel.savedView(gone.id, defaults: defaults).setQuery("gone")
+        let model = TaskViewModel.savedView(kept.id, defaults: defaults)
         model.liveSavedViewIDs = [kept.id]
 
         model.setQuery("kept")
