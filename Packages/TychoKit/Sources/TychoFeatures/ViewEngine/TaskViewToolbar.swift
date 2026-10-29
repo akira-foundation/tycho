@@ -6,19 +6,24 @@ struct TaskViewToolbar<Trailing: View>: View {
     let model: TaskViewModel
     let showsGroup: Bool
     let showsColumns: Bool
+    let members: [Member]
+    let projects: [Project]
     let onFilter: () -> Void
     let trailing: Trailing
 
+    @State private var showingFilter = false
     @State private var showingSort = false
     @State private var showingGroup = false
 
     init(
-        model: TaskViewModel, showsGroup: Bool, showsColumns: Bool, onFilter: @escaping () -> Void = {},
-        @ViewBuilder trailing: () -> Trailing
+        model: TaskViewModel, showsGroup: Bool, showsColumns: Bool, members: [Member] = [], projects: [Project] = [],
+        onFilter: @escaping () -> Void = {}, @ViewBuilder trailing: () -> Trailing
     ) {
         self.model = model
         self.showsGroup = showsGroup
         self.showsColumns = showsColumns
+        self.members = members
+        self.projects = projects
         self.onFilter = onFilter
         self.trailing = trailing()
     }
@@ -59,7 +64,10 @@ struct TaskViewToolbar<Trailing: View>: View {
     }
 
     private func filterButton(count: Int) -> some View {
-        Button(action: onFilter) {
+        Button {
+            showingFilter = true
+            onFilter()
+        } label: {
             HStack(spacing: Spacing.s1) {
                 Image(systemName: "line.3.horizontal.decrease")
                 Text("Filter")
@@ -73,6 +81,9 @@ struct TaskViewToolbar<Trailing: View>: View {
             }
         }
         .buttonStyle(.tycho(.secondary, size: .sm))
+        .popover(isPresented: $showingFilter) {
+            FilterBuilder(model: model, members: members, projects: projects)
+        }
         .accessibilityIdentifier("view.filter")
     }
 }
