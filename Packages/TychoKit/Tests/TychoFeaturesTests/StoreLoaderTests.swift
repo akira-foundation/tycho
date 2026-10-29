@@ -98,4 +98,42 @@ struct StoreLoaderTests {
             #expect(!FileManager.default.fileExists(atPath: path))
         }
     }
+
+    @Test func removeStoreFilesAlsoDeletesTheSupportDirectory() throws {
+        let directory = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
+        let support = directory.appending(path: ".Tycho_SUPPORT").appending(path: "_EXTERNAL_DATA")
+        try FileManager.default.createDirectory(at: support, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        try Data("x".utf8).write(to: support.appending(path: "blob"))
+        try Data("x".utf8).write(to: directory.appending(path: "Other.store"))
+
+        try StoreLoader.removeStoreFiles(at: directory.appending(path: "Tycho.store"))
+
+        let remaining = try FileManager.default.contentsOfDirectory(atPath: directory.path(percentEncoded: false))
+        #expect(remaining == ["Other.store"])
+    }
+
+    @Test func resetRemovesEverythingASwiftDataStoreWithExternalBlobsCreates() throws {
+        let directory = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let storeURL = directory.appending(path: "Tycho.store")
+        do {
+            let configuration = ModelConfiguration(
+                "Tycho", schema: Schema(TychoSchema.models), url: storeURL, cloudKitDatabase: .none)
+            let container = try ModelContainer(for: Schema(TychoSchema.models), configurations: configuration)
+            let record = FileRecord(name: "big.bin", byteCount: 400_000, uploadedAt: .now)
+            record.data = Data(repeating: 7, count: 400_000)
+            record.hasData = true
+            container.mainContext.insert(record)
+            try container.mainContext.save()
+        }
+        let created = try FileManager.default.contentsOfDirectory(atPath: directory.path(percentEncoded: false))
+        #expect(created.contains { $0.hasSuffix("_SUPPORT") })
+
+        try StoreLoader.removeStoreFiles(at: storeURL)
+
+        let remaining = try FileManager.default.contentsOfDirectory(atPath: directory.path(percentEncoded: false))
+        #expect(remaining.isEmpty)
+    }
 }

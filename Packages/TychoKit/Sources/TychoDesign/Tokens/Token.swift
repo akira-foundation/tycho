@@ -34,7 +34,7 @@ public enum Token: String, CaseIterable, Sendable {
         case .text3: (RGBA(hex: 0x6B6760), RGBA(hex: 0x9A968F))
         case .text4: (RGBA(hex: 0x8C8880), RGBA(hex: 0x6F6C66))
         case .textInv: (RGBA(hex: 0xFFFFFF), RGBA(hex: 0x151514))
-        case .onAccent: (RGBA(hex: 0xFFFFFF), RGBA(hex: 0x12131C))
+        case .onAccent: (RGBA(hex: 0xFFFFFF), RGBA(hex: 0xFFFFFF))
         case .green: (RGBA(hex: 0x25754B), RGBA(hex: 0x5CBA86))
         case .amber: (RGBA(hex: 0x8F5E0E), RGBA(hex: 0xD8A443))
         case .red: (RGBA(hex: 0xB23C30), RGBA(hex: 0xE57D70))

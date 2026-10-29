@@ -29,3 +29,7 @@ func day(_ offset: Int, hour: Int = 12) -> Date {
     let shifted = utcCalendar.date(byAdding: .day, value: offset, to: start)!
     return utcCalendar.date(byAdding: .hour, value: hour, to: shifted)!
 }
+
+func utcDate(_ year: Int, _ month: Int, _ day: Int, hour: Int = 0) -> Date {
+    utcCalendar.date(from: DateComponents(year: year, month: month, day: day, hour: hour))!
+}

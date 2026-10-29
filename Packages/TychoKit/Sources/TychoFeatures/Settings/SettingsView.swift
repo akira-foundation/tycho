@@ -8,9 +8,10 @@ public struct SettingsView: View {
     @Environment(ToastCenter.self) private var toast
     @Environment(Router.self) private var router
     @AppStorage(AppearanceKey.theme) private var theme = ThemePreference.system
-    @AppStorage(AppearanceKey.accent) private var accent = Accent.indigo
     @AppStorage(AppearanceKey.density) private var density = Density.comfortable
     @AppStorage(AppearanceKey.motion) private var motion = MotionPreference.system
+    @AppStorage(AppearanceKey.weekStart) private var weekStart = WeekStart.monday
+    @AppStorage(AppearanceKey.dateFormat) private var dateFormat = DateFormatPreference.monthDay
     @State private var confirming: DataAction?
 
     enum DataAction: Identifiable {
@@ -26,17 +27,24 @@ public struct SettingsView: View {
                 Picker("Theme", selection: $theme) {
                     ForEach(ThemePreference.allCases) { Text($0.title).tag($0) }
                 }
-                Picker("Accent", selection: $accent) {
-                    ForEach(Accent.allCases) { option in
-                        Label(option.title, systemImage: "circle.fill").foregroundStyle(option.color).tag(option)
-                    }
-                }
                 Picker("Density", selection: $density) {
                     ForEach(Density.allCases) { Text($0.title).tag($0) }
                 }
                 Picker("Motion", selection: $motion) {
                     ForEach(MotionPreference.allCases) { Text($0.title).tag($0) }
                 }
+            }
+            Section {
+                Picker("Date format", selection: $dateFormat) {
+                    ForEach(DateFormatPreference.allCases) { Text($0.example).tag($0) }
+                }
+                Picker("Start week on", selection: $weekStart) {
+                    ForEach(WeekStart.allCases) { Text($0.title).tag($0) }
+                }
+            } header: {
+                Text("Date & time")
+            } footer: {
+                Text("Affects calendars and the timeline.")
             }
             Section("Data") {
                 Button("Restore demo data…") { confirming = .reloadDemo }

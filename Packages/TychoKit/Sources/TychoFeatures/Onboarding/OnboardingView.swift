@@ -24,6 +24,10 @@ struct OnboardingView: View {
                     .tychoFont(.md)
                     .foregroundStyle(Token.text3.color)
             }
+            #if os(macOS)
+            .focusable()
+            .focusEffectDisabled()
+            #endif
             VStack(alignment: .leading, spacing: Spacing.s2) {
                 Text("Your name").tychoFont(.xs, weight: .medium).foregroundStyle(Token.text3.color)
                 TextField("Your name", text: $name)
@@ -35,13 +39,13 @@ struct OnboardingView: View {
                 Button("Start empty") {
                     toast.perform { try EmptySeed.load(into: context, ownerName: name) }
                 }
-                .buttonStyle(.borderedProminent)
+                .buttonStyle(.tycho(.primary, size: .lg))
                 .disabled(name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 .accessibilityIdentifier("onboarding.empty")
                 Button("Load demo") {
-                    toast.perform { try DemoSeed.load(into: context, now: .now, calendar: .current) }
+                    toast.perform { try DemoSeed.load(into: context, now: .now, calendar: .current, ownerName: name) }
                 }
-                .buttonStyle(.bordered)
+                .buttonStyle(.tycho(.secondary, size: .lg))
                 .accessibilityIdentifier("onboarding.demo")
             }
         }

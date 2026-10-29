@@ -3,11 +3,11 @@ import TychoCore
 import TychoDesign
 
 struct BoardView: View {
-    let project: Project
+    let tasks: [TaskItem]
+    let project: Project?
     @State private var collapsed: Set<TaskStatus> = []
 
     var body: some View {
-        let tasks = project.tasks ?? []
         ScrollView(.horizontal) {
             HStack(alignment: .top, spacing: Spacing.s3) {
                 ForEach(TaskGrouping.byStatus(tasks)) { group in

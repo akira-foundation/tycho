@@ -1,0 +1,77 @@
+import Foundation
+import SwiftData
+import Testing
+
+@testable import TychoCore
+@testable import TychoFeatures
+
+@MainActor
+struct FileUploadTests {
+    private let directory = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
+    private let context: ModelContext
+    private let project: Project
+    private let toast = ToastCenter()
+
+    init() throws {
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        context = ModelContext(try TychoSchema.makeContainer(inMemory: true))
+        project = Project(key: "WEB", name: "Website")
+        context.insert(project)
+    }
+
+    private func write(_ name: String) throws -> URL {
+        let url = directory.appending(path: name)
+        try Data(name.utf8).write(to: url)
+        return url
+    }
+
+    @Test func setsTheUploaderAndAttachesToTheTask() throws {
+        let me = Member(name: "Me", email: "", isMe: true)
+        let workspace = Workspace(name: "Home")
+        context.insert(me)
+        context.insert(workspace)
+        me.workspace = workspace
+        project.workspace = workspace
+        let task = TaskItem(number: 1, title: "Wireframes")
+        context.insert(task)
+        task.project = project
+
+        FileUpload.perform([try write("a.png")], project: project, task: task, context: context, toast: toast)
+
+        let file = try #require(project.files?.first)
+        #expect(file.uploadedBy === me)
+        #expect(file.task === task)
+        #expect(task.orderedAttachments.map(\.name) == ["a.png"])
+    }
+
+    @Test func summarisesAnAllSuccessfulBatch() throws {
+        let urls = [try write("a.png"), try write("b.png"), try write("c.png")]
+        FileUpload.perform(urls, project: project, task: nil, context: context, toast: toast)
+        #expect(toast.message == "Uploaded 3 files")
+        #expect(project.files?.count == 3)
+    }
+
+    @Test func keepsTheFirstFailureAndCountsTheUploaded() throws {
+        let urls = [try write("a.png"), directory, try write("b.png")]
+        FileUpload.perform(urls, project: project, task: nil, context: context, toast: toast)
+        #expect(toast.message == "Only files can be uploaded. (2 of 3 uploaded)")
+        #expect(project.files?.count == 2)
+    }
+
+    @Test func countsZeroWhenEveryFileInABatchFails() throws {
+        let urls = [directory, directory.appending(path: "missing")]
+        FileUpload.perform(urls, project: project, task: nil, context: context, toast: toast)
+        #expect(toast.message == "Only files can be uploaded. (0 of 2 uploaded)")
+        #expect(project.files?.isEmpty != false)
+    }
+
+    @Test func tellsWhenTheTaskHasNoProject() throws {
+        FileUpload.perform([try write("a.png")], project: nil, task: nil, context: context, toast: toast)
+        #expect(toast.message == "This task isn't in a project, so files can't be attached.")
+    }
+
+    @Test func keepsTheSingleFileMessages() throws {
+        FileUpload.perform([try write("a.png")], project: project, task: nil, context: context, toast: toast)
+        #expect(toast.message == "Uploaded a.png")
+    }
+}

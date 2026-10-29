@@ -9,12 +9,16 @@ final class TychoSmokeTests: XCTestCase {
         continueAfterFailure = false
         app = XCUIApplication()
         app.launchArguments = ["-uiTesting"]
-        app.launch()
+        app.launchShowingWindow()
+    }
+
+    private func openWebsiteBoard() {
+        app.loadDemoWorkspace()
+        app.openSidebarItem("Website Redesign", revealing: app.element("column.backlog"))
     }
 
     func testDemoBoardMovesACardThroughTheContextMenu() {
-        app.buttons["onboarding.demo"].click()
-        app.outlines.staticTexts["Website Redesign"].firstMatch.click()
+        openWebsiteBoard()
 
         let card = app.descendants(matching: .any)["card.WEB-124"]
         XCTAssertTrue(card.waitForExistence(timeout: 5))
@@ -28,13 +32,22 @@ final class TychoSmokeTests: XCTestCase {
         XCTAssertFalse(todo.descendants(matching: .any)["card.WEB-124"].exists)
     }
 
-    func testInspectorRejectsABlankTitle() {
-        app.buttons["onboarding.demo"].click()
-        app.outlines.staticTexts["Website Redesign"].firstMatch.click()
-        app.descendants(matching: .any)["card.WEB-109"].click()
+    private func openFirstBacklogCard() -> XCUIElement {
+        openWebsiteBoard()
+        let backlog = app.element("column.backlog")
+        let firstCard = backlog.descendants(matching: .any).matching(
+            NSPredicate(format: "identifier BEGINSWITH 'card.' AND NOT identifier ENDSWITH '.toggle'")
+        ).firstMatch
+        XCTAssertTrue(firstCard.waitForExistence(timeout: 5))
+        firstCard.click()
 
         let title = app.textFields["inspector.title"].firstMatch
         XCTAssertTrue(title.waitForExistence(timeout: 5))
+        return title
+    }
+
+    func testInspectorRejectsABlankTitle() {
+        let title = openFirstBacklogCard()
         title.click()
         title.typeKey("a", modifierFlags: .command)
         title.typeText(" \r")
@@ -43,15 +56,26 @@ final class TychoSmokeTests: XCTestCase {
     }
 
     func testInspectorCloseButtonDismissesThePanel() {
-        app.buttons["onboarding.demo"].click()
-        app.outlines.staticTexts["Website Redesign"].firstMatch.click()
-        app.descendants(matching: .any)["card.WEB-109"].click()
-
-        let title = app.textFields["inspector.title"].firstMatch
-        XCTAssertTrue(title.waitForExistence(timeout: 5))
+        let title = openFirstBacklogCard()
         app.buttons["inspector.close"].firstMatch.click()
 
         XCTAssertTrue(title.waitForNonExistence(timeout: 5))
+    }
+
+    func testNewProjectStartDateToggleRevealsThePicker() {
+        app.loadDemoWorkspace()
+        app.typeKey("n", modifierFlags: [.command, .shift])
+
+        let toggle = app.element("project.hasStart")
+        let picker = app.element("project.start")
+        XCTAssertTrue(toggle.waitForExistence(timeout: 5))
+        XCTAssertFalse(picker.exists)
+
+        toggle.click()
+        XCTAssertTrue(picker.waitForExistence(timeout: 5))
+
+        toggle.click()
+        XCTAssertTrue(picker.waitForNonExistence(timeout: 5))
     }
 }
 #endif

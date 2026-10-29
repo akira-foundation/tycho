@@ -45,10 +45,11 @@ struct TaskRow: View {
 
 struct DueText: View {
     let task: TaskItem
+    @Environment(\.dateText) private var dateText
 
     var body: some View {
         if let due = task.due {
-            Text(due, format: .dateTime.month(.abbreviated).day())
+            Text(dateText.short(due))
                 .tychoFont(.xs)
                 .monospacedDigit()
                 .foregroundStyle(task.isOverdue(now: .now, calendar: .current) ? Token.red.color : Token.text3.color)

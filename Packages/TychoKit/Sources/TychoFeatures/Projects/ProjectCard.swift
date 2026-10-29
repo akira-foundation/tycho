@@ -4,6 +4,7 @@ import TychoDesign
 
 struct ProjectCard: View {
     let project: Project
+    @Environment(\.dateText) private var dateText
 
     var body: some View {
         VStack(alignment: .leading, spacing: Spacing.s3) {
@@ -25,7 +26,7 @@ struct ProjectCard: View {
                 AvatarStack(people: (project.members ?? []).map { ($0.initials, $0.tint) })
                 Spacer()
                 if let due = project.due {
-                    Text(due, format: .dateTime.month(.abbreviated).day())
+                    Text(dateText.short(due))
                         .tychoFont(.xs)
                         .foregroundStyle(Token.text3.color)
                 }

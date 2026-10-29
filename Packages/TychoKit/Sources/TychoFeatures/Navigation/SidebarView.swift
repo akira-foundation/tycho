@@ -15,6 +15,9 @@ struct SidebarView: View {
             Section {
                 Label("Home", systemImage: "house").tag(SidebarItem.home)
                 Label("My Tasks", systemImage: "checklist").tag(SidebarItem.myTasks)
+                Label("Tasks", systemImage: "list.bullet.rectangle").tag(SidebarItem.tasks)
+                Label("Calendar", systemImage: "calendar").tag(SidebarItem.calendar)
+                Label("Timeline", systemImage: "chart.bar.xaxis").tag(SidebarItem.timeline)
                 Label("Projects", systemImage: "folder").tag(SidebarItem.projects)
             }
             let favorites = projects.filter(\.isFavorite)

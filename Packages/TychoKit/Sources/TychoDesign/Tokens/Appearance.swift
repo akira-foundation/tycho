@@ -24,6 +24,5 @@ public enum MotionPreference: String, CaseIterable, Sendable, Identifiable {
 
 extension EnvironmentValues {
     @Entry public var density: Density = .comfortable
-    @Entry public var accent: Accent = .indigo
     @Entry public var motionPreference: MotionPreference = .system
 }

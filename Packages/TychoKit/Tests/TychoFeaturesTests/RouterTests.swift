@@ -38,9 +38,103 @@ struct RouterTests {
         #expect(router.isCreatingProject)
     }
 
+    @Test func newTaskClosesTheInspectorSheetSoItsSheetOpensAtOnce() {
+        let router = Router()
+        router.updateWindowWidth(900)
+        router.inspect(UUID())
+        router.newTask()
+        #expect(router.isCreatingTask)
+        #expect(router.inspectedTaskID == nil)
+        #expect(!router.isInspectorSheetPresented)
+    }
+
+    @Test func newProjectClosesTheInspectorSheetSoItsSheetOpensAtOnce() {
+        let router = Router()
+        router.updateWindowWidth(900)
+        router.inspect(UUID())
+        router.newProject()
+        #expect(router.isCreatingProject)
+        #expect(router.inspectedTaskID == nil)
+    }
+
+    @Test func newTaskKeepsTheInspectorColumnOpen() {
+        let router = Router()
+        router.updateWindowWidth(InspectorLayout.minimumWindowWidth)
+        let id = UUID()
+        router.inspect(id)
+        router.newTask()
+        #expect(router.inspectedTaskID == id)
+    }
+
+    @Test func aCompactSizeClassPresentsTheInspectorAsASheet() {
+        let router = Router()
+        router.updateHorizontalSizeClass(isCompact: true)
+        router.inspect(UUID())
+        #expect(router.isInspectorSheetPresented)
+        #expect(!router.isInspectorColumnPresented)
+        router.newTask()
+        #expect(router.inspectedTaskID == nil)
+        #expect(router.isCreatingTask)
+    }
+
+    @Test func aRegularSizeClassPresentsTheInspectorAsAColumn() {
+        let router = Router()
+        router.updateHorizontalSizeClass(isCompact: true)
+        router.updateHorizontalSizeClass(isCompact: false)
+        router.inspect(UUID())
+        #expect(router.isInspectorColumnPresented)
+        #expect(!router.isInspectorSheetPresented)
+    }
+
+    @Test func newProjectKeepsTheInspectorColumnOpen() {
+        let router = Router()
+        router.updateWindowWidth(InspectorLayout.minimumWindowWidth)
+        let id = UUID()
+        router.inspect(id)
+        router.newProject()
+        #expect(router.inspectedTaskID == id)
+    }
+
     @Test func showsSettings() {
         let router = Router()
         router.showSettings()
         #expect(router.isShowingSettings)
+    }
+
+    @Test func workspaceRoutesMapToTheSidebar() {
+        let router = Router()
+        let pairs: [(SidebarItem, AppRoute)] = [(.tasks, .tasks), (.calendar, .calendar), (.timeline, .timeline)]
+        for (item, route) in pairs {
+            router.sidebarItem = item
+            #expect(router.route == route)
+            #expect(router.sidebarItem == item)
+        }
+    }
+
+    @Test func newTaskCarriesAnOptionalDueDate() {
+        let router = Router()
+        let due = Date(timeIntervalSince1970: 1_800_000_000)
+        router.newTask(due: due)
+        #expect(router.draftDue == due)
+        #expect(router.isCreatingTask)
+        router.newTask()
+        #expect(router.draftDue == nil)
+    }
+
+    @Test func scheduleStateStartsLikeTheOriginal() {
+        let router = Router()
+        #expect(router.calendarMode == .month)
+        #expect(router.timelineZoom == .week)
+        #expect(router.timelineGrouping == .status)
+    }
+
+    @Test func theWorkspaceTimelineStartsGroupedByProjectOnlyOnce() {
+        let router = Router()
+        router.openWorkspaceTimeline()
+        #expect(router.timelineGrouping == .project)
+        router.timelineGrouping = .assignee
+        router.openWorkspaceTimeline()
+        #expect(router.timelineGrouping == .assignee)
+        #expect(router.hasOpenedWorkspaceTimeline)
     }
 }

@@ -19,7 +19,7 @@ build: ## Build the app for macOS and the iOS simulator
 	xcodebuild build $(MAC) CODE_SIGNING_ALLOWED=NO -quiet
 	xcodebuild build $(IOS) CODE_SIGNING_ALLOWED=NO -quiet
 
-test-ui: ## Run the macOS UI smoke test
+test-ui: ## Run the macOS UI smoke and view tests
 	xcodebuild test $(MAC) -only-testing:TychoUITests -quiet
 
 test-ios: ## Build and run the UI smoke test in the iOS simulator

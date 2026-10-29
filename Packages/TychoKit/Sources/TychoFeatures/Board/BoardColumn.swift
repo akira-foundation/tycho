@@ -7,7 +7,7 @@ struct BoardColumn: View {
     @Environment(\.modelContext) private var context
     @Environment(ToastCenter.self) private var toast
     let group: TaskGroup
-    let project: Project
+    let project: Project?
     let allTasks: [TaskItem]
     @Binding var collapsed: Bool
     @State private var targeted = false
@@ -28,13 +28,15 @@ struct BoardColumn: View {
                                 }
                                 .contextMenu { TaskMenu(task: task) }
                         }
-                        InlineComposer(placeholder: "Add task") { title in
-                            toast.perform {
-                                _ = try TaskActions(context: context).create(
-                                    TaskDraft(title: title, status: group.status), in: project)
+                        if let project {
+                            InlineComposer(placeholder: "Add task") { title in
+                                toast.perform {
+                                    _ = try TaskActions(context: context).create(
+                                        TaskDraft(title: title, status: group.status), in: project)
+                                }
                             }
+                            .padding(.horizontal, Spacing.s2)
                         }
-                        .padding(.horizontal, Spacing.s2)
                     }
                     .padding(.bottom, Spacing.s4)
                 }

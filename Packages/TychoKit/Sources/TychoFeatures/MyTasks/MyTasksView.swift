@@ -7,7 +7,7 @@ struct MyTasksView: View {
     @Query private var tasks: [TaskItem]
 
     var body: some View {
-        let mine = tasks.filter { $0.assignee?.isMe == true && $0.project?.isArchived != true }
+        let mine = tasks.inLiveProjects().filter { $0.assignee?.isMe == true }
         Group {
             if mine.isEmpty {
                 EmptyState(

@@ -6,21 +6,24 @@ import TychoDesign
 struct NotesEditor: View {
     @Environment(\.modelContext) private var context
     @Environment(ToastCenter.self) private var toast
+    @Environment(Router.self) private var router
     let task: TaskItem
-    @State private var editing = false
-    @State private var text = ""
+    @State private var draft = NotesDraft()
+    @State private var flushToken = UUID()
 
     var body: some View {
         VStack(alignment: .leading, spacing: Spacing.s2) {
             HStack {
                 Text("Description").tychoFont(.sm, weight: .semibold)
                 Spacer()
-                Button(editing ? "Done" : "Edit", action: toggleEditing)
+                Button(draft.isEditing ? "Done" : "Edit", action: toggleEditing)
                     .buttonStyle(.borderless)
+                    .accessibilityIdentifier("inspector.notes.edit")
             }
-            switch (editing, task.notes.isEmpty) {
+            switch (draft.isEditing, task.notes.isEmpty) {
             case (true, _):
-                TextEditor(text: $text)
+                TextEditor(text: $draft.text)
+                    .accessibilityIdentifier("inspector.notes.editor")
                     .frame(minHeight: 120)
                     .scrollContentBackground(.hidden)
                     .background(Token.sunken.color, in: RoundedRectangle(cornerRadius: Radius.md))
@@ -32,7 +35,11 @@ struct NotesEditor: View {
             }
         }
         .tychoFont(.base)
-        .onDisappear(perform: commitDraft)
+        .onAppear { router.registerInspectorFlush(flushToken, commitDraft) }
+        .onDisappear {
+            commitDraft()
+            router.unregisterInspectorFlush(flushToken)
+        }
     }
 
     private var rendered: AttributedString {
@@ -41,16 +48,15 @@ struct NotesEditor: View {
     }
 
     private func commitDraft() {
-        guard editing, !task.isDeleted, task.modelContext != nil, text != task.notes else { return }
-        toast.perform { try TaskActions(context: context).edit(task) { $0.notes = text } }
+        guard draft.hasUnsavedText, toast.isStored(task, in: context) else { return }
+        draft.commit(storedNotes: { task.notes }) { notes in
+            toast.perform { try TaskActions(context: context).edit(task) { $0.notes = notes } }
+        }
     }
 
     private func toggleEditing() {
-        if editing {
-            toast.perform { try TaskActions(context: context).edit(task) { $0.notes = text } }
-        } else {
-            text = task.notes
-        }
-        editing.toggle()
+        guard draft.isEditing else { return draft.begin(with: task.notes) }
+        commitDraft()
+        draft.finishIfSaved()
     }
 }

@@ -49,4 +49,27 @@ struct SeedTask {
     var favorite = false
     var notes = ""
     var subtasks: [(String, Bool)] = []
+    var blockedBy: [Int] = []
+}
+
+struct SeedMilestone {
+    let project: String
+    let name: String
+    let day: Int
+}
+
+struct SeedEvent {
+    let title: String
+    let day: Int
+    let time: String
+    let project: String
+}
+
+struct SeedFile {
+    let project: String
+    let name: String
+    let bytes: Int
+    let by: String
+    let minutesAgo: Int
+    var task: Int?
 }

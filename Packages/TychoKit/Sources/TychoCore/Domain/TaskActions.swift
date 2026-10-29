@@ -97,6 +97,32 @@ public struct TaskActions {
         try context.saveOrRollback()
     }
 
+    public func isStored(_ task: TaskItem) throws -> Bool {
+        let id = task.persistentModelID
+        var descriptor = FetchDescriptor<TaskItem>(predicate: #Predicate { $0.persistentModelID == id })
+        descriptor.fetchLimit = 1
+        return try context.fetchCount(descriptor) > 0
+    }
+
+    @discardableResult
+    public func reschedule(_ task: TaskItem, toDue day: Date, calendar: Calendar) throws -> Bool {
+        guard let due = task.due else {
+            task.due = DayTime.noon(of: day, calendar: calendar)
+            try touch(task)
+            return true
+        }
+        return try shift(task, byDays: DayTime.days(from: due, to: day, calendar: calendar), calendar: calendar)
+    }
+
+    @discardableResult
+    public func shift(_ task: TaskItem, byDays days: Int, calendar: Calendar) throws -> Bool {
+        guard days != 0, let due = task.due else { return false }
+        task.due = calendar.date(byAdding: .day, value: days, to: due)
+        task.start = task.start.flatMap { calendar.date(byAdding: .day, value: days, to: $0) }
+        try touch(task)
+        return true
+    }
+
     static func cleanTitle(_ raw: String) throws -> String {
         let title = raw.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !title.isEmpty else { throw ValidationError.emptyTitle }

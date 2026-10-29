@@ -6,9 +6,13 @@ import TychoDesign
 struct RootView: View {
     @Environment(Router.self) private var router
     @Query(sort: \Workspace.createdAt) private var workspaces: [Workspace]
+    #if os(iOS)
+    @Environment(\.horizontalSizeClass) private var sizeClass
+    #endif
 
     var body: some View {
         content
+            .onDisappear { router.releaseInspectorFlushes() }
             .onChange(of: workspaces.first?.id) {
                 router.isCreatingTask = false
                 router.isCreatingProject = false
@@ -30,6 +34,17 @@ struct RootView: View {
                 }
             }
             .background(Token.bg.color)
+            #if os(macOS)
+            .onGeometryChange(for: CGFloat.self) {
+                $0.size.width
+            } action: {
+                router.updateWindowWidth($0)
+            }
+            #else
+            .onChange(of: sizeClass, initial: true) {
+                router.updateHorizontalSizeClass(isCompact: sizeClass == .compact)
+            }
+            #endif
             .toolbar {
                 ToolbarItem {
                     Button("Inspector", systemImage: "sidebar.right") { router.closeInspector() }
@@ -39,21 +54,66 @@ struct RootView: View {
             }
             .inspector(
                 isPresented: Binding(
-                    get: { router.inspectedTaskID != nil },
-                    set: { if !$0 { router.closeInspector() } }
+                    get: { showsInspectorColumn },
+                    set: { if !$0 && !inspectsInSheet { router.closeInspector() } }
                 )
             ) {
-                if let id = router.inspectedTaskID {
+                if showsInspectorColumn, let id = router.inspectedTaskID {
                     TaskInspectorView(taskID: id)
                         .id(id)
-                        .inspectorColumnWidth(min: 320, ideal: 380, max: 520)
+                        .inspectorColumnWidth(
+                            min: InspectorLayout.minimumColumnWidth,
+                            ideal: InspectorLayout.idealColumnWidth,
+                            max: InspectorLayout.maximumColumnWidth)
+                }
+            }
+            .sheet(
+                isPresented: Binding(
+                    get: { showsInspectorSheet },
+                    set: { if !$0 && inspectsInSheet { router.closeInspector() } }
+                )
+            ) {
+                if showsInspectorSheet, let id = router.inspectedTaskID {
+                    TaskInspectorView(taskID: id, presentedAsSheet: true)
+                        .id(id)
+                        #if os(macOS)
+                    .frame(
+                        minWidth: InspectorLayout.minimumColumnWidth, idealWidth: InspectorLayout.idealColumnWidth,
+                        minHeight: 560)
+                        #endif
                 }
             }
             .sheet(isPresented: $router.isCreatingProject) { NewProjectSheet(project: nil) }
-            .sheet(isPresented: $router.isCreatingTask) { NewTaskSheet(status: router.draftStatus) }
+            .sheet(isPresented: $router.isCreatingTask) {
+                NewTaskSheet(status: router.draftStatus, due: router.draftDue)
+            }
             .sheet(isPresented: $router.isShowingSettings) {
                 NavigationStack { SettingsView() }
             }
         }
+    }
+
+    private var inspectsInSheet: Bool {
+        #if os(iOS)
+        sizeClass == .compact
+        #else
+        router.inspectsInSheet
+        #endif
+    }
+
+    private var showsInspectorColumn: Bool {
+        #if os(iOS)
+        router.inspectedTaskID != nil && !inspectsInSheet
+        #else
+        router.isInspectorColumnPresented
+        #endif
+    }
+
+    private var showsInspectorSheet: Bool {
+        #if os(iOS)
+        router.inspectedTaskID != nil && inspectsInSheet
+        #else
+        router.isInspectorSheetPresented
+        #endif
     }
 }

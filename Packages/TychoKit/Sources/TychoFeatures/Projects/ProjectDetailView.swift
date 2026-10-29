@@ -68,10 +68,19 @@ struct ProjectTabContent: View {
 
     var body: some View {
         switch tab {
+        case .board:
+            BoardView(tasks: project.tasks ?? [], project: project)
         case .list:
             TaskListView(tasks: project.tasks ?? [], project: project)
-        case .board:
-            BoardView(project: project)
+        case .table:
+            TaskTableView(
+                tasks: project.tasks ?? [], project: project, stateKey: TableViewStates.projectKey(project.id))
+        case .calendar:
+            CalendarView(tasks: project.tasks ?? [], events: project.events ?? [], project: project)
+        case .timeline:
+            TimelineView(tasks: project.tasks ?? [], milestones: project.milestones ?? [], project: project)
+        case .files:
+            FilesView(project: project)
         }
     }
 }

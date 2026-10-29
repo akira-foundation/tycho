@@ -44,19 +44,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
       - name: Select Xcode 27
-        run: |
-          set -euo pipefail
-          xcode="$(find /Applications -maxdepth 1 -name 'Xcode_27*.app' | sort -V | tail -1)"
-          if [ -n "$xcode" ]; then
-            sudo xcode-select -s "$xcode/Contents/Developer"
-          fi
-          version="$(xcodebuild -version)"
-          echo "$version"
-          major="$(printf '%s\n' "$version" | sed -n '1s/^Xcode \([0-9]*\).*/\1/p')"
-          if [ -z "$major" ] || [ "$major" -lt 27 ]; then
-            echo "::error::Xcode 27 or newer is required, this runner has: $version"
-            exit 1
-          fi
+        run: ./Tools/select-xcode.sh
 
       - name: Build for macOS and the iOS simulator
         run: make build

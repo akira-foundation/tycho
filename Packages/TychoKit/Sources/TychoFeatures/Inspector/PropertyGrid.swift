@@ -8,7 +8,10 @@ struct PropertyGrid: View {
     @Environment(ToastCenter.self) private var toast
     @Query(sort: \Member.name) private var members: [Member]
     let task: TaskItem
+    @Environment(Router.self) private var router
     @State private var estimate = ""
+    @State private var syncedEstimate = ""
+    @State private var flushToken = UUID()
 
     var body: some View {
         Grid(alignment: .leading, horizontalSpacing: Spacing.s4, verticalSpacing: Spacing.s2) {
@@ -49,18 +52,26 @@ struct PropertyGrid: View {
                     ForEach(members) { Text($0.name).tag(Member?.some($0)) }
                 }
             }
-            row("Start") { dateField("Start", \.start) }
-            row("Due") { dateField("Due", \.due) }
+            row("Start") { dateField(\.start) }
+            row("Due") { dateField(\.due) }
             row("Labels") { labelsMenu }
+            row("Blocked by") { DependencyPicker(task: task, showsTitles: true, emptyText: "None") }
             row("Estimate") {
                 TextField("e.g. 2d", text: $estimate)
                     .textFieldStyle(.plain)
                     .onSubmit(commitEstimate)
             }
         }
-        .onAppear { estimate = task.estimate ?? "" }
-        .onChange(of: task.id) { estimate = task.estimate ?? "" }
-        .onDisappear(perform: commitEstimate)
+        .onAppear {
+            syncEstimate()
+            router.registerInspectorFlush(flushToken, commitEstimate)
+        }
+        .onChange(of: task.id) { syncEstimate() }
+        .onChange(of: task.estimate) { syncEstimate() }
+        .onDisappear {
+            commitEstimate()
+            router.unregisterInspectorFlush(flushToken)
+        }
         .labelsHidden()
         .tychoFont(.base)
     }
@@ -97,33 +108,23 @@ struct PropertyGrid: View {
         .frame(minHeight: 30)
     }
 
-    private func dateField(_ title: String, _ keyPath: ReferenceWritableKeyPath<TaskItem, Date?>) -> some View {
-        HStack {
-            if let date = task[keyPath: keyPath] {
-                DatePicker(
-                    title,
-                    selection: Binding(get: { date }, set: { value in edit { $0[keyPath: keyPath] = value } }),
-                    displayedComponents: .date)
-                Button("Clear", systemImage: "xmark.circle.fill") { edit { $0[keyPath: keyPath] = nil } }
-                    .labelStyle(.iconOnly)
-                    .buttonStyle(.plain)
-                    .foregroundStyle(Token.text4.color)
-            } else {
-                Button("Set date") {
-                    edit { $0[keyPath: keyPath] = Calendar.current.startOfDay(for: .now).addingTimeInterval(12 * 3600) }
-                }
-                .buttonStyle(.plain)
-                .foregroundStyle(Token.text4.color)
-            }
+    private func dateField(_ keyPath: ReferenceWritableKeyPath<TaskItem, Date?>) -> some View {
+        DatePill(date: task[keyPath: keyPath], emptyText: "Set date") { value in
+            edit { $0[keyPath: keyPath] = value }
         }
     }
 
+    private func syncEstimate() {
+        estimate = task.estimate ?? ""
+        syncedEstimate = estimate
+    }
+
     private func commitEstimate() {
-        guard !task.isDeleted, task.modelContext != nil else { return }
-        let trimmed = estimate.trimmingCharacters(in: .whitespaces)
-        let value = trimmed.isEmpty ? nil : trimmed
+        guard estimate != syncedEstimate, toast.isStored(task, in: context) else { return }
+        let value = Estimate.normalized(estimate)
         guard value != task.estimate else { return }
         edit { $0.estimate = value }
+        syncEstimate()
     }
 
     private func edit(_ change: (TaskItem) -> Void) {

@@ -12,8 +12,16 @@ public final class Router {
     public var isCreatingProject = false
     public var isShowingSettings = false
     public var draftStatus: TaskStatus = .todo
+    public var draftDue: Date?
+    public var calendarDate: Date = .now
+    public var calendarMode: CalendarMode = .month
+    public var timelineZoom: TimelineZoom = .week
+    public var timelineGrouping: TimelineGrouping = .status
+    public private(set) var hasOpenedWorkspaceTimeline = false
     public var columnVisibility: NavigationSplitViewVisibility = .automatic
+    public private(set) var inspectsInSheet = false
     private var projectTabs: [UUID: ProjectTab] = [:]
+    @ObservationIgnored private var inspectorFlushes: [UUID: @MainActor () -> Void] = [:]
 
     public init() {}
 
@@ -22,6 +30,9 @@ public final class Router {
             switch route {
             case .home: .home
             case .myTasks: .myTasks
+            case .tasks: .tasks
+            case .calendar: .calendar
+            case .timeline: .timeline
             case .projects: .projects
             case .project(let id, _): .project(id)
             }
@@ -30,6 +41,9 @@ public final class Router {
             switch newValue {
             case .home?: route = .home
             case .myTasks?: route = .myTasks
+            case .tasks?: route = .tasks
+            case .calendar?: route = .calendar
+            case .timeline?: route = .timeline
             case .projects?: route = .projects
             case .project(let id)?: openProject(id, tab: projectTabs[id] ?? .board)
             case nil: break
@@ -52,15 +66,74 @@ public final class Router {
         open(.project(id, tab))
     }
 
-    public func inspect(_ taskID: UUID) { inspectedTaskID = taskID }
-    public func closeInspector() { inspectedTaskID = nil }
+    public func updateWindowWidth(_ width: CGFloat) {
+        updateInspectorPresentation(inSheet: InspectorLayout.presentsAsSheet(windowWidth: width))
+    }
 
-    public func newTask(status: TaskStatus = .todo) {
+    public func updateHorizontalSizeClass(isCompact: Bool) {
+        updateInspectorPresentation(inSheet: isCompact)
+    }
+
+    private func updateInspectorPresentation(inSheet: Bool) {
+        guard inSheet != inspectsInSheet else { return }
+        flushInspectorEdits()
+        inspectsInSheet = inSheet
+    }
+
+    public var isInspectorSheetPresented: Bool { inspectedTaskID != nil && inspectsInSheet }
+
+    public var isInspectorColumnPresented: Bool { inspectedTaskID != nil && !inspectsInSheet }
+
+    public func inspect(_ taskID: UUID) {
+        if inspectedTaskID != taskID { flushInspectorEdits() }
+        inspectedTaskID = taskID
+    }
+
+    public func closeInspector() {
+        flushInspectorEdits()
+        inspectedTaskID = nil
+    }
+
+    func registerInspectorFlush(_ token: UUID, _ flush: @escaping @MainActor () -> Void) {
+        inspectorFlushes[token] = flush
+    }
+
+    func unregisterInspectorFlush(_ token: UUID) {
+        inspectorFlushes[token] = nil
+    }
+
+    func releaseInspectorFlushes() {
+        flushInspectorEdits()
+        inspectorFlushes.removeAll()
+    }
+
+    var liveInspectorFlushCount: Int { inspectorFlushes.count }
+
+    func flushInspectorEdits() {
+        for flush in inspectorFlushes.values { flush() }
+    }
+
+    public func newTask(status: TaskStatus = .todo, due: Date? = nil) {
         draftStatus = status
+        draftDue = due
+        closeInspectorSheet()
         isCreatingTask = true
     }
 
-    public func newProject() { isCreatingProject = true }
+    public func openWorkspaceTimeline() {
+        guard !hasOpenedWorkspaceTimeline else { return }
+        hasOpenedWorkspaceTimeline = true
+        timelineGrouping = .project
+    }
+
+    public func newProject() {
+        closeInspectorSheet()
+        isCreatingProject = true
+    }
+
+    private func closeInspectorSheet() {
+        if isInspectorSheetPresented { closeInspector() }
+    }
 
     public func showSettings() { isShowingSettings = true }
 }

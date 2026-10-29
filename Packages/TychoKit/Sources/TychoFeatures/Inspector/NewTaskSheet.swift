@@ -14,8 +14,10 @@ struct NewTaskSheet: View {
     @State private var project: Project?
     @State private var error: ValidationError?
 
-    init(status: TaskStatus) {
-        _draft = State(initialValue: TaskDraft(title: "", status: status))
+    init(status: TaskStatus, due: Date? = nil) {
+        var draft = TaskDraft(title: "", status: status)
+        draft.due = due
+        _draft = State(initialValue: draft)
     }
 
     var body: some View {
@@ -37,6 +39,9 @@ struct NewTaskSheet: View {
                     Text("Unassigned").tag(Member?.none)
                     ForEach(members) { Text($0.name).tag(Member?.some($0)) }
                 }
+                LabeledContent("Due") {
+                    DatePill(date: draft.due, emptyText: "No date") { draft.due = $0 }
+                }
                 if let error {
                     Text(error.userMessage).foregroundStyle(Token.red.color)
                 }
@@ -44,9 +49,12 @@ struct NewTaskSheet: View {
             .formStyle(.grouped)
             .navigationTitle("New task")
             .toolbar {
-                ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") { dismiss() }.buttonStyle(.tycho(.secondary))
+                }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Create", action: save)
+                        .buttonStyle(.tycho(.primary))
                         .keyboardShortcut(.return, modifiers: .command)
                         .disabled(project == nil)
                         .accessibilityIdentifier("task.create")

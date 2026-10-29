@@ -24,7 +24,7 @@ public struct AppRootView: View {
         .environment(router)
         .environment(toast)
         .focusedSceneValue(\.router, router)
-        .toastOverlay(toast)
+        .toastOverlay(toast, enabled: !router.isInspectorSheetPresented)
         .tychoAppearance()
     }
 }

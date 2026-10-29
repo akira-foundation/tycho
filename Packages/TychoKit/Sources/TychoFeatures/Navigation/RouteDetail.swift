@@ -1,5 +1,4 @@
 import SwiftUI
-import TychoDesign
 
 struct RouteDetail: View {
     let route: AppRoute
@@ -10,6 +9,12 @@ struct RouteDetail: View {
             HomeView()
         case .myTasks:
             MyTasksView()
+        case .tasks:
+            TasksView()
+        case .calendar:
+            WorkspaceCalendarView()
+        case .timeline:
+            WorkspaceTimelineView()
         case .projects:
             ProjectsView()
         case .project(let id, let tab):

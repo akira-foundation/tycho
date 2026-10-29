@@ -1,6 +1,7 @@
 import Foundation
 import Testing
 
+@testable import TychoCore
 @testable import TychoFeatures
 
 @MainActor
@@ -21,5 +22,19 @@ struct ToastCenterTests {
         toast.perform { throw Failure() }
 
         #expect(toast.message == "Couldn't save changes.")
+    }
+
+    @Test func dependencyErrorsExplainThemselves() {
+        #expect(ValidationError.dependencyOnSelf.userMessage == "A task can't depend on itself.")
+        #expect(ValidationError.dependencyAcrossProjects.userMessage == "Dependencies must be in the same project.")
+        #expect(ValidationError.dependencyCycle.userMessage == "These tasks would block each other.")
+    }
+
+    @Test func largeFilesExplainTheLimit() {
+        #expect(ValidationError.fileTooLarge.userMessage == "Files can be up to 250 MB each.")
+    }
+
+    @Test func foldersExplainThatOnlyFilesUpload() {
+        #expect(ValidationError.unsupportedFile.userMessage == "Only files can be uploaded.")
     }
 }

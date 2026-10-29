@@ -9,9 +9,14 @@ struct TaskInspectorView: View {
     @Environment(Router.self) private var router
     @Query private var matches: [TaskItem]
     @State private var title = ""
+    @State private var syncedTitle = ""
+    @State private var flushToken = UUID()
     @State private var confirmingDelete = false
 
-    init(taskID: UUID) {
+    let presentedAsSheet: Bool
+
+    init(taskID: UUID, presentedAsSheet: Bool = false) {
+        self.presentedAsSheet = presentedAsSheet
         _matches = Query(filter: #Predicate<TaskItem> { $0.id == taskID })
     }
 
@@ -30,13 +35,23 @@ struct TaskInspectorView: View {
                     NotesEditor(task: task)
                     Divider()
                     SubtaskList(task: task)
+                    Divider()
+                    AttachmentsSection(task: task)
                 }
                 .padding(Spacing.s5)
             }
             .background(Token.surface.color)
-            .onAppear { title = task.title }
-            .onChange(of: task.id) { title = task.title }
-            .onDisappear { commitTitle(task) }
+            .toastOverlay(toast, enabled: presentedAsSheet)
+            .onAppear {
+                syncTitle(task)
+                router.registerInspectorFlush(flushToken) { commitTitle(task) }
+            }
+            .onChange(of: task.id) { syncTitle(task) }
+            .onChange(of: task.title) { syncTitle(task) }
+            .onDisappear {
+                commitTitle(task)
+                router.unregisterInspectorFlush(flushToken)
+            }
             .confirmationDialog("Delete \(task.key)?", isPresented: $confirmingDelete) {
                 Button("Delete task", role: .destructive) {
                     router.closeInspector()
@@ -59,6 +74,7 @@ struct TaskInspectorView: View {
                 toast.perform { try TaskActions(context: context).toggleFavorite(task) }
             }
             .labelStyle(.iconOnly)
+            .accessibilityIdentifier("inspector.favorite")
             Button(
                 task.status == .done ? "Reopen" : "Mark complete",
                 systemImage: task.status == .done ? "arrow.uturn.backward.circle" : "checkmark.circle"
@@ -66,6 +82,7 @@ struct TaskInspectorView: View {
                 toast.perform { try TaskActions(context: context).toggleDone(task) }
             }
             .labelStyle(.iconOnly)
+            .accessibilityIdentifier("inspector.complete")
             Button("Delete", systemImage: "trash", role: .destructive) { confirmingDelete = true }
                 .labelStyle(.iconOnly)
             Button("Close", systemImage: "xmark") { router.closeInspector() }
@@ -76,9 +93,14 @@ struct TaskInspectorView: View {
         .buttonStyle(.borderless)
     }
 
-    private func commitTitle(_ task: TaskItem) {
-        guard !task.isDeleted, task.modelContext != nil, title != task.title else { return }
-        toast.perform { try TaskActions(context: context).rename(task, to: title) }
+    private func syncTitle(_ task: TaskItem) {
         title = task.title
+        syncedTitle = task.title
+    }
+
+    private func commitTitle(_ task: TaskItem) {
+        guard title != syncedTitle, toast.isStored(task, in: context), title != task.title else { return }
+        toast.perform { try TaskActions(context: context).rename(task, to: title) }
+        syncTitle(task)
     }
 }

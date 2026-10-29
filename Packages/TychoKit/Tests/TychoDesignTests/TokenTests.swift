@@ -22,20 +22,7 @@ struct TokenTests {
         #expect(Token.stDone.dark == RGBA(hex: 0x5CBA86))
         #expect(Token.overlay.light == RGBA(hex: 0x181613, alpha: 0.28))
         #expect(Token.overlay.dark == RGBA(hex: 0x000000, alpha: 0.55))
-        #expect(Token.onAccent.dark == RGBA(hex: 0x12131C))
-    }
-
-    @Test func accentPairsMatchTheOriginal() {
-        let pairs = Accent.allCases.map { [$0.light, $0.dark] }
-        #expect(
-            pairs == [
-                [RGBA(hex: 0x4B5BD6), RGBA(hex: 0x8E9AF3)],
-                [RGBA(hex: 0x2F6CD4), RGBA(hex: 0x74A7F0)],
-                [RGBA(hex: 0x7348CC), RGBA(hex: 0xAE93F0)],
-                [RGBA(hex: 0x1A7F7A), RGBA(hex: 0x5CC4BA)],
-                [RGBA(hex: 0xB93D68), RGBA(hex: 0xEC8DAE)],
-                [RGBA(hex: 0x34332F), RGBA(hex: 0xD9D6CF)],
-            ])
+        #expect(Token.onAccent.dark == RGBA(hex: 0xFFFFFF))
     }
 
     @Test func densityChangesRowAndCardMetrics() {

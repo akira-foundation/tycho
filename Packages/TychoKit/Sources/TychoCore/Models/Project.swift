@@ -23,6 +23,9 @@ public final class Project {
     public var team: Team?
     @Relationship(deleteRule: .nullify, inverse: \Member.projects) public var members: [Member]? = []
     @Relationship(deleteRule: .cascade, inverse: \TaskItem.project) public var tasks: [TaskItem]? = []
+    @Relationship(deleteRule: .cascade, inverse: \Milestone.project) public var milestones: [Milestone]? = []
+    @Relationship(deleteRule: .cascade, inverse: \CalendarEvent.project) public var events: [CalendarEvent]? = []
+    @Relationship(deleteRule: .cascade, inverse: \FileRecord.project) public var files: [FileRecord]? = []
 
     public init(key: String, name: String) {
         self.key = key

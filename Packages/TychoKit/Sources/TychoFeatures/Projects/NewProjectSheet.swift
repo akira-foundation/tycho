@@ -76,15 +76,24 @@ struct NewProjectSheet: View {
                         ForEach(members) { Text($0.name).tag(Member?.some($0)) }
                     }
                     Toggle("Start date", isOn: $hasStart)
+                        .toggleStyle(TychoToggleStyle())
+                        .accessibilityIdentifier("project.hasStart")
                     if hasStart {
                         DatePicker(
-                            "Start", selection: Binding(get: { draft.start ?? .now }, set: { draft.start = $0 }),
-                            displayedComponents: .date)
+                            "Start",
+                            selection: Binding(
+                                get: { draft.start ?? .now }, set: { draft.start = DatePill.normalized($0) }),
+                            displayedComponents: .date
+                        )
+                        .accessibilityIdentifier("project.start")
                     }
                     Toggle("Due date", isOn: $hasDue)
+                        .toggleStyle(TychoToggleStyle())
                     if hasDue {
                         DatePicker(
-                            "Due", selection: Binding(get: { draft.due ?? .now }, set: { draft.due = $0 }),
+                            "Due",
+                            selection: Binding(
+                                get: { draft.due ?? .now }, set: { draft.due = DatePill.normalized($0) }),
                             displayedComponents: .date)
                     }
                 }
@@ -95,9 +104,12 @@ struct NewProjectSheet: View {
             .formStyle(.grouped)
             .navigationTitle(project == nil ? "New project" : "Edit project")
             .toolbar {
-                ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") { dismiss() }.buttonStyle(.tycho(.secondary))
+                }
                 ToolbarItem(placement: .confirmationAction) {
                     Button(project == nil ? "Create" : "Save", action: save)
+                        .buttonStyle(.tycho(.primary))
                         .keyboardShortcut(.return, modifiers: .command)
                         .disabled(project == nil && workspaces.isEmpty)
                         .accessibilityIdentifier("project.save")

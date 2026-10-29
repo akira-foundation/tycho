@@ -15,6 +15,7 @@ public final class Member {
     @Relationship(deleteRule: .nullify, inverse: \TaskItem.assignee) public var assignedTasks: [TaskItem]? = []
     @Relationship(deleteRule: .nullify, inverse: \Project.lead) public var ledProjects: [Project]? = []
     public var projects: [Project]? = []
+    @Relationship(deleteRule: .nullify, inverse: \FileRecord.uploadedBy) public var uploadedFiles: [FileRecord]? = []
 
     public init(
         name: String,

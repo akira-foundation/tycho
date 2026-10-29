@@ -4,7 +4,10 @@ import SwiftData
 @MainActor
 public enum DemoSeed {
     @discardableResult
-    public static func load(into context: ModelContext, now: Date, calendar: Calendar) throws -> Workspace {
+    public static func load(
+        into context: ModelContext, now: Date, calendar: Calendar, ownerName: String = ""
+    ) throws -> Workspace {
+        let typedName = ownerName.trimmingCharacters(in: .whitespacesAndNewlines)
         let today = calendar.startOfDay(for: now)
         let date: (Int) -> Date = { offset in
             let shifted = calendar.date(byAdding: .day, value: offset, to: today) ?? today
@@ -25,9 +28,11 @@ public enum DemoSeed {
 
         var members: [String: Member] = [:]
         for seed in DemoSeedData.members {
+            let isMe = seed.ref == "m1"
             let member = Member(
-                name: seed.name, email: seed.email, title: seed.title, colorHex: seed.color, role: seed.role,
-                isMe: seed.ref == "m1")
+                name: isMe && !typedName.isEmpty ? typedName : seed.name, email: seed.email, title: seed.title,
+                colorHex: seed.color, role: seed.role,
+                isMe: isMe)
             context.insert(member)
             member.workspace = workspace
             member.team = teams[seed.team]
@@ -57,6 +62,7 @@ public enum DemoSeed {
 
         var countByProject: [String: Int] = [:]
         var doneIndex = 0
+        var seededTasks: [TaskItem] = []
         for (index, seed) in DemoSeedData.tasks.enumerated() {
             let count = (countByProject[seed.project] ?? 0) + 1
             countByProject[seed.project] = count
@@ -77,6 +83,7 @@ public enum DemoSeed {
                 doneIndex += 1
             }
             context.insert(task)
+            seededTasks.append(task)
             task.project = projects[seed.project]
             task.assignee = members[seed.assignee]
             for (offset, subtaskSeed) in seed.subtasks.enumerated() {
@@ -90,6 +97,8 @@ public enum DemoSeed {
         for (ref, project) in projects {
             project.nextTaskNumber = 100 + (countByProject[ref] ?? 0) * 3 + 1
         }
+
+        loadSchedule(into: context, projects: projects, members: members, tasks: seededTasks, now: now, date: date)
 
         try context.saveOrRollback()
         return workspace

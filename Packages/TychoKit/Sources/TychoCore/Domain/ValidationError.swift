@@ -3,4 +3,9 @@ public enum ValidationError: Error, Equatable, Sendable {
     case emptyName
     case invalidProjectKey
     case duplicateProjectKey
+    case dependencyOnSelf
+    case dependencyAcrossProjects
+    case dependencyCycle
+    case fileTooLarge
+    case unsupportedFile
 }
