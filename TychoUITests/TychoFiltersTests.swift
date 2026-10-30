@@ -27,6 +27,9 @@ final class TychoFiltersTests: XCTestCase {
         XCTAssertTrue(addStatus.waitForExistence(timeout: 5))
         addStatus.click()
         let done = element("filter.value.done")
+        if !done.waitForExistence(timeout: 2) {
+            element("filter.values.button.0").click()
+        }
         XCTAssertTrue(done.waitForExistence(timeout: 5))
         done.click()
         app.popovers.staticTexts["Filter by"].firstMatch.click()
