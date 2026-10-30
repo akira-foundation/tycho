@@ -194,9 +194,9 @@ struct TaskViewStateTests {
     }
 
     @Test func phase2TableViewsSurviveMigration() throws {
-        let suiteName = "tycho.migration.\(UUID().uuidString)"
-        let defaults = try #require(UserDefaults(suiteName: suiteName))
-        defer { defaults.removePersistentDomain(forName: suiteName) }
+        let scratch = ScratchDefaults(name: "migration.phase2")
+        defer { scratch.remove() }
+        let defaults = scratch.defaults
         let projectKey = TaskViewStates.projectKey(UUID())
         let widths = Data(#"{"perColumnState":[{"base":{"explicit":{"_0":"title"}}}]}"#.utf8)
         let comparator = try JSONSerialization.jsonObject(
