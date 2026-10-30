@@ -5,7 +5,7 @@ public enum TychoDefaults {
 
     nonisolated(unsafe) public static let current = store(arguments: ProcessInfo.processInfo.arguments)
 
-    static func isUITesting(_ arguments: [String]) -> Bool {
+    public static func isUITesting(_ arguments: [String] = ProcessInfo.processInfo.arguments) -> Bool {
         arguments.contains("-uiTesting")
     }
 

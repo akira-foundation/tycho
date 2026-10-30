@@ -37,6 +37,7 @@ struct RootView: View {
                 }
             }
             .background(Token.bg.color)
+            .uiTestingSplitViewAutosaveOff(TychoDefaults.isUITesting())
             #if os(macOS)
             .onGeometryChange(for: CGFloat.self) {
                 $0.size.width

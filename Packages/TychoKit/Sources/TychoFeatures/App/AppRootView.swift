@@ -28,6 +28,6 @@ public struct AppRootView: View {
         .toastOverlay(toast, enabled: !router.isInspectorSheetPresented)
         .tychoAppearance()
         .defaultAppStorage(TychoDefaults.current)
-        .uiTestingWindowSize(StoreLoader.usesMemory(arguments: ProcessInfo.processInfo.arguments))
+        .uiTestingWindowSize(TychoDefaults.isUITesting())
     }
 }
