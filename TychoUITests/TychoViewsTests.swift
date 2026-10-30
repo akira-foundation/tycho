@@ -21,26 +21,12 @@ final class TychoViewsTests: XCTestCase {
         app.openSidebarItem(title, revealing: element(identifier))
     }
 
-    private func openWebsiteTab(_ tab: String) {
-        openSidebar("Website Redesign", revealing: "project.tab")
-        element("project.tab").descendants(matching: .any)[tab].firstMatch.click()
-    }
-
     private func text(of element: XCUIElement) -> String {
         element.value as? String ?? ""
     }
 
     private func contextMenuItem(_ title: String) -> XCUIElement {
         app.menuItems.matching(NSPredicate(format: "title == %@ AND enabled == true", title)).firstMatch
-    }
-
-    private func eventually(timeout: TimeInterval = 5, _ condition: () -> Bool) -> Bool {
-        let deadline = Date().addingTimeInterval(timeout)
-        while Date() < deadline {
-            if condition() { return true }
-            RunLoop.current.run(until: Date().addingTimeInterval(0.1))
-        }
-        return condition()
     }
 
     func testEveryProjectTabOpens() {
@@ -57,7 +43,7 @@ final class TychoViewsTests: XCTestCase {
     }
 
     func testTableHeaderSortsByPriority() {
-        openWebsiteTab("Table")
+        app.openWebsiteTab("Table")
         let handoff = element("table.title.WEB-124")
         let tokens = element("table.title.WEB-118")
         XCTAssertTrue(handoff.waitForExistence(timeout: 5))
@@ -72,7 +58,7 @@ final class TychoViewsTests: XCTestCase {
     }
 
     func testTableStatusCellChangesTheStatus() {
-        openWebsiteTab("Table")
+        app.openWebsiteTab("Table")
         let status = element("table.status.WEB-118")
         XCTAssertTrue(status.waitForExistence(timeout: 5))
         status.click()
@@ -85,7 +71,7 @@ final class TychoViewsTests: XCTestCase {
     }
 
     func testTableTitleRenamesInlineAndEscapeCancels() {
-        openWebsiteTab("Table")
+        app.openWebsiteTab("Table")
         let title = element("table.title.WEB-118")
         XCTAssertTrue(title.waitForExistence(timeout: 5))
 
@@ -102,7 +88,7 @@ final class TychoViewsTests: XCTestCase {
     }
 
     func testTableEstimateEditsInline() {
-        openWebsiteTab("Table")
+        app.openWebsiteTab("Table")
         for column in ["Status", "Priority", "Assignee", "Due date", "Labels"] {
             element("table.columns").click()
             app.menuItems[column].firstMatch.click()
@@ -153,7 +139,7 @@ final class TychoViewsTests: XCTestCase {
     }
 
     func testFilesDuplicateAndDelete() {
-        openWebsiteTab("Files")
+        app.openWebsiteTab("Files")
         let original = element("file.sitemap-v2.pdf")
         XCTAssertTrue(original.waitForExistence(timeout: 5))
         original.rightClick()

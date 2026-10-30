@@ -61,5 +61,35 @@ final class TychoShortcutsTests: XCTestCase {
         app.typeKey("k", modifierFlags: .command)
         XCTAssertTrue(input.waitForNonExistence(timeout: 5))
     }
+
+    func testQuestionMarkShowsShortcutsAndGThenCOpensCalendar() {
+        XCTAssertTrue(element("toolbar.palette").waitForExistence(timeout: 5))
+        press("?")
+        let sheet = element("shortcuts.sheet")
+        XCTAssertTrue(sheet.waitForExistence(timeout: 5))
+        app.typeKey(.escape, modifierFlags: [])
+        XCTAssertTrue(sheet.waitForNonExistence(timeout: 5))
+
+        press("gc")
+        XCTAssertTrue(element("calendar.title").waitForExistence(timeout: 5))
+    }
+
+    func testDoneClosesTheShortcutsSheetAndSingleKeysStillWork() {
+        XCTAssertTrue(element("toolbar.palette").waitForExistence(timeout: 5))
+        press("?")
+        let sheet = element("shortcuts.sheet")
+        XCTAssertTrue(sheet.waitForExistence(timeout: 5))
+        app.sheets.buttons["Done"].firstMatch.click()
+        XCTAssertTrue(sheet.waitForNonExistence(timeout: 5))
+
+        press("n")
+        XCTAssertTrue(element("task.title").waitForExistence(timeout: 5))
+    }
+
+    func testSettingsShowsTheShortcutsSection() {
+        XCTAssertTrue(element("toolbar.palette").waitForExistence(timeout: 5))
+        app.typeKey(",", modifierFlags: .command)
+        XCTAssertTrue(element("settings.shortcuts").waitForExistence(timeout: 5))
+    }
 }
 #endif

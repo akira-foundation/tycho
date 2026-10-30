@@ -6,6 +6,10 @@ extension XCUIApplication {
         descendants(matching: .any)[identifier].firstMatch
     }
 
+    func elements(withIdentifierPrefix prefix: String) -> XCUIElementQuery {
+        descendants(matching: .any).matching(NSPredicate(format: "identifier BEGINSWITH %@", prefix))
+    }
+
     func loadDemoWorkspace() {
         let demo = buttons["onboarding.demo"]
         XCTAssertTrue(demo.waitForExistence(timeout: 10))
@@ -19,6 +23,39 @@ extension XCUIApplication {
             _ = marker.waitForExistence(timeout: 3)
         }
         XCTAssertTrue(marker.exists, "\(title) did not open")
+    }
+
+    func openWebsiteTab(_ tab: String) {
+        openSidebarItem("Website Redesign", revealing: element("project.tab"))
+        openProjectTab(tab)
+    }
+
+    func openProjectTab(_ tab: String) {
+        let picker = element("project.tab")
+        XCTAssertTrue(picker.waitForExistence(timeout: 5))
+        picker.descendants(matching: .any)[tab].firstMatch.click()
+    }
+
+    func zoomWindow() {
+        menuBars.menuBarItems["Window"].click()
+        menuItems["Zoom"].firstMatch.click()
+    }
+}
+
+extension XCUIElement {
+    var hasFocus: Bool {
+        (value(forKey: "hasKeyboardFocus") as? Bool) == true
+    }
+}
+
+extension XCTestCase {
+    func eventually(timeout: TimeInterval = 5, _ condition: () -> Bool) -> Bool {
+        let deadline = Date().addingTimeInterval(timeout)
+        while Date() < deadline {
+            if condition() { return true }
+            RunLoop.current.run(until: Date().addingTimeInterval(0.1))
+        }
+        return condition()
     }
 }
 #endif
