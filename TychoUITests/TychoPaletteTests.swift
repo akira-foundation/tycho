@@ -62,23 +62,22 @@ final class TychoPaletteTests: XCTestCase {
         XCTAssertTrue(input.waitForExistence(timeout: 5))
         XCTAssertTrue(eventually { self.placeholder(of: input) == "Search tasks, projects, files…" })
 
-        input.typeText("web")
+        input.typeText("launch")
         let viewAll = element("palette.item.view-all")
         XCTAssertTrue(viewAll.waitForExistence(timeout: 5))
-        XCTAssertTrue(viewAll.label.contains("View all results for “web”"))
+        XCTAssertTrue(viewAll.label.contains("View all results for “launch”"))
         app.typeKey(.upArrow, modifierFlags: [])
         XCTAssertTrue(eventually { viewAll.isHittable }, "the last item should scroll into view")
         viewAll.click()
 
         let field = element("search.field")
         XCTAssertTrue(field.waitForExistence(timeout: 5))
-        XCTAssertEqual(field.value as? String, "web")
-        let all = element("search.tab.all")
-        XCTAssertTrue(all.waitForExistence(timeout: 5))
-        XCTAssertTrue(all.label.hasPrefix("All "))
-        XCTAssertNotEqual(all.label, "All 0")
-        for scope in ["tasks", "projects", "files"] {
-            XCTAssertTrue(element("search.tab.\(scope)").exists, "missing the \(scope) tab")
+        XCTAssertEqual(field.value as? String, "launch")
+        for (scope, title) in [("all", "All"), ("tasks", "Tasks"), ("projects", "Projects"), ("files", "Files")] {
+            let tab = element("search.tab.\(scope)")
+            XCTAssertTrue(tab.waitForExistence(timeout: 5), "missing the \(scope) tab")
+            XCTAssertTrue(tab.label.hasPrefix("\(title) "), "unexpected label \(tab.label)")
+            XCTAssertNotEqual(tab.label, "\(title) 0", "no \(scope) results for launch")
         }
     }
 }

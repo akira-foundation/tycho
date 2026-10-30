@@ -40,9 +40,12 @@ final class TychoShortcutsTests: XCTestCase {
     func testShortcutKeysTypeIntoTheToolbarSearch() {
         app.openSidebarItem("Tasks", revealing: element("view.search"))
         let search = element("view.search")
+        let sidebar = app.outlines.firstMatch.frame
         search.click()
         search.typeText("np/?[gc")
         XCTAssertEqual(search.value as? String, "np/?[gc")
+        XCTAssertFalse(element("shortcuts.sheet").exists)
+        XCTAssertEqual(app.outlines.firstMatch.frame, sidebar, "[ should not toggle the sidebar")
         XCTAssertFalse(element("task.title").exists)
         XCTAssertFalse(element("project.name").exists)
         XCTAssertFalse(element("palette.input").exists)
@@ -54,10 +57,13 @@ final class TychoShortcutsTests: XCTestCase {
         app.typeKey("k", modifierFlags: .command)
         let input = element("palette.input")
         XCTAssertTrue(input.waitForExistence(timeout: 5))
-        input.typeText("gnp")
-        XCTAssertEqual(input.value as? String, "gnp")
+        let sidebar = app.outlines.firstMatch.frame
+        input.typeText("np/?[g")
+        XCTAssertEqual(input.value as? String, "np/?[g")
         XCTAssertFalse(element("task.title").exists)
         XCTAssertFalse(element("project.name").exists)
+        XCTAssertFalse(element("shortcuts.sheet").exists)
+        XCTAssertEqual(app.outlines.firstMatch.frame, sidebar, "[ should not toggle the sidebar")
         app.typeKey("k", modifierFlags: .command)
         XCTAssertTrue(input.waitForNonExistence(timeout: 5))
     }
