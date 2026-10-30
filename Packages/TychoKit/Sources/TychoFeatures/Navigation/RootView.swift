@@ -31,6 +31,9 @@ struct RootView: View {
             } detail: {
                 NavigationStack {
                     RouteDetail(route: router.route)
+                        .toolbar {
+                            ToolbarItem(placement: .principal) { PaletteToolbarButton() }
+                        }
                 }
             }
             .background(Token.bg.color)
@@ -48,7 +51,6 @@ struct RootView: View {
             .overlay { PaletteOverlay() }
             .shortcutReceiver()
             .toolbar {
-                ToolbarItem(placement: .principal) { PaletteToolbarButton() }
                 ToolbarItem {
                     Button("Inspector", systemImage: "sidebar.right") { router.closeInspector() }
                         .disabled(router.inspectedTaskID == nil)

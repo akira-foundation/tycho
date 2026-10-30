@@ -73,7 +73,7 @@ struct EstimateCell: View {
                     .marksTextEditing(isFocused: focused)
                     .textFieldStyle(.plain)
                     .focused($focused)
-                    .focusedOnceTheTableReleasesTheClick($focused)
+                    .focusedOnTheNextRunLoopTurn($focused)
                     .onSubmit(commit)
                     .onKeyPress(.escape) {
                         editing = false

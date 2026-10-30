@@ -40,7 +40,7 @@ struct PaletteInput: View {
         .padding(.horizontal, 14)
         .frame(height: 50)
         .paletteKeyMonitor { handle($0) }
-        .onAppear { isFocused = true }
+        .focusedOnTheNextRunLoopTurn($isFocused)
     }
 
     private var placeholder: String {

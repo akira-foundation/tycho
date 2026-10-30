@@ -8,6 +8,7 @@ struct PalettePanel: View {
     let onRun: (PaletteItem) -> Void
     let onClose: () -> Void
     @State private var listHeight: CGFloat = 0
+    @State private var pointerGate = PalettePointerGate(pointer: PalettePointerGate.pointer)
 
     private var items: [PaletteItem] { PaletteSections.flattened(sections) }
 
@@ -93,7 +94,7 @@ struct PalettePanel: View {
                 .frame(maxHeight: listHeight > 0 ? listHeight : nil)
                 .onChange(of: state.highlight) {
                     guard items.indices.contains(state.highlight) else { return }
-                    proxy.scrollTo(items[state.highlight].id)
+                    proxy.scrollTo(Self.rowID(items[state.highlight]))
                 }
             }
         }
@@ -129,12 +130,17 @@ struct PalettePanel: View {
             PaletteRow(item: item, query: state.query, isHighlighted: index == state.highlight)
         }
         .buttonStyle(.plain)
-        .id(item.id)
+        .id(Self.rowID(item))
         .accessibilityIdentifier("palette.item.\(item.id)")
         .accessibilityAddTraits(index == state.highlight ? .isSelected : [])
         .onHover { hovering in
-            if hovering { state.highlight = index }
+            guard hovering, pointerGate.admits(PalettePointerGate.pointer) else { return }
+            state.highlight = index
         }
+    }
+
+    static func rowID(_ item: PaletteItem) -> String {
+        "row-\(item.id)"
     }
 
     private var sectionOffsets: [Int] {

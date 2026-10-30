@@ -104,6 +104,14 @@ struct PaletteSectionsTests {
         #expect(withoutResults[0].items[0].kind == .viewAll)
     }
 
+    @Test func rowScrollTargetsNeverCollideWithSectionIDs() {
+        let result = sections(state(.search, query: "task"), results: SearchResults(tasks: makeTasks(1)))
+        let sectionIDs = Set(result.map(\.id))
+        let rowIDs = Set(PaletteSections.flattened(result).map(PalettePanel.rowID))
+        #expect(sectionIDs.contains("view-all"))
+        #expect(sectionIDs.isDisjoint(with: rowIDs))
+    }
+
     @Test func emptyGroupsAreDropped() {
         let result = sections(
             state(.commands, query: "zzz"), results: SearchResults(tasks: makeTasks(1)))

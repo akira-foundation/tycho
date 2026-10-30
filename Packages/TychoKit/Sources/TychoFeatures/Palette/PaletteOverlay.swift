@@ -93,14 +93,11 @@ struct PaletteToolbarButton: View {
             router.togglePalette()
         } label: {
             #if os(macOS)
-            HStack(spacing: 8) {
+            HStack(spacing: 6) {
                 Image(systemName: "magnifyingglass").foregroundStyle(Token.text3.color)
-                Text("Search or jump to…").tychoFont(.sm).foregroundStyle(Token.text3.color)
-                Spacer(minLength: 12)
                 ShortcutKeyChip("⌘K")
             }
-            .padding(.horizontal, 8)
-            .frame(minWidth: 240)
+            .padding(.horizontal, 6)
             #else
             Label("Search or jump to…", systemImage: "magnifyingglass")
             #endif
