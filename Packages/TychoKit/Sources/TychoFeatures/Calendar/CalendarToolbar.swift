@@ -26,7 +26,10 @@ struct CalendarToolbar: View {
                 .accessibilityIdentifier("calendar.title")
             Spacer()
             if showsLegend {
-                CalendarLegend(tasks: tasks)
+                ViewThatFits(in: .horizontal) {
+                    CalendarLegend(tasks: tasks)
+                    Color.clear.frame(width: 0)
+                }
             }
             Picker("Mode", selection: $router.calendarMode) {
                 ForEach(CalendarMode.allCases) { Text($0.title).tag($0) }
