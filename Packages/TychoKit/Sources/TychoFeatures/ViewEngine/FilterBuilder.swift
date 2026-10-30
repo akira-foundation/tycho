@@ -60,7 +60,11 @@ struct FilterBuilder: View {
             FlowLayout(spacing: Spacing.s1) {
                 ForEach(TaskFilterField.allCases, id: \.self) { field in
                     Button(field.title, systemImage: field.symbol) {
-                        openIndex = model.addFilter(field)
+                        let index = model.addFilter(field)
+                        Task { @MainActor in
+                            await RunLoopTurn.next()
+                            openIndex = index
+                        }
                     }
                     .buttonStyle(.tycho(.secondary, size: .sm))
                     .accessibilityIdentifier("filter.add.\(field.rawValue)")

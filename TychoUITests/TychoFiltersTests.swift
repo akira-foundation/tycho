@@ -1,4 +1,5 @@
 #if os(macOS)
+import AppKit
 import XCTest
 
 @MainActor
@@ -27,10 +28,7 @@ final class TychoFiltersTests: XCTestCase {
         XCTAssertTrue(addStatus.waitForExistence(timeout: 5))
         addStatus.click()
         let done = element("filter.value.done")
-        if !done.waitForExistence(timeout: 2) {
-            element("filter.values.button.0").click()
-        }
-        XCTAssertTrue(done.waitForExistence(timeout: 5))
+        XCTAssertTrue(done.waitForExistence(timeout: 5), "adding a filter should open its value list")
         done.click()
         app.popovers.staticTexts["Filter by"].firstMatch.click()
         app.typeKey(.escape, modifierFlags: [])
@@ -42,6 +40,23 @@ final class TychoFiltersTests: XCTestCase {
         let item = app.menuItems[title].firstMatch
         XCTAssertTrue(item.waitForExistence(timeout: 5))
         return item
+    }
+
+    func testAddingAFilterOpensItsValueList() {
+        app.openWebsiteTab("List")
+        for attempt in 1...3 {
+            element("view.filter").click()
+            let addStatus = element("filter.add.status")
+            XCTAssertTrue(addStatus.waitForExistence(timeout: 5))
+            addStatus.click()
+            XCTAssertTrue(
+                element("filter.values.0").waitForExistence(timeout: 5),
+                "attempt \(attempt): adding Status should open its value list")
+            app.popovers.staticTexts["Filter by"].firstMatch.click()
+            element("filter.clear").click()
+            app.typeKey(.escape, modifierFlags: [])
+            XCTAssertTrue(element("filter.builder").waitForNonExistence(timeout: 5))
+        }
     }
 
     func testStatusFilterNarrowsTheListAndClearAllRestoresIt() {
@@ -63,7 +78,9 @@ final class TychoFiltersTests: XCTestCase {
         XCTAssertTrue(eventually { self.websiteRows.count == before })
     }
 
-    func testSavingRenamingAndDeletingAView() {
+    func testSavingRenamingAndDeletingAView() throws {
+        let widest = NSScreen.screens.map(\.visibleFrame.width).max() ?? 0
+        try XCTSkipUnless(widest >= 1500, "the project toolbar needs a zoomed window at least 1500 pt wide")
         app.zoomWindow()
         app.openWebsiteTab("List")
         addStatusDoneFilter()
