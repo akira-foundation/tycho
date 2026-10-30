@@ -27,5 +27,6 @@ public struct AppRootView: View {
         .focusedSceneValue(\.router, router)
         .toastOverlay(toast, enabled: !router.isInspectorSheetPresented)
         .tychoAppearance()
+        .uiTestingWindowSize(StoreLoader.usesMemory(arguments: ProcessInfo.processInfo.arguments))
     }
 }
