@@ -11,7 +11,7 @@ struct TasksView: View {
     @State private var model: TaskViewModel
 
     init() {
-        TasksMode.migrateLegacyPreference(.standard)
+        TasksMode.migrateLegacyPreference(TychoDefaults.current)
         _model = State(initialValue: TaskViewModel(key: TaskViewStates.tasksKey, inProject: false))
     }
 

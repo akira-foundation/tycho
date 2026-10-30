@@ -7,7 +7,7 @@ struct SavedViewFlow {
     let context: ModelContext
     let router: Router
     let toast: ToastCenter
-    var defaults: UserDefaults = .standard
+    var defaults: UserDefaults = TychoDefaults.current
 
     func baseFilters(of project: Project) -> [TaskFilter] {
         let data = defaults.data(forKey: TaskViewStates.storageKey) ?? Data()
@@ -42,7 +42,7 @@ struct SavedViewFlow {
 }
 
 extension TaskViewModel {
-    static func savedView(_ id: UUID, defaults: UserDefaults = .standard) -> TaskViewModel {
+    static func savedView(_ id: UUID, defaults: UserDefaults = TychoDefaults.current) -> TaskViewModel {
         TaskViewModel(key: TaskViewStates.savedViewKey(id), inProject: true, defaults: defaults)
     }
 }

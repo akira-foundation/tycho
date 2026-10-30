@@ -30,7 +30,7 @@ public final class Router {
     @ObservationIgnored private var editingFields: Set<UUID> = []
     @ObservationIgnored private let defaults: UserDefaults
 
-    public init(defaults: UserDefaults = .standard) {
+    public init(defaults: UserDefaults = TychoDefaults.current) {
         self.defaults = defaults
     }
 

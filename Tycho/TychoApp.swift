@@ -6,7 +6,7 @@ struct TychoApp: App {
     @State private var loader = StoreLoader.live()
 
     init() {
-        UITestingDefaults.resetIfTesting()
+        TychoDefaults.resetIfTesting()
     }
 
     var body: some Scene {

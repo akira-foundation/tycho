@@ -9,7 +9,10 @@ struct PaletteRunner {
     let defaults: UserDefaults
     let toggleTheme: @MainActor () -> Void
 
-    init(context: ModelContext, defaults: UserDefaults = .standard, toggleTheme: @escaping @MainActor () -> Void) {
+    init(
+        context: ModelContext, defaults: UserDefaults = TychoDefaults.current,
+        toggleTheme: @escaping @MainActor () -> Void
+    ) {
         self.context = context
         self.defaults = defaults
         self.toggleTheme = toggleTheme

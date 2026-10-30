@@ -3,7 +3,7 @@ import TychoDesign
 
 public struct TychoCommands: Commands {
     @FocusedValue(\.router) private var router
-    @AppStorage(AppearanceKey.theme) private var theme = ThemePreference.system
+    @AppStorage(AppearanceKey.theme, store: TychoDefaults.current) private var theme = ThemePreference.system
 
     public init() {}
 

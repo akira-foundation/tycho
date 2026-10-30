@@ -17,7 +17,7 @@ enum TaskViewStates {
         current.isEmpty ? legacy : current
     }
 
-    static func migrateStoredDefaults(_ defaults: UserDefaults = .standard) {
+    static func migrateStoredDefaults(_ defaults: UserDefaults = TychoDefaults.current) {
         let current = defaults.data(forKey: storageKey) ?? Data()
         guard current.isEmpty, let legacy = defaults.data(forKey: legacyKey) else { return }
         defaults.set(migrated(current: current, legacy: legacy), forKey: storageKey)

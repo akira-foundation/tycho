@@ -26,7 +26,7 @@ struct SearchPage: View {
         }
         .background(Token.bg.color)
         .task(id: router.searchQuery) { refresh() }
-        .onAppear { recent = RecentSearches.load(from: .standard) }
+        .onAppear { recent = RecentSearches.load(from: TychoDefaults.current) }
     }
 
     private func field(_ text: Binding<String>) -> some View {

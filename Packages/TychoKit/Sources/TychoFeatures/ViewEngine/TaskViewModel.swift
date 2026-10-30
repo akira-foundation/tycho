@@ -15,7 +15,7 @@ final class TaskViewModel {
     @ObservationIgnored var liveSavedViewIDs: Set<UUID>?
     private var cached: TaskViewState
 
-    init(key: String, inProject: Bool, defaults: UserDefaults = .standard) {
+    init(key: String, inProject: Bool, defaults: UserDefaults = TychoDefaults.current) {
         self.key = key
         self.inProject = inProject
         self.defaults = defaults
@@ -33,7 +33,7 @@ final class TaskViewModel {
         }
     }
 
-    static func project(_ id: UUID, defaults: UserDefaults = .standard) -> TaskViewModel {
+    static func project(_ id: UUID, defaults: UserDefaults = TychoDefaults.current) -> TaskViewModel {
         TaskViewModel(key: TaskViewStates.projectKey(id), inProject: true, defaults: defaults)
     }
 

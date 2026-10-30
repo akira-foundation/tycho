@@ -60,7 +60,7 @@ private struct PaletteContent: View {
             commands: PaletteCommands.all(isDark: colorScheme == .dark),
             recentTasks: recentTasks,
             results: results,
-            recentSearches: RecentSearches.load(from: .standard),
+            recentSearches: RecentSearches.load(from: TychoDefaults.current),
             suggestions: PaletteSuggestions.items(projects: projects, savedViews: savedViews))
     }
 
