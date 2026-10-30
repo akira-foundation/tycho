@@ -14,6 +14,7 @@ struct ShortcutsSheet: View {
                 }
                 .padding(20)
             }
+            .accessibilityIdentifier("shortcuts.sheet")
             .navigationTitle("Keyboard shortcuts")
             #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
@@ -28,6 +29,5 @@ struct ShortcutsSheet: View {
         #if os(macOS)
         .frame(minWidth: 620, minHeight: 420)
         #endif
-        .accessibilityIdentifier("shortcuts.sheet")
     }
 }

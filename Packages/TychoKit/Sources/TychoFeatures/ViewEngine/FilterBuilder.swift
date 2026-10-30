@@ -32,6 +32,7 @@ struct FilterBuilder: View {
         }
         .padding(Spacing.s4)
         .frame(minWidth: 440, idealWidth: 500, maxWidth: 560)
+        .accessibilityElement(children: .contain)
         .accessibilityIdentifier("filter.builder")
     }
 
