@@ -37,6 +37,22 @@ final class TychoShortcutsTests: XCTestCase {
         XCTAssertTrue(element("palette.input").waitForNonExistence(timeout: 5))
     }
 
+    func testPOpensNewProjectAndBracketTogglesTheSidebarOutsideFields() {
+        XCTAssertTrue(element("toolbar.palette").waitForExistence(timeout: 5))
+        press("p")
+        XCTAssertTrue(element("project.name").waitForExistence(timeout: 5))
+        app.typeKey(.escape, modifierFlags: [])
+        XCTAssertTrue(element("project.name").waitForNonExistence(timeout: 5))
+
+        let outline = app.outlines.firstMatch
+        XCTAssertTrue(outline.waitForExistence(timeout: 5))
+        let shown = outline.frame
+        press("[")
+        XCTAssertTrue(eventually { !outline.exists || outline.frame != shown }, "[ should hide the sidebar")
+        press("[")
+        XCTAssertTrue(eventually { outline.exists && outline.frame == shown }, "[ should show the sidebar again")
+    }
+
     func testShortcutKeysTypeIntoTheToolbarSearch() {
         app.openSidebarItem("Tasks", revealing: element("view.search"))
         let search = element("view.search")

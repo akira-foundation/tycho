@@ -48,7 +48,13 @@ final class TychoPaletteTests: XCTestCase {
     func testCommandKOpensThePaletteAndEnterOpensAResult() {
         let input = openPalette()
         input.typeText("web")
+        let items = app.descendants(matching: .any).matching(
+            NSPredicate(format: "identifier BEGINSWITH 'palette.item.'"))
+        XCTAssertTrue(eventually { items.count >= 2 && items.element(boundBy: 0).isSelected })
         app.typeKey(.downArrow, modifierFlags: [])
+        XCTAssertTrue(
+            eventually { items.element(boundBy: 1).isSelected && !items.element(boundBy: 0).isSelected },
+            "Down should move the highlight to the second result")
         app.typeKey(.return, modifierFlags: [])
 
         XCTAssertTrue(input.waitForNonExistence(timeout: 5))
