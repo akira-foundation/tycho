@@ -85,6 +85,9 @@ struct TaskViewToolbar<Trailing: View>: View {
         .popover(isPresented: $showingFilter) {
             FilterBuilder(model: model, members: members, projects: projects)
         }
+        .onChange(of: showingFilter) { _, open in
+            if !open { model.editingFilterIndex = nil }
+        }
         .accessibilityIdentifier("view.filter")
     }
 }

@@ -53,6 +53,9 @@ struct FilterChips: View {
             .popover(isPresented: $showingBuilder) {
                 FilterBuilder(model: model, members: members, projects: projects)
             }
+            .onChange(of: showingBuilder) { _, open in
+                if !open { model.editingFilterIndex = nil }
+            }
             .accessibilityIdentifier("filter.chips.add")
     }
 

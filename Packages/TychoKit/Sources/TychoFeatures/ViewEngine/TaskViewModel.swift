@@ -69,6 +69,7 @@ final class TaskViewModel {
         lastData = data
         let next = TaskViewStates.state(for: key, inProject: inProject, in: data)
         guard next != cached else { return }
+        if next.filters != cached.filters { editingFilterIndex = nil }
         cached = next
     }
 

@@ -59,6 +59,23 @@ final class TychoFiltersTests: XCTestCase {
         }
     }
 
+    func testReopeningTheBuilderShowsTheFilterCollapsed() {
+        app.openWebsiteTab("List")
+        element("view.filter").click()
+        let addStatus = element("filter.add.status")
+        XCTAssertTrue(addStatus.waitForExistence(timeout: 5))
+        addStatus.click()
+        XCTAssertTrue(element("filter.values.0").waitForExistence(timeout: 5))
+        app.typeKey(.escape, modifierFlags: [])
+        XCTAssertTrue(element("filter.builder").waitForNonExistence(timeout: 5))
+
+        element("view.filter").click()
+
+        XCTAssertTrue(element("filter.values.button.0").waitForExistence(timeout: 5))
+        XCTAssertFalse(element("filter.values.0").exists)
+        element("filter.clear").click()
+    }
+
     func testStatusFilterNarrowsTheListAndClearAllRestoresIt() {
         app.openWebsiteTab("List")
         XCTAssertTrue(element("task.WEB-118").waitForExistence(timeout: 5))
