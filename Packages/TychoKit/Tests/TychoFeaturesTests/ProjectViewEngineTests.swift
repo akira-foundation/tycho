@@ -9,10 +9,7 @@ struct ProjectViewEngineTests {
     private let calendar = Calendar(identifier: .gregorian)
 
     private func makeDefaults() throws -> UserDefaults {
-        let suite = "ProjectViewEngineTests.\(UUID().uuidString)"
-        let defaults = try #require(UserDefaults(suiteName: suite))
-        defaults.removePersistentDomain(forName: suite)
-        return defaults
+        try ScratchDefaults.numbered("project-view-engine").defaults
     }
 
     private func task(_ number: Int, _ title: String, priority: TaskPriority) -> TaskItem {

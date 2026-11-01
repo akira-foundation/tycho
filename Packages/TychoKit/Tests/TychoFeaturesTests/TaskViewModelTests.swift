@@ -8,10 +8,7 @@ import Testing
 @MainActor
 struct TaskViewModelTests {
     private func makeDefaults() throws -> UserDefaults {
-        let suite = "TaskViewModelTests.\(UUID().uuidString)"
-        let defaults = try #require(UserDefaults(suiteName: suite))
-        defaults.removePersistentDomain(forName: suite)
-        return defaults
+        try ScratchDefaults.numbered("task-view-model").defaults
     }
 
     private func makeModel(

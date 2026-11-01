@@ -17,9 +17,7 @@ struct RecentSearchesTests {
     }
 
     @Test func listRoundTripsThroughUserDefaults() throws {
-        let suite = "recent-searches-\(UUID().uuidString)"
-        let defaults = try #require(UserDefaults(suiteName: suite))
-        defer { defaults.removePersistentDomain(forName: suite) }
+        let defaults = try ScratchDefaults.numbered("recent-searches").defaults
         #expect(RecentSearches.load(from: defaults).isEmpty)
         RecentSearches.save(["one", "two"], to: defaults)
         #expect(RecentSearches.load(from: defaults) == ["one", "two"])

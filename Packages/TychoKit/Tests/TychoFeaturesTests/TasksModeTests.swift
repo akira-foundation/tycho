@@ -6,10 +6,7 @@ import Testing
 
 struct TasksModeTests {
     private func makeDefaults() throws -> UserDefaults {
-        let suite = "TasksModeTests.\(UUID().uuidString)"
-        let defaults = try #require(UserDefaults(suiteName: suite))
-        defaults.removePersistentDomain(forName: suite)
-        return defaults
+        try ScratchDefaults.numbered("tasks-mode").defaults
     }
 
     private func storedState(_ defaults: UserDefaults) -> TaskViewState {

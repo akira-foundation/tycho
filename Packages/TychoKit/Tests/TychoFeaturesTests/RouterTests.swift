@@ -150,9 +150,7 @@ struct RouterTests {
     }
 
     @Test func openTasksAppliesEachPreset() throws {
-        let suite = "router-presets-\(UUID().uuidString)"
-        let defaults = try #require(UserDefaults(suiteName: suite))
-        defer { defaults.removePersistentDomain(forName: suite) }
+        let defaults = try ScratchDefaults.numbered("router-presets").defaults
         var previous = TaskViewState(inProject: false)
         previous.mode = "board"
         previous.query = "login"

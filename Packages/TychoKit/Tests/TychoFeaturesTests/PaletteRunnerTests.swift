@@ -15,9 +15,7 @@ struct PaletteRunnerTests {
     init() throws {
         container = try TychoSchema.makeContainer(inMemory: true)
         context = ModelContext(container)
-        let suite = "PaletteRunnerTests.\(UUID().uuidString)"
-        defaults = try #require(UserDefaults(suiteName: suite))
-        defaults.removePersistentDomain(forName: suite)
+        defaults = try ScratchDefaults.numbered("palette-runner").defaults
         router = Router(defaults: defaults)
     }
 

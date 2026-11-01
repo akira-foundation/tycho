@@ -8,10 +8,7 @@ import Testing
 @MainActor
 struct TaskViewModelReactivityTests {
     private func makeDefaults() throws -> UserDefaults {
-        let suite = "TaskViewModelReactivityTests.\(UUID().uuidString)"
-        let defaults = try #require(UserDefaults(suiteName: suite))
-        defaults.removePersistentDomain(forName: suite)
-        return defaults
+        try ScratchDefaults.numbered("task-view-model-reactivity").defaults
     }
 
     @Test func aWriteFromAnotherModelNotifiesObservers() throws {
