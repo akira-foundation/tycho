@@ -110,6 +110,16 @@ final class TaskViewModel {
         state = next
     }
 
+    func toggleValue(_ id: String, inFilterAt index: Int) {
+        updateFilter(at: index) { filter in
+            guard let position = filter.values.firstIndex(of: id) else {
+                filter.values.append(id)
+                return
+            }
+            filter.values.remove(at: position)
+        }
+    }
+
     func setField(at index: Int, to field: TaskFilterField) {
         updateFilter(at: index) {
             guard $0.field != field else { return }

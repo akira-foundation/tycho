@@ -25,7 +25,7 @@ struct FilterValueList: View {
 
     private func row(_ option: FilterOption, isSelected: Bool) -> some View {
         Button {
-            toggle(option.id)
+            model.toggleValue(option.id, inFilterAt: index)
         } label: {
             HStack(spacing: Spacing.s2) {
                 Image(systemName: isSelected ? "checkmark.square.fill" : "square")
@@ -39,16 +39,6 @@ struct FilterValueList: View {
         .buttonStyle(.plain)
         .accessibilityAddTraits(isSelected ? .isSelected : [])
         .accessibilityIdentifier("filter.value.\(option.id)")
-    }
-
-    private func toggle(_ id: String) {
-        model.updateFilter(at: index) { filter in
-            guard let position = filter.values.firstIndex(of: id) else {
-                filter.values.append(id)
-                return
-            }
-            filter.values.remove(at: position)
-        }
     }
 }
 

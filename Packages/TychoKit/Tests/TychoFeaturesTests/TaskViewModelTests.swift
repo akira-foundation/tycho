@@ -34,6 +34,27 @@ struct TaskViewModelTests {
         #expect(model.state.sort == [TaskComparator(field: .title, order: .reverse)])
     }
 
+    @Test func togglingAValueSelectsItThenDeselectsIt() throws {
+        let model = try makeModel()
+        let index = model.addFilter(.status)
+
+        model.toggleValue(TaskStatus.done.rawValue, inFilterAt: index)
+        model.toggleValue(TaskStatus.todo.rawValue, inFilterAt: index)
+        #expect(model.state.filters[index].values == [TaskStatus.done.rawValue, TaskStatus.todo.rawValue])
+
+        model.toggleValue(TaskStatus.done.rawValue, inFilterAt: index)
+        #expect(model.state.filters[index].values == [TaskStatus.todo.rawValue])
+    }
+
+    @Test func togglingAValueOfAMissingFilterChangesNothing() throws {
+        let model = try makeModel()
+        _ = model.addFilter(.status)
+
+        model.toggleValue(TaskStatus.done.rawValue, inFilterAt: 3)
+
+        #expect(model.state.filters.map(\.values) == [[]])
+    }
+
     @Test func clearFiltersAlsoClearsTheQuery() throws {
         let model = try makeModel()
         model.setQuery("ship")
