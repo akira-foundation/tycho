@@ -10,17 +10,16 @@ Xcode 27, com alvos iOS 27 e macOS 27. O package usa `swift-tools-version: 6.2` 
 |---|---|
 | `make test` | Corre os testes do package (`swift test` em `Packages/TychoKit`). |
 | `make build` | Compila a app para macOS e para o simulador iOS, sem assinatura. |
-| `make test-ui` | Corre os XCUITests de macOS: o smoke da Fase 1 (incluindo o toggle do novo projeto), os testes das vistas Table, Calendar, Timeline e Files, e os do inspector (fechar e botões do cabeçalho). |
+| `make test-ui` | Corre os XCUITests de macOS: o smoke da Fase 1 (incluindo o toggle do novo projeto), os testes das vistas Table, Calendar, Timeline e Files, os do inspector (fechar e botões do cabeçalho), e os da Fase 3: filtros e saved views, command palette e página de pesquisa, e atalhos de teclado. |
 | `make test-ios` | Corre o smoke XCUITest no simulador iOS. O simulador por omissão é `iPhone 17`; muda-se com `make test-ios SIM_NAME="iPhone 17 Pro"`. |
 | `make lint` | SwiftLint e swift-format em modo estrito (`swiftlint` e `format-check`). |
 | `make format` | Reescreve as fontes com o swift-format. |
 
 ## Testes de UI
 
-Os testes de UI lançam a app com o argumento `-uiTesting`, que faz o `StoreLoader` usar um store SwiftData em memória. Cada execução começa limpa e não toca nos dados reais.
+Os testes de UI lançam a app com o argumento `-uiTesting`, que faz o `StoreLoader` usar um store SwiftData em memória e o `TychoDefaults` usar o suite `io.akira.tycho.uitesting`, limpo a cada arranque. Cada execução começa limpa e não toca nos dados nem nas preferências reais. A janela abre com 1100 por 730 pt e não grava o frame; o frame e o split que o AppKit escreve ao criar a janela são copiados antes do primeiro arranque de teste e repostos no arranque normal seguinte.
 
-Os testes de UI usam cliques e menus de contexto, porque o XCUITest de macOS não entrega drags ao SwiftUI. Os drags do Board, do Calendar e da Timeline são cobertos pelos testes das ações e dos handlers no package, e verificados à mão. As preferências em `@AppStorage` (como a ordenação da Table) persistem entre execuções, por isso os testes não assumem o estado inicial dessas preferências.
-
+Os testes de UI usam cliques e menus de contexto, porque o XCUITest de macOS não entrega drags ao SwiftUI. Os drags do Board, do Calendar e da Timeline são cobertos pelos testes das ações e dos handlers no package, e verificados à mão. 
 Enquanto a automação de UI não for autorizada na máquina, `make test-ui` falha com "Timed out while enabling automation mode" e os testes só são compilados: `xcodebuild build-for-testing -scheme Tycho -destination 'platform=macOS'`. O `make test-ios` depende de um CoreSimulator atualizado.
 
 ## Referência do original
