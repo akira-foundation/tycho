@@ -13,12 +13,7 @@ struct RootView: View {
     var body: some View {
         content
             .onDisappear { router.releaseInspectorFlushes() }
-            .onChange(of: workspaces.first?.id) {
-                router.isCreatingTask = false
-                router.isCreatingProject = false
-                router.closeInspector()
-                router.open(.home)
-            }
+            .onChange(of: workspaces.first?.id) { router.resetForNewWorkspace() }
     }
 
     @ViewBuilder private var content: some View {

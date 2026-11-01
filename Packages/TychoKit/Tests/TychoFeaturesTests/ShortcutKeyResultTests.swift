@@ -75,4 +75,18 @@ struct ShortcutKeyResultTests {
         #expect(router.hasModalPresentation)
         #expect(router.blocksNavigationCommands)
     }
+
+    @Test func aNewWorkspaceDropsWhatWasRequestedDuringOnboarding() {
+        let router = Router()
+        router.openPalette(mode: .search)
+        router.showShortcuts()
+        router.newProject()
+
+        router.resetForNewWorkspace()
+
+        #expect(router.palette == nil)
+        #expect(!router.isShowingShortcuts)
+        #expect(!router.isCreatingProject)
+        #expect(router.route == .home)
+    }
 }

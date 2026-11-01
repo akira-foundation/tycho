@@ -10,6 +10,15 @@ extension Router {
         palette == nil && hasModalPresentation
     }
 
+    func resetForNewWorkspace() {
+        isCreatingTask = false
+        isCreatingProject = false
+        isShowingShortcuts = false
+        closePalette()
+        closeInspector()
+        open(.home)
+    }
+
     public func toggleSidebar() {
         columnVisibility = columnVisibility == .detailOnly ? .all : .detailOnly
     }
