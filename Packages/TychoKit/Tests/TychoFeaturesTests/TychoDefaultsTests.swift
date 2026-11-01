@@ -5,8 +5,8 @@ import Testing
 
 @MainActor
 struct TychoDefaultsTests {
-    @Test func uiTestingSelectsTheSeparateSuite() {
-        let scratch = ScratchDefaults(name: "defaults.select")
+    @Test func uiTestingSelectsTheSeparateSuite() throws {
+        let scratch = try ScratchDefaults(name: "defaults.select")
         defer { scratch.remove() }
         let testing = TychoDefaults.store(arguments: ["Tycho", "-uiTesting"], suite: scratch.suite)
 
@@ -22,8 +22,8 @@ struct TychoDefaultsTests {
         #expect(TychoDefaults.isUITesting(["Tycho", "-uiTesting"]))
     }
 
-    @Test func resettingClearsOnlyTheTestingSuite() {
-        let scratch = ScratchDefaults(name: "defaults.reset")
+    @Test func resettingClearsOnlyTheTestingSuite() throws {
+        let scratch = try ScratchDefaults(name: "defaults.reset")
         let standardKey = "tycho-defaults-standard-\(UUID().uuidString)"
         defer {
             scratch.remove()
@@ -38,8 +38,8 @@ struct TychoDefaultsTests {
         #expect(UserDefaults.standard.string(forKey: standardKey) == "kept")
     }
 
-    @Test func aNormalLaunchResetsNothing() {
-        let scratch = ScratchDefaults(name: "defaults.normal-reset")
+    @Test func aNormalLaunchResetsNothing() throws {
+        let scratch = try ScratchDefaults(name: "defaults.normal-reset")
         defer { scratch.remove() }
         scratch.defaults.set(["query"], forKey: RecentSearches.key)
 

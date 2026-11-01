@@ -194,7 +194,7 @@ struct TaskViewStateTests {
     }
 
     @Test func phase2TableViewsSurviveMigration() throws {
-        let scratch = ScratchDefaults(name: "migration.phase2")
+        let scratch = try ScratchDefaults(name: "migration.phase2")
         defer { scratch.remove() }
         let defaults = scratch.defaults
         let projectKey = TaskViewStates.projectKey(UUID())
