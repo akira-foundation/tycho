@@ -142,6 +142,13 @@ struct ProjectViewEngineTests {
         #expect(ListDropPolicy.allowsStatusChange(grouping: grouping) == changesStatus)
     }
 
+    @Test func aDescendingManualSortDoesNotReorder() {
+        let sort = [TaskComparator(field: .manual, order: .reverse)]
+
+        #expect(!ListDropPolicy.allowsReorder(sort: sort, grouping: .status))
+        #expect(ListDropPolicy.allowsStatusChange(grouping: .status))
+    }
+
     @Test func filteredEmptyStateNeedsTasksHiddenByTheView() {
         #expect(FilteredEmptyState.applies(source: 3, visible: 0))
         #expect(!FilteredEmptyState.applies(source: 0, visible: 0))
