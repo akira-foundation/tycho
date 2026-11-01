@@ -78,15 +78,22 @@ struct ShortcutKeyResultTests {
 
     @Test func aNewWorkspaceDropsWhatWasRequestedDuringOnboarding() {
         let router = Router()
+        router.open(.calendar)
+        router.inspect(UUID())
         router.openPalette(mode: .search)
         router.showShortcuts()
+        router.showSettings()
         router.newProject()
+        router.newTask()
 
         router.resetForNewWorkspace()
 
         #expect(router.palette == nil)
         #expect(!router.isShowingShortcuts)
+        #expect(!router.isShowingSettings)
         #expect(!router.isCreatingProject)
+        #expect(!router.isCreatingTask)
+        #expect(router.inspectedTaskID == nil)
         #expect(router.route == .home)
     }
 }

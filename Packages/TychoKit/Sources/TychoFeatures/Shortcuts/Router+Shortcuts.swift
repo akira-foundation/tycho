@@ -14,6 +14,7 @@ extension Router {
         isCreatingTask = false
         isCreatingProject = false
         isShowingShortcuts = false
+        isShowingSettings = false
         closePalette()
         closeInspector()
         open(.home)
