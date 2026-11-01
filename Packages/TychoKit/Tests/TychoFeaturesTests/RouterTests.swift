@@ -66,6 +66,17 @@ struct RouterTests {
         #expect(router.inspectedTaskID == id)
     }
 
+    @Test func thePaletteLabelShowsOnlyInWideWindows() {
+        let router = Router()
+        #expect(!router.showsPaletteLabel)
+        router.updateWindowWidth(1100)
+        #expect(!router.showsPaletteLabel)
+        router.updateWindowWidth(1400)
+        #expect(router.showsPaletteLabel)
+        router.updateWindowWidth(1399)
+        #expect(!router.showsPaletteLabel)
+    }
+
     @Test func aCompactSizeClassPresentsTheInspectorAsASheet() {
         let router = Router()
         router.updateHorizontalSizeClass(isCompact: true)

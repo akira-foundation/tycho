@@ -30,6 +30,21 @@ final class TychoPaletteTests: XCTestCase {
         input.placeholderValue ?? ""
     }
 
+    func testToolbarButtonIsCompactAndKeepsTheProjectTabsInADefaultWindow() {
+        let button = element("toolbar.palette")
+        XCTAssertEqual(button.label, "Search or jump to…")
+        XCTAssertLessThan(button.frame.width, 120)
+        app.openSidebarItem("Website Redesign", revealing: element("project.tab"))
+    }
+
+    func testToolbarButtonShowsItsSearchLabelInAWideWindow() throws {
+        let widest = NSScreen.screens.map(\.visibleFrame.width).max() ?? 0
+        try XCTSkipUnless(widest >= 1500, "the label needs a zoomed window at least 1500 pt wide")
+        app.zoomWindow()
+        let button = element("toolbar.palette")
+        XCTAssertTrue(eventually { button.frame.width >= 200 }, "the label should be visible, not only in the tooltip")
+    }
+
     func testCommandKOpensThePaletteAndEnterOpensAResult() {
         let input = openPalette()
         input.typeText("web")

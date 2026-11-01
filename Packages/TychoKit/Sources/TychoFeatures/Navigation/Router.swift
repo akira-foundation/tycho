@@ -20,6 +20,7 @@ public final class Router {
     public private(set) var hasOpenedWorkspaceTimeline = false
     public var columnVisibility: NavigationSplitViewVisibility = .automatic
     public private(set) var inspectsInSheet = false
+    public private(set) var showsPaletteLabel = false
     private var projectTabs: [UUID: ProjectTab] = [:]
     @ObservationIgnored private var inspectorFlushes: [UUID: @MainActor () -> Void] = [:]
 
@@ -102,6 +103,8 @@ public final class Router {
 
     public func updateWindowWidth(_ width: CGFloat) {
         updateInspectorPresentation(inSheet: InspectorLayout.presentsAsSheet(windowWidth: width))
+        let showsLabel = PaletteToolbarLayout.showsLabel(windowWidth: width)
+        if showsLabel != showsPaletteLabel { showsPaletteLabel = showsLabel }
     }
 
     public func updateHorizontalSizeClass(isCompact: Bool) {
