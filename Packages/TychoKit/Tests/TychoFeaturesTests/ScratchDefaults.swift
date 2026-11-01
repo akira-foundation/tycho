@@ -6,7 +6,7 @@ struct ScratchDefaults {
     private static let checkout = URL(fileURLWithPath: #filePath)
         .deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
         .deletingLastPathComponent().deletingLastPathComponent().lastPathComponent
-    private static let issued = Mutex(0)
+    private static let issued = Mutex([String: Int]())
 
     let suite: String
     let defaults: UserDefaults
@@ -18,9 +18,9 @@ struct ScratchDefaults {
     }
 
     static func numbered(_ prefix: String) throws -> ScratchDefaults {
-        let number = issued.withLock { count in
-            count += 1
-            return count
+        let number = issued.withLock { counts in
+            counts[prefix, default: 0] += 1
+            return counts[prefix, default: 0]
         }
         return try ScratchDefaults(name: "\(prefix).\(number)")
     }
