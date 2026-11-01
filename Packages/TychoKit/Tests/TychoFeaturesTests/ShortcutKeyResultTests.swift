@@ -67,4 +67,12 @@ struct ShortcutKeyResultTests {
         router.updateWindowWidth(400)
         #expect(router.blocksNavigationCommands)
     }
+
+    @Test func aLocalSheetBlocksNavigationCommands() {
+        let router = Router()
+        router.isShowingLocalSheet = true
+
+        #expect(router.hasModalPresentation)
+        #expect(router.blocksNavigationCommands)
+    }
 }

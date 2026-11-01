@@ -3,7 +3,7 @@ import SwiftUI
 extension Router {
     public var hasModalPresentation: Bool {
         palette != nil || isCreatingTask || isCreatingProject || isShowingSettings || isShowingShortcuts
-            || isInspectorSheetPresented
+            || isInspectorSheetPresented || isShowingLocalSheet
     }
 
     public var blocksNavigationCommands: Bool {

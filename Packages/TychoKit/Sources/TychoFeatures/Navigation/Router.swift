@@ -28,6 +28,7 @@ public final class Router {
     public var searchQuery = ""
     public var searchScope: SearchScope = .all
     public var isShowingShortcuts = false
+    public var isShowingLocalSheet = false
     @ObservationIgnored private var editingFields: Set<UUID> = []
     @ObservationIgnored private let defaults: UserDefaults
 
