@@ -5,7 +5,7 @@ public enum TychoDefaults {
 
     nonisolated(unsafe) public static let current = store(arguments: ProcessInfo.processInfo.arguments)
 
-    public static func isUITesting(_ arguments: [String] = ProcessInfo.processInfo.arguments) -> Bool {
+    static func isUITesting(_ arguments: [String] = ProcessInfo.processInfo.arguments) -> Bool {
         arguments.contains("-uiTesting")
     }
 
@@ -14,10 +14,18 @@ public enum TychoDefaults {
         return testing
     }
 
-    public static func resetIfTesting(
-        arguments: [String] = ProcessInfo.processInfo.arguments, suite: String = uiTestingSuite
+    public static func prepareLaunch(
+        arguments: [String] = ProcessInfo.processInfo.arguments, suite: String = uiTestingSuite,
+        real: UserDefaults = .standard
     ) {
-        guard isUITesting(arguments) else { return }
-        UserDefaults(suiteName: suite)?.removePersistentDomain(forName: suite)
+        guard let testing = UserDefaults(suiteName: suite) else { return }
+        guard isUITesting(arguments) else {
+            WindowFrames.restore(into: real, from: testing)
+            return
+        }
+        WindowFrames.preserve(from: real, into: testing)
+        let backup = testing.dictionary(forKey: WindowFrames.backupKey)
+        testing.removePersistentDomain(forName: suite)
+        testing.set(backup, forKey: WindowFrames.backupKey)
     }
 }

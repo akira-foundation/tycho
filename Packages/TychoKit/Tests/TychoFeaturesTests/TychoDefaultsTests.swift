@@ -22,28 +22,50 @@ struct TychoDefaultsTests {
         #expect(TychoDefaults.isUITesting(["Tycho", "-uiTesting"]))
     }
 
-    @Test func resettingClearsOnlyTheTestingSuite() throws {
+    @Test func aTestingLaunchClearsOnlyTheTestingSuite() throws {
         let scratch = try ScratchDefaults(name: "defaults.reset")
-        let standardKey = "tycho-defaults-standard-\(UUID().uuidString)"
+        let real = try ScratchDefaults(name: "defaults.reset.real")
         defer {
             scratch.remove()
-            UserDefaults.standard.removeObject(forKey: standardKey)
+            real.remove()
         }
         scratch.defaults.set(["query"], forKey: RecentSearches.key)
-        UserDefaults.standard.set("kept", forKey: standardKey)
+        real.defaults.set("kept", forKey: AppearanceKey.theme)
 
-        TychoDefaults.resetIfTesting(arguments: ["Tycho", "-uiTesting"], suite: scratch.suite)
+        TychoDefaults.prepareLaunch(arguments: ["Tycho", "-uiTesting"], suite: scratch.suite, real: real.defaults)
 
         #expect(scratch.defaults.stringArray(forKey: RecentSearches.key) == nil)
-        #expect(UserDefaults.standard.string(forKey: standardKey) == "kept")
+        #expect(real.defaults.string(forKey: AppearanceKey.theme) == "kept")
+    }
+
+    @Test func aTestingLaunchKeepsTheRealFramesThroughTheReset() throws {
+        let scratch = try ScratchDefaults(name: "defaults.frames")
+        let real = try ScratchDefaults(name: "defaults.frames.real")
+        let key = "NSWindow Frame tycho-defaults-test"
+        defer {
+            scratch.remove()
+            real.remove()
+        }
+        real.defaults.set("414 339 900 450 0 0 1728 1084 ", forKey: key)
+
+        TychoDefaults.prepareLaunch(arguments: ["Tycho", "-uiTesting"], suite: scratch.suite, real: real.defaults)
+        real.defaults.set("314 177 1100 730 0 0 1728 1084 ", forKey: key)
+        TychoDefaults.prepareLaunch(arguments: ["Tycho", "-uiTesting"], suite: scratch.suite, real: real.defaults)
+        TychoDefaults.prepareLaunch(arguments: ["Tycho"], suite: scratch.suite, real: real.defaults)
+
+        #expect(real.defaults.string(forKey: key) == "414 339 900 450 0 0 1728 1084 ")
     }
 
     @Test func aNormalLaunchResetsNothing() throws {
         let scratch = try ScratchDefaults(name: "defaults.normal-reset")
-        defer { scratch.remove() }
+        let real = try ScratchDefaults(name: "defaults.normal-reset.real")
+        defer {
+            scratch.remove()
+            real.remove()
+        }
         scratch.defaults.set(["query"], forKey: RecentSearches.key)
 
-        TychoDefaults.resetIfTesting(arguments: ["Tycho"], suite: scratch.suite)
+        TychoDefaults.prepareLaunch(arguments: ["Tycho"], suite: scratch.suite, real: real.defaults)
 
         #expect(scratch.defaults.stringArray(forKey: RecentSearches.key) == ["query"])
     }
