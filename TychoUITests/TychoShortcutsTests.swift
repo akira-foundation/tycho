@@ -53,6 +53,23 @@ final class TychoShortcutsTests: XCTestCase {
         XCTAssertTrue(eventually { outline.exists && outline.frame == shown }, "[ should show the sidebar again")
     }
 
+    func testCommandKStaysOffWhileEditProjectIsOpen() throws {
+        let widest = NSScreen.screens.map(\.visibleFrame.width).max() ?? 0
+        try XCTSkipUnless(widest >= 1500, "Edit Project needs a zoomed window at least 1500 pt wide")
+        app.zoomWindow()
+        app.openSidebarItem("Website Redesign", revealing: element("project.tab"))
+        app.buttons["Edit Project"].firstMatch.click()
+        let name = element("project.name")
+        XCTAssertTrue(name.waitForExistence(timeout: 5))
+        app.typeKey("k", modifierFlags: .command)
+        XCTAssertFalse(element("palette.input").waitForExistence(timeout: 1), "the palette should stay closed")
+
+        app.typeKey(.escape, modifierFlags: [])
+        XCTAssertTrue(name.waitForNonExistence(timeout: 5))
+        app.typeKey("k", modifierFlags: .command)
+        XCTAssertTrue(element("palette.input").waitForExistence(timeout: 5), "the palette should open again")
+    }
+
     func testShortcutKeysTypeIntoTheToolbarSearch() {
         app.openSidebarItem("Tasks", revealing: element("view.search"))
         let search = element("view.search")
