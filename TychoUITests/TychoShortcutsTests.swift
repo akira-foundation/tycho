@@ -44,12 +44,12 @@ final class TychoShortcutsTests: XCTestCase {
         search.click()
         search.typeText("np/?[gc")
         XCTAssertEqual(search.value as? String, "np/?[gc")
-        XCTAssertFalse(element("shortcuts.sheet").exists)
+        XCTAssertFalse(element("shortcuts.sheet").waitForExistence(timeout: 1))
+        XCTAssertFalse(element("calendar.title").waitForExistence(timeout: 1))
         XCTAssertEqual(app.outlines.firstMatch.frame, sidebar, "[ should not toggle the sidebar")
         XCTAssertFalse(element("task.title").exists)
         XCTAssertFalse(element("project.name").exists)
         XCTAssertFalse(element("palette.input").exists)
-        XCTAssertFalse(element("calendar.title").exists)
     }
 
     func testShortcutKeysTypeIntoThePalette() {
@@ -62,9 +62,9 @@ final class TychoShortcutsTests: XCTestCase {
         XCTAssertTrue(input.waitForExistence(timeout: 5))
         input.typeText("np/?[g")
         XCTAssertEqual(input.value as? String, "np/?[g")
+        XCTAssertFalse(element("shortcuts.sheet").waitForExistence(timeout: 1))
         XCTAssertFalse(element("task.title").exists)
         XCTAssertFalse(element("project.name").exists)
-        XCTAssertFalse(element("shortcuts.sheet").exists)
         app.typeKey("k", modifierFlags: .command)
         XCTAssertTrue(input.waitForNonExistence(timeout: 5))
         XCTAssertTrue(outline.waitForExistence(timeout: 5), "[ should not hide the sidebar")
