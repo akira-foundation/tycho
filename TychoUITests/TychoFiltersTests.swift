@@ -30,7 +30,7 @@ final class TychoFiltersTests: XCTestCase {
         let done = element("filter.value.done")
         XCTAssertTrue(done.waitForExistence(timeout: 5), "adding a filter should open its value list")
         done.click()
-        app.popovers.staticTexts["Filter by"].firstMatch.click()
+        XCTAssertTrue(eventually { done.isSelected }, "clicking Done should select it")
         app.typeKey(.escape, modifierFlags: [])
         XCTAssertTrue(element("filter.builder").waitForNonExistence(timeout: 5))
     }
@@ -49,10 +49,10 @@ final class TychoFiltersTests: XCTestCase {
             let addStatus = element("filter.add.status")
             XCTAssertTrue(addStatus.waitForExistence(timeout: 5))
             addStatus.click()
+            let list = element("filter.values.0")
             XCTAssertTrue(
-                element("filter.values.0").waitForExistence(timeout: 5),
-                "attempt \(attempt): adding Status should open its value list")
-            app.popovers.staticTexts["Filter by"].firstMatch.click()
+                list.waitForExistence(timeout: 5), "attempt \(attempt): adding Status should open its value list")
+            XCTAssertGreaterThan(list.frame.height, 40, "attempt \(attempt): the value list should show its options")
             element("filter.clear").click()
             app.typeKey(.escape, modifierFlags: [])
             XCTAssertTrue(element("filter.builder").waitForNonExistence(timeout: 5))

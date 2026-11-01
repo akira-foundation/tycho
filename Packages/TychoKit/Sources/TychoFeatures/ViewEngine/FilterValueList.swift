@@ -18,8 +18,8 @@ struct FilterValueList: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(Spacing.s3)
         }
-        .frame(width: 220)
         .frame(maxHeight: 200)
+        .fixedSize(horizontal: false, vertical: true)
         .accessibilityIdentifier("filter.values.\(index)")
     }
 

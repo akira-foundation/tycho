@@ -81,6 +81,7 @@ struct FilterChips: View {
                         .padding(.top, Spacing.s3)
                     FilterValueList(model: model, index: index, options: options)
                 }
+                .frame(width: 220)
             }
             .accessibilityIdentifier("filter.chip.\(index)")
             Button("Remove filter", systemImage: "xmark") {

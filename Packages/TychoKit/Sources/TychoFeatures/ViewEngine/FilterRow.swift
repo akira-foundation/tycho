@@ -12,6 +12,20 @@ struct FilterRow: View {
 
     var body: some View {
         let options = FilterOptions.options(for: filter.field, members: members, projects: projects)
+        VStack(alignment: .leading, spacing: Spacing.s1) {
+            controls(options: options)
+            if openIndex == index {
+                FilterValueList(model: model, index: index, options: options)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: Radius.md, style: .continuous)
+                            .strokeBorder(Token.border.color)
+                    )
+                    .padding(.leading, 50)
+            }
+        }
+    }
+
+    private func controls(options: [FilterOption]) -> some View {
         HStack(spacing: Spacing.s2) {
             Text(index == 0 ? "Where" : "and")
                 .tychoFont(.xs)
@@ -43,17 +57,19 @@ struct FilterRow: View {
 
     private func valuesButton(options: [FilterOption]) -> some View {
         let summary = FilterOptions.summary(filter, options: options)
+        let isOpen = openIndex == index
         return Button {
-            openIndex = index
+            openIndex = isOpen ? nil : index
         } label: {
-            Text(filter.values.isEmpty ? "Select…" : summary)
-                .lineLimit(1)
-                .frame(maxWidth: 160, alignment: .leading)
+            HStack(spacing: Spacing.s1) {
+                Text(filter.values.isEmpty ? "Select…" : summary)
+                    .lineLimit(1)
+                    .frame(maxWidth: 160, alignment: .leading)
+                Image(systemName: "chevron.down").imageScale(.small)
+            }
         }
         .buttonStyle(.tycho(.secondary, size: .sm))
-        .popover(isPresented: .open($openIndex, at: index)) {
-            FilterValueList(model: model, index: index, options: options)
-        }
+        .accessibilityValue(isOpen ? "expanded" : "collapsed")
         .accessibilityIdentifier("filter.values.button.\(index)")
     }
 

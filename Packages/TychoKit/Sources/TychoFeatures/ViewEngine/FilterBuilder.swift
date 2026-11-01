@@ -7,8 +7,6 @@ struct FilterBuilder: View {
     let members: [Member]
     let projects: [Project]
 
-    @State private var openIndex: Int?
-
     var body: some View {
         let filters = model.state.filters
         VStack(alignment: .leading, spacing: Spacing.s3) {
@@ -21,10 +19,11 @@ struct FilterBuilder: View {
                 .foregroundStyle(Token.text3.color)
                 .fixedSize(horizontal: false, vertical: true)
             } else {
+                @Bindable var model = model
                 ForEach(Array(filters.enumerated()), id: \.offset) { index, filter in
                     FilterRow(
                         model: model, index: index, filter: filter, members: members, projects: projects,
-                        openIndex: $openIndex)
+                        openIndex: $model.editingFilterIndex)
                 }
             }
             Divider()
@@ -60,11 +59,7 @@ struct FilterBuilder: View {
             FlowLayout(spacing: Spacing.s1) {
                 ForEach(TaskFilterField.allCases, id: \.self) { field in
                     Button(field.title, systemImage: field.symbol) {
-                        let index = model.addFilter(field)
-                        Task { @MainActor in
-                            await RunLoopTurn.next()
-                            openIndex = index
-                        }
+                        model.editingFilterIndex = model.addFilter(field)
                     }
                     .buttonStyle(.tycho(.secondary, size: .sm))
                     .accessibilityIdentifier("filter.add.\(field.rawValue)")
