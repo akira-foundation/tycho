@@ -54,18 +54,21 @@ final class TychoShortcutsTests: XCTestCase {
 
     func testShortcutKeysTypeIntoThePalette() {
         XCTAssertTrue(element("toolbar.palette").waitForExistence(timeout: 5))
+        let outline = app.outlines.firstMatch
+        XCTAssertTrue(outline.waitForExistence(timeout: 5))
+        let sidebar = outline.frame
         app.typeKey("k", modifierFlags: .command)
         let input = element("palette.input")
         XCTAssertTrue(input.waitForExistence(timeout: 5))
-        let sidebar = app.outlines.firstMatch.frame
         input.typeText("np/?[g")
         XCTAssertEqual(input.value as? String, "np/?[g")
         XCTAssertFalse(element("task.title").exists)
         XCTAssertFalse(element("project.name").exists)
         XCTAssertFalse(element("shortcuts.sheet").exists)
-        XCTAssertEqual(app.outlines.firstMatch.frame, sidebar, "[ should not toggle the sidebar")
         app.typeKey("k", modifierFlags: .command)
         XCTAssertTrue(input.waitForNonExistence(timeout: 5))
+        XCTAssertTrue(outline.waitForExistence(timeout: 5), "[ should not hide the sidebar")
+        XCTAssertEqual(outline.frame, sidebar, "[ should not toggle the sidebar")
     }
 
     func testQuestionMarkShowsShortcutsAndGThenCOpensCalendar() {
