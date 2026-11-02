@@ -6,63 +6,42 @@ import TychoDesign
 struct TaskTableView: View {
     @Environment(Router.self) var router
     @Environment(ToastCenter.self) var toast
-    @AppStorage(TableViewStates.storageKey) private var stored = Data()
     @Query(sort: \Member.name) var members: [Member]
-    @Query private var projects: [Project]
+    @Query(filter: #Predicate<Project> { !$0.isArchived }, sort: \Project.sortOrder) private var projects: [Project]
     #if os(iOS)
     @Environment(\.horizontalSizeClass) private var sizeClass
     #endif
     let tasks: [TaskItem]
-    let project: Project?
-    let stateKey: String
+    let model: TaskViewModel
 
-    init(tasks: [TaskItem], project: Project?, stateKey: String) {
+    init(tasks: [TaskItem], model: TaskViewModel) {
         self.tasks = tasks
-        self.project = project
-        self.stateKey = stateKey
+        self.model = model
     }
 
     var body: some View {
-        content.background(Token.bg.color)
+        content(model.apply(tasks, now: .now, calendar: DateText.gregorian))
+            .background(Token.bg.color)
     }
 
-    @ViewBuilder private var content: some View {
-        switch (tasks.isEmpty, isCompact) {
-        case (true, _): empty
-        case (false, true): TableCardList(tasks: TableSort.sorted(tasks, by: state.sort))
-        case (false, false): grid
+    @ViewBuilder private func content(_ visible: [TaskItem]) -> some View {
+        switch (tasks.isEmpty, FilteredEmptyState.applies(source: tasks.count, visible: visible.count), isCompact) {
+        case (true, _, _): empty
+        case (false, true, _): FilteredEmptyState { model.clearFilters() }
+        case (false, false, true): TableCardList(tasks: visible)
+        case (false, false, false):
+            grid(
+                model.groups(
+                    of: visible, members: members, projects: projects, now: .now, calendar: DateText.gregorian))
         }
     }
 
-    private var liveProjectIDs: Set<UUID> { Set(projects.map(\.id)) }
-
-    private var state: TableViewState {
-        TableViewStates.state(for: stateKey, inProject: project != nil, in: stored)
-    }
-
-    private var stateBinding: Binding<TableViewState> {
-        Binding(
-            get: { state },
-            set: { stored = TableViewStates.storing($0, for: stateKey, in: stored, liveProjectIDs: liveProjectIDs) })
-    }
-
     private var sortBinding: Binding<[TaskComparator]> {
-        Binding(
-            get: { state.sort },
-            set: {
-                stored = TableViewStates.storingSort(
-                    $0, for: stateKey, inProject: project != nil, in: stored, liveProjectIDs: liveProjectIDs)
-            })
+        Binding(get: { model.state.sort }, set: { model.setSort($0) })
     }
 
     private var customization: Binding<TableColumnCustomization<TaskItem>> {
-        Binding(
-            get: { TableCustomization.make(from: state) },
-            set: { value in
-                var next = state
-                TableCustomization.store(value, into: &next)
-                stored = TableViewStates.storing(next, for: stateKey, in: stored, liveProjectIDs: liveProjectIDs)
-            })
+        Binding(get: { model.columnCustomization }, set: { model.setColumnCustomization($0) })
     }
 
     private var isCompact: Bool {
@@ -73,22 +52,19 @@ struct TaskTableView: View {
         #endif
     }
 
-    private var grid: some View {
-        VStack(spacing: 0) {
-            HStack {
-                Spacer()
-                TableColumnsMenu(state: stateBinding)
-            }
-            .padding(.horizontal, Spacing.s4)
-            .padding(.vertical, Spacing.s2)
+    private func grid(_ groups: [TaskViewGroup]) -> some View {
+        let grouping = model.state.grouping
+        return VStack(spacing: 0) {
             Table(of: TaskItem.self, sortOrder: sortBinding, columnCustomization: customization) {
                 columns
             } rows: {
-                ForEach(TaskGrouping.byStatus(tasks)) { group in
+                ForEach(groups) { group in
                     Section {
-                        ForEach(TableSort.sorted(group.tasks, by: state.sort)) { TableRow($0) }
+                        ForEach(group.tasks) { TableRow($0) }
                     } header: {
-                        TableGroupHeader(status: group.status, count: group.tasks.count)
+                        TableGroupHeader(
+                            title: group.title, count: group.tasks.count,
+                            status: grouping == .status ? TaskStatus(rawValue: group.id) : nil)
                     }
                 }
             }

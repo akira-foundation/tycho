@@ -13,12 +13,7 @@ struct RootView: View {
     var body: some View {
         content
             .onDisappear { router.releaseInspectorFlushes() }
-            .onChange(of: workspaces.first?.id) {
-                router.isCreatingTask = false
-                router.isCreatingProject = false
-                router.closeInspector()
-                router.open(.home)
-            }
+            .onChange(of: workspaces.first?.id) { router.resetForNewWorkspace() }
     }
 
     @ViewBuilder private var content: some View {
@@ -31,9 +26,13 @@ struct RootView: View {
             } detail: {
                 NavigationStack {
                     RouteDetail(route: router.route)
+                        .toolbar {
+                            ToolbarItem(placement: .principal) { PaletteToolbarButton() }
+                        }
                 }
             }
             .background(Token.bg.color)
+            .uiTestingSplitViewAutosaveOff(TychoDefaults.isUITesting())
             #if os(macOS)
             .onGeometryChange(for: CGFloat.self) {
                 $0.size.width
@@ -45,6 +44,8 @@ struct RootView: View {
                 router.updateHorizontalSizeClass(isCompact: sizeClass == .compact)
             }
             #endif
+            .overlay { PaletteOverlay() }
+            .shortcutReceiver()
             .toolbar {
                 ToolbarItem {
                     Button("Inspector", systemImage: "sidebar.right") { router.closeInspector() }
@@ -87,6 +88,7 @@ struct RootView: View {
             .sheet(isPresented: $router.isCreatingTask) {
                 NewTaskSheet(status: router.draftStatus, due: router.draftDue)
             }
+            .sheet(isPresented: $router.isShowingShortcuts) { ShortcutsSheet() }
             .sheet(isPresented: $router.isShowingSettings) {
                 NavigationStack { SettingsView() }
             }

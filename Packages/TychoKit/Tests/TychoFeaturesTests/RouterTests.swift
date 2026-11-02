@@ -66,6 +66,17 @@ struct RouterTests {
         #expect(router.inspectedTaskID == id)
     }
 
+    @Test func thePaletteLabelShowsOnlyInWideWindows() {
+        let router = Router()
+        #expect(!router.showsPaletteLabel)
+        router.updateWindowWidth(1100)
+        #expect(!router.showsPaletteLabel)
+        router.updateWindowWidth(1400)
+        #expect(router.showsPaletteLabel)
+        router.updateWindowWidth(1399)
+        #expect(!router.showsPaletteLabel)
+    }
+
     @Test func aCompactSizeClassPresentsTheInspectorAsASheet() {
         let router = Router()
         router.updateHorizontalSizeClass(isCompact: true)
@@ -136,5 +147,56 @@ struct RouterTests {
         router.openWorkspaceTimeline()
         #expect(router.timelineGrouping == .assignee)
         #expect(router.hasOpenedWorkspaceTimeline)
+    }
+
+    @Test func openTasksAppliesEachPreset() throws {
+        let defaults = try ScratchDefaults.numbered("router-presets").defaults
+        var previous = TaskViewState(inProject: false)
+        previous.mode = "board"
+        previous.query = "login"
+        var other = TaskViewState(inProject: false)
+        other.query = "kept"
+        let seeded = TaskViewStates.storing(other, for: TaskViewStates.myTasksKey, in: Data())
+        defaults.set(
+            TaskViewStates.storing(previous, for: TaskViewStates.tasksKey, in: seeded),
+            forKey: TaskViewStates.storageKey)
+        let router = Router(defaults: defaults)
+        let expected: [(TasksPreset, [TaskFilter])] = [
+            (.open, [TaskFilter(field: .status, op: .isNot, values: ["done"])]),
+            (
+                .done,
+                [
+                    TaskFilter(field: .status, op: .is, values: ["done"]),
+                    TaskFilter(field: .updated, op: .is, values: ["7"]),
+                ]
+            ),
+            (.overdue, [TaskFilter(field: .due, op: .is, values: ["overdue"])]),
+        ]
+        for (preset, filters) in expected {
+            router.openTasks(preset: preset)
+            let data = defaults.data(forKey: TaskViewStates.storageKey) ?? Data()
+            let state = TaskViewStates.state(for: TaskViewStates.tasksKey, inProject: false, in: data)
+            #expect(router.route == .tasks)
+            #expect(state.filters == filters)
+            #expect(state.query.isEmpty)
+            #expect(state.mode == "list")
+            #expect(TaskViewStates.state(for: TaskViewStates.myTasksKey, inProject: false, in: data) == other)
+        }
+    }
+
+    @Test func paletteTogglesAndCloses() {
+        let router = Router()
+        #expect(router.palette == nil)
+        router.togglePalette()
+        #expect(router.palette?.mode == .commands)
+        router.palette?.query = "x"
+        router.palette?.highlight = 3
+        router.togglePalette()
+        #expect(router.palette == nil)
+        router.openPalette(mode: .search)
+        #expect(router.palette == PaletteState(mode: .search))
+        router.closePalette()
+        #expect(router.palette == nil)
+        #expect(!router.isShowingShortcuts && !router.isEditingText)
     }
 }

@@ -23,5 +23,6 @@ public struct SettingsRootView: View {
         .toastOverlay(toast)
         .frame(width: 460)
         .tychoAppearance()
+        .defaultAppStorage(TychoDefaults.current)
     }
 }

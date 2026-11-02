@@ -32,6 +32,7 @@ struct OnboardingView: View {
                 Text("Your name").tychoFont(.xs, weight: .medium).foregroundStyle(Token.text3.color)
                 TextField("Your name", text: $name)
                     .textFieldStyle(.roundedBorder)
+                    .marksTextEditing()
                     .accessibilityIdentifier("onboarding.name")
             }
             .frame(maxWidth: 320)

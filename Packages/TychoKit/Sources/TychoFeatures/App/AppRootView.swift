@@ -8,6 +8,7 @@ public struct AppRootView: View {
 
     public init(loader: StoreLoader) {
         self.loader = loader
+        TaskViewStates.migrateStoredDefaults()
     }
 
     public var body: some View {
@@ -26,5 +27,7 @@ public struct AppRootView: View {
         .focusedSceneValue(\.router, router)
         .toastOverlay(toast, enabled: !router.isInspectorSheetPresented)
         .tychoAppearance()
+        .defaultAppStorage(TychoDefaults.current)
+        .uiTestingWindowSize(TychoDefaults.isUITesting())
     }
 }

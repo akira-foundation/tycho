@@ -136,4 +136,25 @@ struct SeedTests {
         #expect(try context.fetchCount(FetchDescriptor<CalendarEvent>()) == 0)
         #expect(try context.fetchCount(FetchDescriptor<FileRecord>()) == 0)
     }
+
+    @Test func demoSeedsTheHighPriorityViewOnWebsiteRedesign() throws {
+        let context = try makeTestContext()
+        let workspace = try DemoSeed.load(into: context, now: referenceNow, calendar: utcCalendar)
+        let web = try #require(workspace.projects?.first { $0.key == "WEB" })
+
+        let views = SavedView.ordered(in: web)
+
+        #expect(views.count == 1)
+        #expect(views.first?.name == "High priority")
+        #expect(views.first?.layout == .list)
+        #expect(views.first?.filters == [TaskFilter(field: .priority, op: .is, values: ["urgent", "high"])])
+        #expect(try context.fetchCount(FetchDescriptor<SavedView>()) == 1)
+    }
+
+    @Test func emptySeedHasNoSavedViews() throws {
+        let context = try makeTestContext()
+        try EmptySeed.load(into: context, ownerName: "Ana")
+
+        #expect(try context.fetchCount(FetchDescriptor<SavedView>()) == 0)
+    }
 }

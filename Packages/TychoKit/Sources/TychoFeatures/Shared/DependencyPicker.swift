@@ -51,6 +51,7 @@ struct DependencyList: View {
     var body: some View {
         VStack(alignment: .leading, spacing: Spacing.s2) {
             TextField("Blocked by…", text: $query)
+                .marksTextEditing()
                 .textFieldStyle(.roundedBorder)
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: 0) {

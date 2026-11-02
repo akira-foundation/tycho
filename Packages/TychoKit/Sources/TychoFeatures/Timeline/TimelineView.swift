@@ -12,6 +12,7 @@ struct TimelineView: View {
     let tasks: [TaskItem]
     let milestones: [Milestone]
     let project: Project?
+    var engine: TaskViewEngine?
     @State private var sync = TimelineScrollSync()
 
     var body: some View {
@@ -21,8 +22,8 @@ struct TimelineView: View {
         let rows = TimelineRows.build(
             tasks: tasks, grouping: grouping, milestoneCount: marks.count, members: members, projects: projects)
         VStack(spacing: 0) {
-            TimelineControls(showsNewTask: project != nil) { sync.scrollHorizontally(to: layout.initialScrollX) }
-            Divider()
+            header(
+                TimelineControls(showsNewTask: project != nil) { sync.scrollHorizontally(to: layout.initialScrollX) })
             if rows.isEmpty {
                 empty
             } else {
@@ -34,6 +35,17 @@ struct TimelineView: View {
         }
         .background(Token.bg.color)
         .onChange(of: router.timelineZoom) { sync.scrollHorizontally(to: makeLayout().initialScrollX) }
+    }
+
+    @ViewBuilder private func header(_ controls: TimelineControls) -> some View {
+        if let engine {
+            TaskViewHeader(engine: engine) { controls }
+        } else {
+            controls
+                .padding(.horizontal, Spacing.s4)
+                .padding(.vertical, Spacing.s2)
+            Divider()
+        }
     }
 
     private func makeLayout() -> TimelineLayout {

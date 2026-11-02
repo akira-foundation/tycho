@@ -72,13 +72,13 @@ struct HomeView: View {
                 title: "Open tasks", symbol: "circle.dashed", value: "\(summary.openTasks)",
                 detail: "\(summary.openAssignedToMe) assigned to you", tone: nil
             ) {
-                router.open(.myTasks)
+                router.openTasks(preset: .open)
             }
             StatCard(
                 title: "Completed", symbol: "checkmark.circle", value: "\(summary.completedThisWeek)",
                 detail: "this week", tone: nil
             ) {
-                router.open(.myTasks)
+                router.openTasks(preset: .done)
             }
             StatCard(
                 title: "Overdue",
@@ -87,7 +87,7 @@ struct HomeView: View {
                 detail: summary.overdue > 0 ? "need attention" : "all on track",
                 tone: summary.overdue > 0 ? Token.red.color : nil
             ) {
-                router.open(.myTasks)
+                router.openTasks(preset: .overdue)
             }
         }
     }

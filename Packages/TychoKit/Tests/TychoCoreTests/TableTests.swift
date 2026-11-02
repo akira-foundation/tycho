@@ -27,14 +27,14 @@ struct TableTests {
 
     @Test func defaultVisibilityHidesTheSecondaryColumns() {
         #expect(
-            TableViewState(inProject: true).visibleColumns == [
+            TaskViewState(inProject: true).visibleColumns == [
                 .title, .status, .priority, .assignee, .due, .labels, .estimate,
             ])
-        #expect(TableViewState(inProject: false).visibleColumns.last == .project)
+        #expect(TaskViewState(inProject: false).visibleColumns.last == .project)
     }
 
     @Test func theTaskColumnCannotBeHidden() {
-        var state = TableViewState(inProject: true)
+        var state = TaskViewState(inProject: true)
         state.setVisible(false, for: .title)
         state.setVisible(true, for: .created)
         state.setVisible(false, for: .status)
@@ -44,13 +44,13 @@ struct TableTests {
     }
 
     @Test func resetWidthsDropsOnlyTheColumnCustomization() throws {
-        var state = TableViewState(inProject: true)
+        var state = TaskViewState(inProject: true)
         state.columns = Data([1])
         state.sort = [TaskComparator(field: .due, order: .reverse)]
         state.resetWidths()
         #expect(state.columns == nil)
         #expect(state.hidden == TableColumnID.defaultHidden(inProject: true))
-        let decoded = try JSONDecoder().decode(TableViewState.self, from: JSONEncoder().encode(state))
+        let decoded = try JSONDecoder().decode(TaskViewState.self, from: JSONEncoder().encode(state))
         #expect(decoded == state)
     }
 
@@ -141,16 +141,16 @@ struct TableTests {
 
     @Test func decodingToleratesMissingKeysAndUnknownColumns() throws {
         let json = Data(#"{"hidden":["created","retired","deps"]}"#.utf8)
-        let state = try JSONDecoder().decode(TableViewState.self, from: json)
+        let state = try JSONDecoder().decode(TaskViewState.self, from: json)
         #expect(state.hidden == [.created, .deps])
         #expect(state.sort.isEmpty)
         #expect(state.columns == nil)
-        let empty = try JSONDecoder().decode(TableViewState.self, from: Data("{}".utf8))
+        let empty = try JSONDecoder().decode(TaskViewState.self, from: Data("{}".utf8))
         #expect(empty.hidden == TableColumnID.defaultHidden(inProject: false))
     }
 
     @Test func hiddenColumnsEncodeInCaseOrder() throws {
-        var state = TableViewState(inProject: true)
+        var state = TaskViewState(inProject: true)
         state.hidden = [.project, .start, .created]
         let encoder = JSONEncoder()
         encoder.outputFormatting = .sortedKeys

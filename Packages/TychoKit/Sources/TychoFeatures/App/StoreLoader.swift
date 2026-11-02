@@ -23,7 +23,7 @@ public final class StoreLoader {
         self.resetStore = resetStore
     }
 
-    public static func usesMemory(arguments: [String]) -> Bool { arguments.contains("-uiTesting") }
+    public static func usesMemory(arguments: [String]) -> Bool { TychoDefaults.isUITesting(arguments) }
 
     public static func live(arguments: [String] = ProcessInfo.processInfo.arguments) -> StoreLoader {
         let inMemory = usesMemory(arguments: arguments)

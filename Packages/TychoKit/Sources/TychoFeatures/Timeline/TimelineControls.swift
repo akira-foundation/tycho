@@ -31,7 +31,5 @@ struct TimelineControls: View {
                     .buttonStyle(.borderless)
             }
         }
-        .padding(.horizontal, Spacing.s4)
-        .padding(.vertical, Spacing.s2)
     }
 }

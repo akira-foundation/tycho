@@ -58,6 +58,7 @@ struct PropertyGrid: View {
             row("Blocked by") { DependencyPicker(task: task, showsTitles: true, emptyText: "None") }
             row("Estimate") {
                 TextField("e.g. 2d", text: $estimate)
+                    .marksTextEditing()
                     .textFieldStyle(.plain)
                     .onSubmit(commitEstimate)
             }

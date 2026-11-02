@@ -11,6 +11,7 @@ struct InlineComposer: View {
         HStack(spacing: Spacing.s2) {
             Image(systemName: "plus").foregroundStyle(Token.text4.color)
             TextField(placeholder, text: $text)
+                .marksTextEditing(isFocused: focused)
                 .textFieldStyle(.plain)
                 .focused($focused)
                 .onSubmit {

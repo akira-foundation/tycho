@@ -46,6 +46,17 @@ public struct SettingsView: View {
             } footer: {
                 Text("Affects calendars and the timeline.")
             }
+            Section {
+                ForEach(Array(ShortcutCatalog.groups.enumerated()), id: \.offset) { _, group in
+                    ShortcutGroupView(title: group.title, entries: group.entries)
+                        .padding(.vertical, 4)
+                }
+            } header: {
+                Text("Keyboard shortcuts")
+            } footer: {
+                Text("Move faster with the keyboard.")
+            }
+            .accessibilityIdentifier("settings.shortcuts")
             Section("Data") {
                 Button("Restore demo data…") { confirming = .reloadDemo }
                 Button("Delete everything…", role: .destructive) { confirming = .deleteAll }

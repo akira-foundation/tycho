@@ -24,6 +24,7 @@ struct NewTaskSheet: View {
         NavigationStack {
             Form {
                 TextField("Task title", text: $draft.title)
+                    .marksTextEditing()
                     .accessibilityIdentifier("task.title")
                     .onChange(of: draft.title) { error = nil }
                 Picker("Project", selection: $project) {

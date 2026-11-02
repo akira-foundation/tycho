@@ -7,6 +7,8 @@ struct ProjectDetailView: View {
     @Environment(Router.self) private var router
     @Query private var matches: [Project]
     @State private var editing = false
+    @State private var isSavingView = false
+    @State private var renamingView: SavedView?
     private let tab: ProjectTab
 
     init(projectID: UUID, tab: ProjectTab) {
@@ -16,28 +18,46 @@ struct ProjectDetailView: View {
 
     var body: some View {
         if let project = matches.first {
+            let target = ProjectTabTarget(tab: tab, in: project)
             VStack(spacing: 0) {
                 header(project)
                 Divider()
-                ProjectTabContent(project: project, tab: tab)
+                ProjectTabContent(project: project, target: target)
+                    .id(target.stateKey)
             }
             .background(Token.bg.color)
-            .navigationTitle(project.name)
+            .navigationTitle(target.title)
             .toolbar {
                 ToolbarItem {
-                    Picker("View", selection: Binding(get: { tab }, set: { router.openProject(project.id, tab: $0) })) {
-                        ForEach(ProjectTab.allCases, id: \.self) { Text($0.title).tag($0) }
+                    Picker("View", selection: builtInSelection(project)) {
+                        ForEach(ProjectBuiltInTab.allCases, id: \.self) { Text($0.title).tag(Optional($0)) }
                     }
                     .pickerStyle(.segmented)
                     .accessibilityIdentifier("project.tab")
+                }
+                ToolbarItem {
+                    SavedViewTabs(
+                        project: project, tab: tab, onSave: { isSavingView = true }, onRename: { renamingView = $0 })
                 }
                 ToolbarItem { Button("Edit Project", systemImage: "slider.horizontal.3") { editing = true } }
                 ToolbarItem { Button("New Task", systemImage: "plus") { router.newTask() } }
             }
             .sheet(isPresented: $editing) { NewProjectSheet(project: project) }
+            .sheet(isPresented: $isSavingView) { SaveViewSheet(project: project) }
+            .sheet(item: $renamingView) { RenameViewSheet(view: $0) }
+            .blocksNavigation(while: editing || isSavingView || renamingView != nil)
         } else {
             EmptyState(title: "Project not found", symbol: "questionmark.folder", message: "It may have been deleted.")
         }
+    }
+
+    private func builtInSelection(_ project: Project) -> Binding<ProjectBuiltInTab?> {
+        Binding(
+            get: { ProjectTabTarget.pickerSelection(for: tab) },
+            set: { selection in
+                guard let selection else { return }
+                router.openProject(project.id, tab: .builtIn(selection))
+            })
     }
 
     private func header(_ project: Project) -> some View {
@@ -59,28 +79,5 @@ struct ProjectDetailView: View {
         }
         .padding(.horizontal, Spacing.s6)
         .padding(.vertical, Spacing.s4)
-    }
-}
-
-struct ProjectTabContent: View {
-    let project: Project
-    let tab: ProjectTab
-
-    var body: some View {
-        switch tab {
-        case .board:
-            BoardView(tasks: project.tasks ?? [], project: project)
-        case .list:
-            TaskListView(tasks: project.tasks ?? [], project: project)
-        case .table:
-            TaskTableView(
-                tasks: project.tasks ?? [], project: project, stateKey: TableViewStates.projectKey(project.id))
-        case .calendar:
-            CalendarView(tasks: project.tasks ?? [], events: project.events ?? [], project: project)
-        case .timeline:
-            TimelineView(tasks: project.tasks ?? [], milestones: project.milestones ?? [], project: project)
-        case .files:
-            FilesView(project: project)
-        }
     }
 }

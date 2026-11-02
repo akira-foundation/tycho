@@ -5,6 +5,10 @@ import TychoFeatures
 struct TychoApp: App {
     @State private var loader = StoreLoader.live()
 
+    init() {
+        TychoDefaults.prepareLaunch()
+    }
+
     var body: some Scene {
         WindowGroup {
             AppRootView(loader: loader)
