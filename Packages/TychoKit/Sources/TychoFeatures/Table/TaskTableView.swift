@@ -8,9 +8,7 @@ struct TaskTableView: View {
     @Environment(ToastCenter.self) var toast
     @Query(sort: \Member.name) var members: [Member]
     @Query(filter: #Predicate<Project> { !$0.isArchived }, sort: \Project.sortOrder) private var projects: [Project]
-    #if os(iOS)
-    @Environment(\.horizontalSizeClass) private var sizeClass
-    #endif
+    @Environment(\.isCompactWidth) private var isCompact
     let tasks: [TaskItem]
     let model: TaskViewModel
 
@@ -42,14 +40,6 @@ struct TaskTableView: View {
 
     private var customization: Binding<TableColumnCustomization<TaskItem>> {
         Binding(get: { model.columnCustomization }, set: { model.setColumnCustomization($0) })
-    }
-
-    private var isCompact: Bool {
-        #if os(iOS)
-        sizeClass == .compact
-        #else
-        false
-        #endif
     }
 
     private func grid(_ groups: [TaskViewGroup]) -> some View {

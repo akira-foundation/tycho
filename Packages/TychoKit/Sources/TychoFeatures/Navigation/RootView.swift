@@ -6,9 +6,7 @@ import TychoDesign
 struct RootView: View {
     @Environment(Router.self) private var router
     @Query(sort: \Workspace.createdAt) private var workspaces: [Workspace]
-    #if os(iOS)
-    @Environment(\.horizontalSizeClass) private var sizeClass
-    #endif
+    @Environment(\.isCompactWidth) private var isCompactWidth
 
     var body: some View {
         content
@@ -18,7 +16,7 @@ struct RootView: View {
 
     private var paletteSlot: ToolbarItemPlacement {
         #if os(iOS)
-        sizeClass == .compact ? .topBarTrailing : .principal
+        isCompactWidth ? .topBarTrailing : .principal
         #else
         .principal
         #endif
@@ -48,8 +46,8 @@ struct RootView: View {
                 router.updateWindowWidth($0)
             }
             #else
-            .onChange(of: sizeClass, initial: true) {
-                router.updateHorizontalSizeClass(isCompact: sizeClass == .compact)
+            .onChange(of: isCompactWidth, initial: true) {
+                router.updateHorizontalSizeClass(isCompact: isCompactWidth)
             }
             #endif
             .overlay { PaletteOverlay() }
@@ -105,7 +103,7 @@ struct RootView: View {
 
     private var inspectsInSheet: Bool {
         #if os(iOS)
-        sizeClass == .compact
+        isCompactWidth
         #else
         router.inspectsInSheet
         #endif

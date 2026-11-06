@@ -9,9 +9,7 @@ struct ProjectDetailView: View {
     @State private var editing = false
     @State private var isSavingView = false
     @State private var renamingView: SavedView?
-    #if os(iOS)
-    @Environment(\.horizontalSizeClass) private var sizeClass
-    #endif
+    @Environment(\.isCompactWidth) private var isCompact
     private let tab: ProjectTab
 
     init(projectID: UUID, tab: ProjectTab) {
@@ -47,14 +45,6 @@ struct ProjectDetailView: View {
         } else {
             EmptyState(title: "Project not found", symbol: "questionmark.folder", message: "It may have been deleted.")
         }
-    }
-
-    private var isCompact: Bool {
-        #if os(iOS)
-        sizeClass == .compact
-        #else
-        false
-        #endif
     }
 
     private func builtInSelection(_ project: Project) -> Binding<ProjectBuiltInTab?> {
