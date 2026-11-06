@@ -9,6 +9,9 @@ struct ProjectDetailView: View {
     @State private var editing = false
     @State private var isSavingView = false
     @State private var renamingView: SavedView?
+    #if os(iOS)
+    @Environment(\.horizontalSizeClass) private var sizeClass
+    #endif
     private let tab: ProjectTab
 
     init(projectID: UUID, tab: ProjectTab) {
@@ -28,13 +31,8 @@ struct ProjectDetailView: View {
             .background(Token.bg.color)
             .navigationTitle(target.title)
             .toolbar {
-                ToolbarItem {
-                    Picker("View", selection: builtInSelection(project)) {
-                        ForEach(ProjectBuiltInTab.allCases, id: \.self) { Text($0.title).tag(Optional($0)) }
-                    }
-                    .pickerStyle(.segmented)
-                    .accessibilityIdentifier("project.tab")
-                }
+                ToolbarItem { ProjectTabPicker(selection: builtInSelection(project), isCompact: isCompact) }
+                if isCompact { ToolbarSpacer(.fixed) }
                 ToolbarItem {
                     SavedViewTabs(
                         project: project, tab: tab, onSave: { isSavingView = true }, onRename: { renamingView = $0 })
@@ -49,6 +47,14 @@ struct ProjectDetailView: View {
         } else {
             EmptyState(title: "Project not found", symbol: "questionmark.folder", message: "It may have been deleted.")
         }
+    }
+
+    private var isCompact: Bool {
+        #if os(iOS)
+        sizeClass == .compact
+        #else
+        false
+        #endif
     }
 
     private func builtInSelection(_ project: Project) -> Binding<ProjectBuiltInTab?> {

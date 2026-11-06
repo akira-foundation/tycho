@@ -14,6 +14,12 @@ struct AppRouteTests {
         #expect(ProjectBuiltInTab.allCases.map(\.title) == ["Board", "List", "Table", "Calendar", "Timeline", "Files"])
     }
 
+    @Test func everyProjectTabHasItsOwnSymbol() {
+        let symbols = ProjectBuiltInTab.allCases.map(\.symbol)
+        #expect(Set(symbols).count == ProjectBuiltInTab.allCases.count)
+        #expect(!symbols.contains(""))
+    }
+
     @Test func savedViewTabsRoundTripThroughTheRoute() {
         let projectID = UUID()
         let viewID = UUID()
