@@ -16,6 +16,14 @@ struct RootView: View {
             .onChange(of: workspaces.first?.id) { router.resetForNewWorkspace() }
     }
 
+    private var paletteSlot: ToolbarItemPlacement {
+        #if os(iOS)
+        sizeClass == .compact ? .topBarTrailing : .principal
+        #else
+        .principal
+        #endif
+    }
+
     @ViewBuilder private var content: some View {
         @Bindable var router = router
         if workspaces.isEmpty {
@@ -27,7 +35,7 @@ struct RootView: View {
                 NavigationStack {
                     RouteDetail(route: router.route)
                         .toolbar {
-                            ToolbarItem(placement: .principal) { PaletteToolbarButton() }
+                            ToolbarItem(placement: paletteSlot) { PaletteToolbarButton() }
                         }
                 }
             }
