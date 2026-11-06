@@ -101,11 +101,9 @@ struct PaletteToolbarButton: View {
                         .lineLimit(1)
                         .frame(width: PaletteToolbarLayout.labelWidth, alignment: .leading)
                 }
-                ShortcutKeyChip("⌘K")
             }
             .foregroundStyle(Token.text3.color)
-            .padding(.leading, router.showsPaletteLabel ? 9 : 6)
-            .padding(.trailing, 6)
+            .padding(.horizontal, router.showsPaletteLabel ? 9 : 6)
             #else
             Label("Search or jump to…", systemImage: "magnifyingglass")
             #endif

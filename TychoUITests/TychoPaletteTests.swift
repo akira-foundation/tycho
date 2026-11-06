@@ -34,6 +34,7 @@ final class TychoPaletteTests: XCTestCase {
         let button = element("toolbar.palette")
         XCTAssertEqual(button.label, "Search or jump to…")
         XCTAssertLessThan(button.frame.width, 120)
+        XCTAssertFalse(button.staticTexts["⌘K"].exists)
         app.openSidebarItem("Website Redesign", revealing: element("project.tab"))
     }
 
@@ -42,7 +43,7 @@ final class TychoPaletteTests: XCTestCase {
         try XCTSkipUnless(widest >= 1500, "the label needs a zoomed window at least 1500 pt wide")
         app.zoomWindow()
         let button = element("toolbar.palette")
-        XCTAssertTrue(eventually { button.frame.width >= 200 }, "the label should be visible, not only in the tooltip")
+        XCTAssertTrue(eventually { button.frame.width >= 160 }, "the label should be visible, not only in the tooltip")
     }
 
     func testCommandKOpensThePaletteAndEnterOpensAResult() {
