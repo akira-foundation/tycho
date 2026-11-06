@@ -8,6 +8,7 @@ struct SidebarView: View {
     @Environment(ToastCenter.self) private var toast
     @Environment(\.modelContext) private var context
     @Query(filter: #Predicate<Project> { !$0.isArchived }, sort: \Project.sortOrder) private var projects: [Project]
+    @Environment(\.isCompactWidth) private var isCompactWidth
 
     var body: some View {
         @Bindable var router = router
@@ -38,7 +39,7 @@ struct SidebarView: View {
                 Button("New Project", systemImage: "plus") { router.newProject() }
             }
             #if os(iOS)
-            ToolbarItem(placement: .topBarLeading) {
+            ToolbarItem(placement: isCompactWidth ? .topBarLeading : .bottomBar) {
                 Button("Settings", systemImage: "gearshape") { router.showSettings() }
             }
             #endif

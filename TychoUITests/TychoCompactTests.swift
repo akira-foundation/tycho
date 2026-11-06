@@ -9,6 +9,7 @@ final class TychoCompactTests: XCTestCase {
         continueAfterFailure = false
         app = XCUIApplication()
         app.launchArguments = ["-uiTesting"]
+        try XCTSkipUnless(UIDevice.current.userInterfaceIdiom == .phone, "compact width needs an iPhone")
         app.launch()
         let demo = app.buttons["onboarding.demo"]
         XCTAssertTrue(demo.waitForExistence(timeout: 10))
