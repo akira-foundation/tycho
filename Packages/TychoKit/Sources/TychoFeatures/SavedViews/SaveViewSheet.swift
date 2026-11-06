@@ -49,11 +49,10 @@ struct SaveViewSheet: View {
             .navigationSubtitle("Save the current filters as a tab on this project.")
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }.buttonStyle(.tycho(.secondary))
+                    Button("Cancel", role: .cancel) { dismiss() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Save view", action: save)
-                        .buttonStyle(.tycho(.primary))
+                    Button("Save view", role: .confirm, action: save)
                         .keyboardShortcut(.return, modifiers: .command)
                         .accessibilityIdentifier("saveView.save")
                 }

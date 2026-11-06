@@ -107,11 +107,10 @@ struct NewProjectSheet: View {
             .navigationTitle(project == nil ? "New project" : "Edit project")
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }.buttonStyle(.tycho(.secondary))
+                    Button("Cancel", role: .cancel) { dismiss() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button(project == nil ? "Create" : "Save", action: save)
-                        .buttonStyle(.tycho(.primary))
+                    Button(project == nil ? "Create" : "Save", role: .confirm, action: save)
                         .keyboardShortcut(.return, modifiers: .command)
                         .disabled(project == nil && workspaces.isEmpty)
                         .accessibilityIdentifier("project.save")

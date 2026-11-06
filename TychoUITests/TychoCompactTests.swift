@@ -50,5 +50,17 @@ final class TychoCompactTests: XCTestCase {
         XCTAssertGreaterThan(palette.frame.minX, picker.frame.maxX)
     }
 
+    func testNewTaskSheetCancelsFromTheNavigationBar() {
+        openProject("Website Redesign")
+        app.buttons["New Task"].firstMatch.tap()
+        let sheetBar = app.navigationBars["New task"]
+        XCTAssertTrue(sheetBar.waitForExistence(timeout: 5))
+        XCTAssertTrue(sheetBar.buttons["task.create"].exists)
+
+        sheetBar.buttons["Cancel"].tap()
+
+        XCTAssertTrue(eventually { !sheetBar.exists })
+    }
+
 }
 #endif

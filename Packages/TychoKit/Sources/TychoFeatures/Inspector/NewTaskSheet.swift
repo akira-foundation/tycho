@@ -51,11 +51,10 @@ struct NewTaskSheet: View {
             .navigationTitle("New task")
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }.buttonStyle(.tycho(.secondary))
+                    Button("Cancel", role: .cancel) { dismiss() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Create", action: save)
-                        .buttonStyle(.tycho(.primary))
+                    Button("Create", role: .confirm, action: save)
                         .keyboardShortcut(.return, modifiers: .command)
                         .disabled(project == nil)
                         .accessibilityIdentifier("task.create")
