@@ -112,6 +112,7 @@ struct AssigneeCell: View {
         HStack(spacing: Spacing.s1) {
             if let assignee = task.assignee {
                 Avatar(initials: assignee.initials, color: assignee.tint, size: 18)
+                    .accessibilityIdentifier("table.avatar.\(task.key)")
             }
             Menu(task.assignee?.name ?? "Unassigned") {
                 Button("Unassigned") { assign(nil) }
@@ -121,6 +122,7 @@ struct AssigneeCell: View {
             }
             .menuStyle(.borderlessButton)
             .menuIndicator(.hidden)
+            .foregroundStyle(task.assignee == nil ? Token.text4.color : Token.text.color)
             .accessibilityIdentifier("table.assignee.\(task.key)")
         }
     }

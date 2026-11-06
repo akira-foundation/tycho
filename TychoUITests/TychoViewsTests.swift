@@ -75,6 +75,9 @@ final class TychoViewsTests: XCTestCase {
         let assignee = element("table.assignee.WEB-124")
         XCTAssertTrue(assignee.waitForExistence(timeout: 5))
         XCTAssertEqual(assignee.title, "Sarah Chen")
+        let avatar = element("table.avatar.WEB-124")
+        XCTAssertTrue(avatar.exists)
+        XCTAssertLessThanOrEqual(avatar.frame.maxX, assignee.frame.minX)
 
         assignee.click()
         app.menuItems["Emma Wilson"].firstMatch.click()
