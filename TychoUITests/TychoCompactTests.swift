@@ -62,5 +62,11 @@ final class TychoCompactTests: XCTestCase {
         XCTAssertTrue(eventually { !sheetBar.exists })
     }
 
+    func testSidebarSettingsLivesInTheNavigationBar() {
+        let back = app.navigationBars.buttons["BackButton"]
+        if back.waitForExistence(timeout: 3) { back.tap() }
+        let settings = app.navigationBars["Tycho"].buttons["Settings"]
+        XCTAssertTrue(settings.waitForExistence(timeout: 5))
+    }
 }
 #endif

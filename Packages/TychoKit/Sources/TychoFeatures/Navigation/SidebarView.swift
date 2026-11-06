@@ -38,7 +38,7 @@ struct SidebarView: View {
                 Button("New Project", systemImage: "plus") { router.newProject() }
             }
             #if os(iOS)
-            ToolbarItem(placement: .bottomBar) {
+            ToolbarItem(placement: .topBarLeading) {
                 Button("Settings", systemImage: "gearshape") { router.showSettings() }
             }
             #endif
