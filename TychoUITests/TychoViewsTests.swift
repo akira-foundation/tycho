@@ -70,6 +70,18 @@ final class TychoViewsTests: XCTestCase {
             })
     }
 
+    func testTableAssigneeCellShowsTheNameAndReassigns() {
+        app.openWebsiteTab("Table")
+        let assignee = element("table.assignee.WEB-124")
+        XCTAssertTrue(assignee.waitForExistence(timeout: 5))
+        XCTAssertEqual(assignee.title, "Sarah Chen")
+
+        assignee.click()
+        app.menuItems["Emma Wilson"].firstMatch.click()
+
+        XCTAssertTrue(eventually { assignee.title == "Emma Wilson" })
+    }
+
     func testTableTitleRenamesInlineAndEscapeCancels() {
         app.openWebsiteTab("Table")
         let title = element("table.title.WEB-118")
