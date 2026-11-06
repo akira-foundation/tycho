@@ -19,6 +19,10 @@ struct TasksModeTests {
         #expect(TasksMode.list.rawValue == "list")
     }
 
+    @Test func tasksModesShareTheProjectViewSymbols() {
+        #expect(TasksMode.allCases.map(\.symbol) == [ProjectBuiltInTab.list, .board, .table].map(\.symbol))
+    }
+
     @Test func subtitleCountsTheProjects() {
         #expect(TasksMode.subtitle(projectCount: 7) == "Every task across 7 projects.")
     }

@@ -29,9 +29,9 @@ enum TasksMode: String, CaseIterable, Identifiable {
 
     var symbol: String {
         switch self {
-        case .list: "list.bullet"
-        case .board: "rectangle.split.3x1"
-        case .table: "tablecells"
+        case .list: ProjectBuiltInTab.list.symbol
+        case .board: ProjectBuiltInTab.board.symbol
+        case .table: ProjectBuiltInTab.table.symbol
         }
     }
 
