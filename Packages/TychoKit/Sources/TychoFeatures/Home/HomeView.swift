@@ -97,11 +97,11 @@ struct HomeView: View {
                 } label: {
                     LabeledContent {
                         HStack(spacing: 8) {
-                            ProgressView(value: Double(project.progress), total: 100)
-                                .tint(project.color.tint)
-                                .frame(width: 60)
+                            ProgressBar(percent: project.progress, color: project.color.tint)
+                                .frame(maxWidth: 160)
                             Text("\(project.progress)%").monospacedDigit().frame(minWidth: 36, alignment: .trailing)
                         }
+                        .alignmentGuide(.firstTextBaseline) { $0[VerticalAlignment.center] }
                     } label: {
                         Label {
                             Text(project.name).lineLimit(1)

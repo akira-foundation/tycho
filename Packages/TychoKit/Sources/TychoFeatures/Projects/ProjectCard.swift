@@ -21,7 +21,7 @@ struct ProjectCard: View {
                 .foregroundStyle(.secondary)
                 .lineLimit(2, reservesSpace: true)
             StatusPill(status: project.status)
-            ProgressView(value: Double(project.progress), total: 100).tint(project.color.tint)
+            ProgressBar(percent: project.progress, color: project.color.tint)
             HStack {
                 AvatarStack(people: (project.members ?? []).map { ($0.initials, $0.tint) })
                 Spacer()

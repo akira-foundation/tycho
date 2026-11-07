@@ -22,6 +22,7 @@ struct ComponentTests {
         _ = Avatar(initials: "SC", color: .pink).body
         _ = AvatarStack(people: [("SC", .pink), ("JC", .blue)]).body
         _ = ProgressRing(percent: 50, color: .green).body
+        _ = ProgressBar(percent: 50, color: .green).body
         _ = StatCard(title: "Overdue", symbol: "clock", value: "3", detail: "need attention", tone: .red) {}.body
         _ = ProjectGlyph(symbol: "globe", color: .indigo).body
         _ = EmptyState(title: "No tasks", symbol: "tray", message: "Nothing here yet").body
