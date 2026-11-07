@@ -1,7 +1,7 @@
 import SwiftUI
 
 public struct TychoMark: View {
-    public static let core = Color(red: 232 / 255, green: 150 / 255, blue: 31 / 255)
+    private static let core = Color(red: 232 / 255, green: 150 / 255, blue: 31 / 255)
 
     private let size: CGFloat
 

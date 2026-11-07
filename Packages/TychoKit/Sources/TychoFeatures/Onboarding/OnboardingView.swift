@@ -20,6 +20,7 @@ struct OnboardingView: View {
         VStack(spacing: 28) {
             VStack(spacing: 8) {
                 TychoMark(size: 96)
+                    .accessibilityHidden(true)
                     .padding(.bottom, 8)
                 Text("Welcome to Tycho").font(.largeTitle.bold())
                 Text("A calm place for projects and tasks.")
