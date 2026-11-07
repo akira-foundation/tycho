@@ -29,11 +29,12 @@ struct CalendarFieldTests {
     }
 
     private func visiblePopovers() -> Int {
-        NSApp.windows.filter { String(describing: type(of: $0)).contains("Popover") && $0.isVisible }.count
+        NSApplication.shared.windows.filter { String(describing: type(of: $0)).contains("Popover") && $0.isVisible }
+            .count
     }
 
     private func datePickers() -> [NSDatePicker] {
-        NSApp.windows.flatMap { views(of: NSDatePicker.self, in: $0.contentView?.superview) }
+        NSApplication.shared.windows.flatMap { views(of: NSDatePicker.self, in: $0.contentView?.superview) }
     }
 
     @Test func inspectorDateRowShowsNoStepperField() {
