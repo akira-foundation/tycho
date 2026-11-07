@@ -86,6 +86,8 @@ struct TaskListView: View {
             isExpanded.wrappedValue.toggle()
         } label: {
             headerLabel(group, status: status, isExpanded: isExpanded.wrappedValue)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
         .accessibilityValue(isExpanded.wrappedValue ? "Expanded" : "Collapsed")
@@ -110,7 +112,6 @@ struct TaskListView: View {
             Text(group.title)
             Text("\(group.tasks.count)").foregroundStyle(.secondary)
         }
-        .contentShape(Rectangle())
         .accessibilityElement(children: .combine)
     }
 
