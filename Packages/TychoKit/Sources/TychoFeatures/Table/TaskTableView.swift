@@ -62,12 +62,12 @@ struct TaskTableView: View {
             Button {
                 router.newTask()
             } label: {
-                Label("New task", systemImage: "plus")
+                Label("New Task", systemImage: "plus")
                     .frame(maxWidth: .infinity, minHeight: 36, alignment: .leading)
                     .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
-            .foregroundStyle(Token.text3.color)
+            .foregroundStyle(.secondary)
             .padding(.horizontal, Spacing.s4)
             .accessibilityIdentifier("table.newTask")
         }

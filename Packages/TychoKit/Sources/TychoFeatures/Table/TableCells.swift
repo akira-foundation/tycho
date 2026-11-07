@@ -30,9 +30,16 @@ struct TitleCell: View {
                         if !focused { commit() }
                     }
             } else {
+                #if os(iOS)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(task.title).lineLimit(2)
+                    key
+                }
+                #else
                 Text(task.title).lineLimit(1)
                 Spacer(minLength: Spacing.s2)
-                Text(task.key).tychoFont(.xxs, design: .monospaced).foregroundStyle(Token.text4.color)
+                key
+                #endif
             }
         }
         .contentShape(Rectangle())
@@ -42,6 +49,10 @@ struct TitleCell: View {
         .accessibilityElement(children: .combine)
         .accessibilityAddTraits(.isButton)
         .accessibilityIdentifier("table.title.\(task.key)")
+    }
+
+    private var key: some View {
+        Text(task.key).tychoFont(.xxs, design: .monospaced).foregroundStyle(Token.text4.color)
     }
 
     private func beginEditing() {
@@ -71,6 +82,7 @@ struct StatusCell: View {
                 }
             }
             .menuStyle(.borderlessButton)
+            .foregroundStyle(.primary)
             .menuIndicator(.hidden)
             .fixedSize()
             .accessibilityIdentifier("table.status.\(task.key)")
@@ -95,6 +107,7 @@ struct PriorityCell: View {
                 }
             }
             .menuStyle(.borderlessButton)
+            .foregroundStyle(.primary)
             .menuIndicator(.hidden)
             .fixedSize()
             .accessibilityIdentifier("table.priority.\(task.key)")
