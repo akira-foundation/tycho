@@ -108,6 +108,23 @@ final class TychoFiltersTests: XCTestCase {
         closeFilter()
     }
 
+    func testManyFiltersScrollInsideACappedPopover() {
+        app.openWebsiteTab("List")
+        addFilter("Status")
+        for title in ["Priority", "Labels", "Assignee", "Project", "Due date"] {
+            element("filter.add").click()
+            let item = app.menuItems[title].firstMatch
+            XCTAssertTrue(item.waitForExistence(timeout: 5))
+            item.click()
+        }
+
+        XCTAssertTrue(element("filter.values.5").waitForExistence(timeout: 5))
+        XCTAssertLessThanOrEqual(element("filter.builder").frame.height, 660, "the popover should cap its height")
+        element("filter.clear").click()
+        XCTAssertTrue(element("filter.values.0").waitForNonExistence(timeout: 5))
+        closeFilter()
+    }
+
     func testStatusFilterNarrowsTheListAndClearAllRestoresIt() {
         app.openWebsiteTab("List")
         XCTAssertTrue(element("task.WEB-118").waitForExistence(timeout: 5))

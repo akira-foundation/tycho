@@ -8,6 +8,7 @@ struct FilterForm: View {
     var body: some View {
         #if os(macOS)
         form
+            .frame(maxHeight: 640)
             .fixedSize(horizontal: false, vertical: true)
             .frame(width: 440)
             .presentationBackground(.background)
@@ -111,8 +112,14 @@ struct FilterSection: View {
     private var title: String { index == 0 ? "Where" : "And" }
 
     private var removeButton: some View {
-        Button("Remove Filter", systemImage: "minus.circle", role: .destructive) {
+        Button(role: .destructive) {
             engine.model.removeFilter(at: index)
+        } label: {
+            #if os(macOS)
+            Label("Remove Filter", systemImage: "minus.circle")
+            #else
+            Text("Remove Filter")
+            #endif
         }
         .accessibilityIdentifier("filter.remove.\(index)")
     }
