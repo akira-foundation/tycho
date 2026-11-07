@@ -37,6 +37,20 @@ struct CalendarFieldTests {
         defer { window.close() }
 
         #expect(views(of: NSDatePicker.self, in: window.contentView).isEmpty)
+        #expect((window.contentView?.fittingSize.height ?? 0) > 0)
+    }
+
+    @Test func pickedDatesLandOnNoon() {
+        var stored = date
+        let field = CalendarField(title: "Due", selection: Binding(get: { stored }, set: { stored = $0 }))
+        let calendar = DateText.gregorian
+        let morning = calendar.date(from: DateComponents(year: 2026, month: 12, day: 3, hour: 4))!
+
+        field.normalizedSelection.wrappedValue = morning
+
+        #expect(
+            calendar.dateComponents([.year, .month, .day, .hour], from: stored)
+                == DateComponents(year: 2026, month: 12, day: 3, hour: 12))
     }
 
     @Test func openDateFieldShowsAGraphicalCalendar() {

@@ -49,7 +49,7 @@ struct CalendarField: View {
         #endif
     }
 
-    private var normalizedSelection: Binding<Date> {
+    var normalizedSelection: Binding<Date> {
         Binding(get: { selection }, set: { selection = DatePill.normalized($0) })
     }
 }
