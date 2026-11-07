@@ -36,7 +36,8 @@ struct HomeView: View {
 
     static func subtitle(name: String, now: Date, dateText: DateText) -> String {
         let greeting = Greeting.text(hour: DateText.gregorian.component(.hour, from: now))
-        return "\(greeting), \(name) · \(dateText.weekdayMonthDay(now))"
+        let salutation = name.isEmpty ? greeting : "\(greeting), \(name)"
+        return "\(salutation) · \(dateText.weekdayMonthDay(now))"
     }
 
     private func stats(_ summary: HomeSummary) -> some View {

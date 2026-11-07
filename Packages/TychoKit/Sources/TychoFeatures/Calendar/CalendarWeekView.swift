@@ -43,7 +43,7 @@ struct CalendarWeekColumn: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 4) {
                     if items.isEmpty {
-                        Text("No tasks").font(.caption).foregroundStyle(.tertiary).padding(4)
+                        Text("No Tasks").font(.caption).foregroundStyle(.tertiary).padding(4)
                     }
                     ForEach(items) { item in
                         switch item {

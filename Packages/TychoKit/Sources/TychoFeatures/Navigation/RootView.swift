@@ -47,7 +47,7 @@ struct RootView: View {
                 )
             ) {
                 if showsInspectorColumn, let id = router.inspectedTaskID {
-                    TaskInspectorView(taskID: id)
+                    inspectorColumn(id)
                         .id(id)
                         .inspectorColumnWidth(
                             min: InspectorLayout.minimumColumnWidth,
@@ -105,6 +105,14 @@ struct RootView: View {
         router.inspectedTaskID != nil && inspectsInSheet
         #else
         router.isInspectorSheetPresented
+        #endif
+    }
+
+    @ViewBuilder private func inspectorColumn(_ id: UUID) -> some View {
+        #if os(iOS)
+        NavigationStack { TaskInspectorView(taskID: id) }
+        #else
+        TaskInspectorView(taskID: id)
         #endif
     }
 }

@@ -122,7 +122,7 @@ struct AssigneeCell: View {
             }
             .menuStyle(.borderlessButton)
             .menuIndicator(.hidden)
-            .foregroundStyle(task.assignee == nil ? Token.text4.color : Token.text.color)
+            .foregroundStyle(task.assignee == nil ? .secondary : .primary)
             .accessibilityIdentifier("table.assignee.\(task.key)")
         }
     }

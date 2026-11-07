@@ -46,26 +46,26 @@ struct TaskPropertiesSection: View {
                     .marksTextEditing()
                     .onSubmit(commitEstimate)
             }
+            .onAppear {
+                syncEstimate()
+                router.registerInspectorFlush(flushToken, commitEstimate)
+            }
+            .onChange(of: task.id) { syncEstimate() }
+            .onChange(of: task.estimate) { syncEstimate() }
+            .onDisappear {
+                commitEstimate()
+                router.unregisterInspectorFlush(flushToken)
+            }
         }
         Section {
             LabeledContent("Labels") { labelsMenu }
             LabeledContent("Blocked By") { DependencyPicker(task: task, showsTitles: false, emptyText: "None") }
         }
-        .onAppear {
-            syncEstimate()
-            router.registerInspectorFlush(flushToken, commitEstimate)
-        }
-        .onChange(of: task.id) { syncEstimate() }
-        .onChange(of: task.estimate) { syncEstimate() }
-        .onDisappear {
-            commitEstimate()
-            router.unregisterInspectorFlush(flushToken)
-        }
     }
 
     static func labelSummary(_ labels: Set<TaskLabel>) -> String {
         let titles = TaskLabel.allCases.filter(labels.contains).map(\.title)
-        return titles.isEmpty ? "None" : titles.formatted(.list(type: .and, width: .narrow))
+        return titles.isEmpty ? "None" : titles.joined(separator: ", ")
     }
 
     private var labelsMenu: some View {

@@ -2,7 +2,7 @@ import SwiftUI
 
 struct ProjectTabPicker: View {
     @Binding var selection: ProjectBuiltInTab?
-    let isCompact: Bool
+    @Environment(\.isCompactWidth) private var isCompact
 
     var body: some View {
         if isCompact {

@@ -86,7 +86,7 @@ struct TaskInspectorView: View {
                     toast.perform { try TaskActions(context: context).toggleDone(task) }
                 }
                 .accessibilityIdentifier("inspector.complete")
-                Menu("More", systemImage: "ellipsis") {
+                Menu("More", systemImage: "ellipsis.circle") {
                     Button("Delete Task", systemImage: "trash", role: .destructive) { confirmingDelete = true }
                         .accessibilityIdentifier("inspector.delete")
                 }

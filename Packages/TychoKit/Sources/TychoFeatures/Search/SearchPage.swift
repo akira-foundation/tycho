@@ -19,6 +19,7 @@ struct SearchPage: View {
             .navigationTitle("Search")
             .searchable(text: $router.searchQuery, prompt: "Search Tasks, Projects, and Files")
             .searchFocused($isSearchFocused)
+            .marksTextEditing(isFocused: isSearchFocused)
             .searchScopes($router.searchScope) {
                 ForEach(SearchScope.allCases, id: \.self) { scope in
                     Text("\(scope.title) \(counts[scope] ?? 0)").tag(scope)

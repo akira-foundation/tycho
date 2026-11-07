@@ -8,10 +8,13 @@ struct FilesControls: ViewModifier {
     @Binding var layout: FileLayout
     let onUpload: () -> Void
     @Environment(\.isCompactWidth) private var isCompactWidth
+    @FocusState private var isSearchFocused: Bool
 
     func body(content: Content) -> some View {
         content
             .searchable(text: $search, prompt: "Search Files")
+            .searchFocused($isSearchFocused)
+            .marksTextEditing(isFocused: isSearchFocused)
             .toolbar { items }
     }
 

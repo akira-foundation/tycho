@@ -25,7 +25,7 @@ struct ProjectDetailView: View {
                 .navigationTitle(target.title)
                 .navigationSubtitle(Self.subtitle(project))
                 .toolbar {
-                    ToolbarItem { ProjectTabPicker(selection: builtInSelection(project), isCompact: isCompact) }
+                    ToolbarItem { ProjectTabPicker(selection: builtInSelection(project)) }
                     if isCompact { ToolbarSpacer(.fixed) }
                     ToolbarItem {
                         ProjectMenu(
@@ -39,7 +39,7 @@ struct ProjectDetailView: View {
                 .sheet(item: $renamingView) { RenameViewSheet(view: $0) }
                 .blocksNavigation(while: editing || isSavingView || renamingView != nil)
         } else {
-            EmptyState(title: "Project not found", symbol: "questionmark.folder", message: "It may have been deleted.")
+            EmptyState(title: "Project Not Found", symbol: "questionmark.folder", message: "It may have been deleted.")
         }
     }
 

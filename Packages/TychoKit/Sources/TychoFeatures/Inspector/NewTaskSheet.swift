@@ -63,7 +63,7 @@ struct NewTaskSheet: View {
             .overlay {
                 if projects.isEmpty {
                     EmptyState(
-                        title: "No projects yet", symbol: "folder", message: "Create a project before adding tasks.")
+                        title: "No Projects", symbol: "folder", message: "Create a project before adding tasks.")
                 }
             }
         }

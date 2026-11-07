@@ -57,6 +57,13 @@ final class TychoFiltersTests: XCTestCase {
         return app.menuItems[title].firstMatch.waitForExistence(timeout: 5)
     }
 
+    private func projectMenuOmits(_ title: String) -> Bool {
+        element("project.menu").click()
+        defer { app.typeKey(.escape, modifierFlags: []) }
+        let opened = app.menuItems["Save View…"].firstMatch.waitForExistence(timeout: 5)
+        return opened && !app.menuItems[title].firstMatch.exists
+    }
+
     func testAddingAFilterShowsItsValues() {
         app.openWebsiteTab("List")
         addFilter("Status")
@@ -119,9 +126,10 @@ final class TychoFiltersTests: XCTestCase {
         rename.typeText("Released")
         element("renameView.save").click()
         XCTAssertTrue(projectMenuLists("Released"))
+        XCTAssertTrue(projectMenuOmits("Shipped"))
 
         projectMenuItem("Delete View").click()
-        XCTAssertFalse(projectMenuLists("Released"))
+        XCTAssertTrue(projectMenuOmits("Released"))
     }
 
     func testHomeOverdueCardOpensTasksWithTheDueChip() {

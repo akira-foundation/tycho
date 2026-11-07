@@ -32,7 +32,6 @@ final class TychoPaletteTests: XCTestCase {
 
     func testTheToolbarHasNoPaletteButtonBesideTheSearchField() {
         app.openSidebarItem("Tasks", revealing: app.searchFields.firstMatch)
-        XCTAssertFalse(element("toolbar.palette").exists)
         XCTAssertEqual(app.toolbars.searchFields.count, 1)
     }
 

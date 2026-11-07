@@ -26,13 +26,11 @@ struct HomeTests {
         #expect(HomeTab.allCases.map(\.title) == ["Upcoming", "Overdue", "Completed"])
     }
 
-    @Test func subtitleGreetsByNameAndShowsTheDate() {
+    @Test(arguments: [("Kid", "Good morning, Kid · Saturday, November 7"), ("", "Good morning · Saturday, November 7")])
+    func subtitleGreetsByNameAndShowsTheDate(name: String, expected: String) {
         var components = DateComponents(year: 2026, month: 11, day: 7, hour: 9)
         components.timeZone = DateText.gregorian.timeZone
         let now = DateText.gregorian.date(from: components)!
-        let dateText = DateText(now: now)
-        #expect(
-            HomeView.subtitle(name: "Kid", now: now, dateText: dateText)
-                == "Good morning, Kid · \(dateText.weekdayMonthDay(now))")
+        #expect(HomeView.subtitle(name: name, now: now, dateText: DateText(now: now)) == expected)
     }
 }
