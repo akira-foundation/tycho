@@ -39,7 +39,7 @@ struct TasksView: View {
         }
         .toolbar {
             if !isCompactWidth {
-                ToolbarItem { modePicker(mode).pickerStyle(.segmented) }
+                ToolbarItem { modePicker(mode).pickerStyle(.segmented).segmentedToolbarWidth(TasksMode.allCases.count) }
             }
             ToolbarItem(placement: .primaryAction) {
                 Button("New Task", systemImage: "plus") { router.newTask() }
@@ -75,5 +75,15 @@ struct TasksView: View {
                 grouping: state.grouping, project: nil,
                 allowsReorder: ListDropPolicy.allowsReorder(sort: state.sort, grouping: state.grouping))
         }
+    }
+}
+
+extension View {
+    @ViewBuilder fileprivate func segmentedToolbarWidth(_ segments: Int) -> some View {
+        #if os(iOS)
+        self.frame(width: CGFloat(segments) * 44)
+        #else
+        self
+        #endif
     }
 }
