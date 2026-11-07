@@ -17,12 +17,10 @@ struct ProjectTabTarget {
         savedView = view
         layout = view.map { Self.layout(for: $0.layout) } ?? tab.builtIn ?? .board
         stateKey = view.map { TaskViewStates.savedViewKey($0.id) } ?? TaskViewStates.projectKey(project.id)
-        title = view == nil ? project.name : "Saved view · \(project.name)"
+        title = view.map { "\($0.name) · \(project.name)" } ?? project.name
     }
 
-    static func pickerSelection(for tab: ProjectTab) -> ProjectBuiltInTab? {
-        tab.builtIn
-    }
+    var pickerSelection: ProjectBuiltInTab { layout }
 
     private static func layout(for layout: SavedViewLayout) -> ProjectBuiltInTab {
         switch layout {

@@ -22,10 +22,13 @@ struct ProjectDetailView: View {
             let target = ProjectTabTarget(tab: tab, in: project)
             ProjectTabContent(project: project, target: target)
                 .id(target.stateKey)
+                .safeAreaInset(edge: .top, spacing: 0) {
+                    SavedViewStrip(project: project, tab: tab, layout: target.layout) { isSavingView = true }
+                }
                 .navigationTitle(target.title)
                 .navigationSubtitle(Self.subtitle(project))
                 .toolbar {
-                    ToolbarItem { ProjectTabPicker(selection: builtInSelection(project)) }
+                    ToolbarItem { ProjectTabPicker(selection: builtInSelection(project, target: target)) }
                     if isCompact { ToolbarSpacer(.fixed) }
                     ToolbarItem {
                         ProjectMenu(
@@ -43,9 +46,9 @@ struct ProjectDetailView: View {
         }
     }
 
-    private func builtInSelection(_ project: Project) -> Binding<ProjectBuiltInTab?> {
+    private func builtInSelection(_ project: Project, target: ProjectTabTarget) -> Binding<ProjectBuiltInTab?> {
         Binding(
-            get: { ProjectTabTarget.pickerSelection(for: tab) },
+            get: { target.pickerSelection },
             set: { selection in
                 guard let selection else { return }
                 router.openProject(project.id, tab: .builtIn(selection))
