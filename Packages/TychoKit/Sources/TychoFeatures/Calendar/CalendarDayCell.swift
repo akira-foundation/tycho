@@ -30,7 +30,7 @@ struct CalendarDayCell: View {
         } isTargeted: {
             targeted = $0
         }
-        .popover(isPresented: $showingDay) { DayListPopover(day: cell.date) }
+        .themedPopover(isPresented: $showingDay) { DayListPopover(day: cell.date) }
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("calendar.day.\(cell.key)")
     }

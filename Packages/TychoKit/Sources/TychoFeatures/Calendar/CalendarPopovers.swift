@@ -31,7 +31,6 @@ struct DayListPopover: View {
         }
         .padding()
         .frame(width: 300, alignment: .leading)
-        .presentationBackground(.background)
         #else
         NavigationStack {
             List(items) { row($0) }
