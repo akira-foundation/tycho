@@ -12,7 +12,6 @@ extension Calendar {
 
 struct DatePill: View {
     @Environment(\.dateText) private var dateText
-    @Environment(\.weekStart) private var weekStart
     let date: Date?
     let emptyText: String
     var color: Color = .primary
@@ -39,14 +38,14 @@ struct DatePill: View {
 
     private var picker: some View {
         VStack(alignment: .leading, spacing: 8) {
-            DatePicker(
-                "Date",
-                selection: Binding(get: { date ?? .now }, set: { commit($0) }),
-                displayedComponents: .date
-            )
-            .datePickerStyle(.graphical)
-            .labelsHidden()
-            .environment(\.calendar, Calendar.picker(weekStart: weekStart))
+            CalendarPicker(
+                title: "Date",
+                selection: Binding(
+                    get: { date ?? .now },
+                    set: {
+                        commit($0)
+                        picking = false
+                    }))
             HStack {
                 Button("Today") { commit(.now) }
                 Spacer()

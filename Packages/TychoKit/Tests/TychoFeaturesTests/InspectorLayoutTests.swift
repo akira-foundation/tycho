@@ -43,14 +43,6 @@ struct InspectorLayoutTests {
             }
         }
 
-        func minimumWindowWidth(
-            at width: CGFloat, showing destination: Destination, inspecting: Bool
-        ) throws
-            -> CGFloat
-        {
-            try layout(at: width, showing: destination, inspecting: inspecting).minimumWidth
-        }
-
         func layout(
             at width: CGFloat, showing destination: Destination, inspecting: Bool
         ) throws -> (minimumWidth: CGFloat, sheetCount: Int) {
@@ -61,11 +53,18 @@ struct InspectorLayoutTests {
             let host = NSHostingController(
                 rootView: RootView().environment(router).environment(ToastCenter()).modelContainer(container))
             let window = NSWindow(contentViewController: host)
+            if let screen = Self.screen(fitting: width) {
+                window.setFrameOrigin(screen.visibleFrame.origin)
+            }
             window.setContentSize(NSSize(width: width, height: 800))
             window.makeKeyAndOrderFront(nil)
             RunLoop.main.run(until: Date().addingTimeInterval(0.8))
             defer { window.orderOut(nil) }
             return (window.contentMinSize.width, window.sheets.count)
+        }
+
+        static func screen(fitting width: CGFloat) -> NSScreen? {
+            NSScreen.screens.first { $0.visibleFrame.width >= width }
         }
     }
 
@@ -82,7 +81,7 @@ struct InspectorLayoutTests {
     @Test(
         .enabled("needs a screen at least as wide as the inspector threshold") {
             await MainActor.run {
-                (NSScreen.main?.visibleFrame.width ?? 0) >= InspectorLayout.minimumWindowWidth
+                DemoFixture.screen(fitting: InspectorLayout.minimumWindowWidth) != nil
             }
         },
         arguments: Destination.allCases)
@@ -90,11 +89,10 @@ struct InspectorLayoutTests {
         let fixture = try DemoFixture()
         let threshold = InspectorLayout.minimumWindowWidth
 
-        let closed = try fixture.minimumWindowWidth(at: threshold, showing: destination, inspecting: false)
-        let open = try fixture.minimumWindowWidth(at: threshold, showing: destination, inspecting: true)
+        let layout = try fixture.layout(at: threshold, showing: destination, inspecting: true)
 
-        #expect(open > closed)
-        #expect(open <= threshold)
+        #expect(layout.sheetCount == 0)
+        #expect(layout.minimumWidth <= threshold)
     }
 
     @Test func routerPresentsTheInspectorAsASheetBelowTheThreshold() {
