@@ -60,7 +60,7 @@ final class TychoInspectorTests: XCTestCase {
         loadDemo()
         app.openWebsiteTab("List")
         let title = openInspector(from: element("task.WEB-118"))
-        XCTAssertEqual(element("inspector.close").label, "Close")
+        XCTAssertEqual(element("inspector.close").label, "Done")
         mouseClick("inspector.close")
 
         XCTAssertTrue(title.waitForNonExistence(timeout: 5))
