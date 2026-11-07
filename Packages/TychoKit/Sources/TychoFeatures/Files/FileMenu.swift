@@ -14,7 +14,7 @@ struct FileMenuItems: View {
     var body: some View {
         Button("Preview", systemImage: "eye", action: actions.preview)
         Button("Rename", systemImage: "pencil", action: actions.rename)
-        Button("Copy link", systemImage: "link", action: actions.copyLink)
+        Button("Copy Link", systemImage: "link", action: actions.copyLink)
         Button("Duplicate", systemImage: "doc.on.doc", action: actions.duplicate)
         Divider()
         Button("Delete", systemImage: "trash", role: .destructive, action: actions.delete)
@@ -33,6 +33,6 @@ struct FileMenuButton: View {
         .menuStyle(.borderlessButton)
         .menuIndicator(.hidden)
         .fixedSize()
-        .accessibilityLabel("File options")
+        .accessibilityLabel("File Options")
     }
 }

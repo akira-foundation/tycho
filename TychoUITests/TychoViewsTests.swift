@@ -32,7 +32,7 @@ final class TychoViewsTests: XCTestCase {
     func testEveryProjectTabOpens() {
         let markers = [
             ("Board", "column.todo"), ("List", "group.todo"), ("Table", "table.grid"),
-            ("Calendar", "calendar.title"), ("Timeline", "timeline.header.week"), ("Files", "files.search"),
+            ("Calendar", "calendar.title"), ("Timeline", "timeline.header.week"), ("Files", "files.content"),
         ]
         openSidebar("Website Redesign", revealing: "project.tab")
         let picker = element("project.tab")
@@ -165,7 +165,7 @@ final class TychoViewsTests: XCTestCase {
         XCTAssertTrue(copy.waitForExistence(timeout: 5))
         copy.rightClick()
         contextMenuItem("Delete").click()
-        let confirm = app.sheets.buttons["Delete file"].firstMatch
+        let confirm = app.sheets.buttons["Delete File"].firstMatch
         XCTAssertTrue(confirm.waitForExistence(timeout: 5))
         confirm.click()
 
