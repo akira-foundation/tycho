@@ -20,27 +20,27 @@ struct ProjectDetailView: View {
     var body: some View {
         if let project = matches.first {
             let target = ProjectTabTarget(tab: tab, in: project)
-            ProjectTabContent(project: project, target: target)
-                .id(target.stateKey)
-                .safeAreaInset(edge: .top, spacing: 0) {
-                    SavedViewStrip(project: project, tab: tab, layout: target.layout) { isSavingView = true }
+            VStack(spacing: 0) {
+                SavedViewStrip(project: project, tab: tab, layout: target.layout) { isSavingView = true }
+                ProjectTabContent(project: project, target: target)
+                    .id(target.stateKey)
+            }
+            .navigationTitle(target.title)
+            .navigationSubtitle(Self.subtitle(project))
+            .toolbar {
+                ToolbarItem { ProjectTabPicker(selection: builtInSelection(project, target: target)) }
+                if isCompact { ToolbarSpacer(.fixed) }
+                ToolbarItem {
+                    ProjectMenu(
+                        project: project, tab: tab, onSave: { isSavingView = true },
+                        onRename: { renamingView = $0 }, onEdit: { editing = true })
                 }
-                .navigationTitle(target.title)
-                .navigationSubtitle(Self.subtitle(project))
-                .toolbar {
-                    ToolbarItem { ProjectTabPicker(selection: builtInSelection(project, target: target)) }
-                    if isCompact { ToolbarSpacer(.fixed) }
-                    ToolbarItem {
-                        ProjectMenu(
-                            project: project, tab: tab, onSave: { isSavingView = true },
-                            onRename: { renamingView = $0 }, onEdit: { editing = true })
-                    }
-                    ToolbarItem { Button("New Task", systemImage: "plus") { router.newTask() } }
-                }
-                .sheet(isPresented: $editing) { NewProjectSheet(project: project) }
-                .sheet(isPresented: $isSavingView) { SaveViewSheet(project: project) }
-                .sheet(item: $renamingView) { RenameViewSheet(view: $0) }
-                .blocksNavigation(while: editing || isSavingView || renamingView != nil)
+                ToolbarItem { Button("New Task", systemImage: "plus") { router.newTask() } }
+            }
+            .sheet(isPresented: $editing) { NewProjectSheet(project: project) }
+            .sheet(isPresented: $isSavingView) { SaveViewSheet(project: project) }
+            .sheet(item: $renamingView) { RenameViewSheet(view: $0) }
+            .blocksNavigation(while: editing || isSavingView || renamingView != nil)
         } else {
             EmptyState(title: "Project Not Found", symbol: "questionmark.folder", message: "It may have been deleted.")
         }
