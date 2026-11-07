@@ -15,23 +15,36 @@ struct DayListPopover: View {
         let items = CalendarDay.items(
             on: day, events: events.inLiveProjects(),
             tasks: tasks.inLiveProjects(), calendar: DateText.gregorian)
+        #if os(macOS)
+        VStack(alignment: .leading, spacing: Spacing.s3) {
+            Text(dateText.long(day))
+                .font(.headline)
+                .accessibilityIdentifier("calendar.daylist.title")
+            ScrollView {
+                VStack(alignment: .leading, spacing: Spacing.s3) {
+                    ForEach(items) { row($0) }
+                }
+            }
+            .frame(maxHeight: 320)
+            .fixedSize(horizontal: false, vertical: true)
+            .accessibilityIdentifier("calendar.daylist")
+        }
+        .padding()
+        .frame(width: 300, alignment: .leading)
+        .presentationBackground(.background)
+        #else
         NavigationStack {
             List(items) { row($0) }
                 .accessibilityIdentifier("calendar.daylist")
                 .navigationTitle(dateText.long(day))
-                #if os(iOS)
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button(role: .close) { dismiss() }
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .cancellationAction) {
+                        Button(role: .close) { dismiss() }
+                    }
                 }
-            }
-                #endif
         }
-        #if os(iOS)
         .presentationDetents([.medium, .large])
-        #else
-        .frame(width: 300, height: 260)
         #endif
     }
 
@@ -41,9 +54,7 @@ struct DayListPopover: View {
             Button {
                 if let id = event.project?.id { router.openProject(id, tab: .calendar) }
             } label: {
-                LabeledContent {
-                    Text(event.time).monospacedDigit()
-                } label: {
+                DayListRow(trailing: event.time) {
                     Label(event.title, systemImage: "clock")
                 }
             }
@@ -52,9 +63,7 @@ struct DayListPopover: View {
             Button {
                 router.inspect(task.id)
             } label: {
-                LabeledContent {
-                    Text(task.assignee?.name ?? "")
-                } label: {
+                DayListRow(trailing: task.assignee?.name ?? "") {
                     Label {
                         Text(task.title)
                     } icon: {
@@ -64,6 +73,20 @@ struct DayListPopover: View {
             }
             .buttonStyle(.plain)
         }
+    }
+}
+
+private struct DayListRow<Leading: View>: View {
+    let trailing: String
+    @ViewBuilder let leading: Leading
+
+    var body: some View {
+        HStack(spacing: Spacing.s2) {
+            leading.lineLimit(1).layoutPriority(1)
+            Spacer(minLength: Spacing.s2)
+            Text(trailing).monospacedDigit().foregroundStyle(.secondary).lineLimit(1)
+        }
+        .contentShape(Rectangle())
     }
 }
 

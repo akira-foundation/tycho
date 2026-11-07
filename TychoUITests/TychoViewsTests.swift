@@ -155,7 +155,18 @@ final class TychoViewsTests: XCTestCase {
         }
         let more = try XCTUnwrap(reachable, "no reachable +N more button")
         more.click()
-        XCTAssertTrue(element("calendar.daylist").waitForExistence(timeout: 5))
+        let list = element("calendar.daylist")
+        XCTAssertTrue(list.waitForExistence(timeout: 5))
+        let popover = app.popovers.firstMatch
+        XCTAssertTrue(element("calendar.daylist.title").exists)
+        let rows = list.buttons.allElementsBoundByIndex
+        let lastRow = try XCTUnwrap(rows.last)
+        try XCTSkipIf(rows.count > 8, "the seeded day overflows the capped list")
+        for row in rows {
+            XCTAssertTrue(row.isHittable, "every item of the day should show without scrolling")
+        }
+        let gap = popover.frame.maxY - lastRow.frame.maxY
+        XCTAssertTrue((0...32).contains(gap), "the day list popover should fit its items, gap \(gap)")
     }
 
     func testTimelineSwitchesToMonths() {
