@@ -27,17 +27,6 @@ struct RootView: View {
                 }
             }
             .uiTestingSplitViewAutosaveOff(TychoDefaults.isUITesting())
-            #if os(macOS)
-            .onGeometryChange(for: CGFloat.self) {
-                $0.size.width
-            } action: {
-                router.updateWindowWidth($0)
-            }
-            #else
-            .onChange(of: isCompactWidth, initial: true) {
-                router.updateHorizontalSizeClass(isCompact: isCompactWidth)
-            }
-            #endif
             .overlay { PaletteOverlay() }
             .shortcutReceiver()
             .inspector(
@@ -81,6 +70,17 @@ struct RootView: View {
             .sheet(isPresented: $router.isShowingSettings) {
                 NavigationStack { SettingsView() }
             }
+            #if os(macOS)
+            .onGeometryChange(for: CGFloat.self) {
+                $0.size.width
+            } action: {
+                router.updateWindowWidth($0)
+            }
+            #else
+            .onChange(of: isCompactWidth, initial: true) {
+                router.updateHorizontalSizeClass(isCompact: isCompactWidth)
+            }
+            #endif
         }
     }
 
