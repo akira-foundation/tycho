@@ -44,7 +44,7 @@ struct TasksModeTests {
                 == "Overdue tasks across 7 projects.")
         #expect(
             TasksMode.subtitle(projectCount: 7, state: state(TasksPreset.done.filters))
-                == "Done tasks updated in the last 7 days across 7 projects.")
+                == "Tasks completed in the last 7 days across 7 projects.")
         #expect(
             TasksMode.subtitle(projectCount: 7, state: state(TasksPreset.open.filters))
                 == "Open tasks across 7 projects.")

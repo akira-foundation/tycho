@@ -26,8 +26,7 @@ public struct HomeSummary {
         openAssignedToMe = open.filter { $0.assignee?.isMe == true }.count
         completedThisWeek =
             visible.filter { task in
-                guard task.status == .done, let completed = task.completedAt else { return false }
-                return now.timeIntervalSince(completed) < 7 * 24 * 3600
+                TaskFilter.completedThisWeek.allSatisfy { $0.matches(task, now: now, calendar: calendar) }
             }.count
         overdue = visible.filter(isOverdue).count
         upcoming =

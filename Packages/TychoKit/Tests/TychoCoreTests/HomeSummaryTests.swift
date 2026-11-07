@@ -62,4 +62,23 @@ struct HomeSummaryTests {
         #expect(summary.deadlines[1].tasks.map(\.title) == ["tomorrow"])
         #expect(summary.deadlines[2].tasks.map(\.title) == ["week"])
     }
+
+    @Test func completedCountMatchesTheCompletedListAfterAnEdit() {
+        let me = Member(name: "Tanjim Islam", email: "", isMe: true)
+        let other = Member(name: "Sarah Chen", email: "")
+        let recent = task("recent", .done, due: nil, mine: true, completedHoursAgo: 30, me: me, other: other)
+        recent.updatedAt = referenceNow.addingTimeInterval(-20 * 86400)
+        let editedOld = task(
+            "edited old", .done, due: nil, mine: true, completedHoursAgo: 20 * 24, me: me, other: other)
+        editedOld.updatedAt = referenceNow.addingTimeInterval(-3600)
+        let tasks = [recent, editedOld]
+
+        let summary = HomeSummary(projects: [], tasks: tasks, now: referenceNow, calendar: utcCalendar)
+        let listed = tasks.filter { task in
+            TaskFilter.completedThisWeek.allSatisfy { $0.matches(task, now: referenceNow, calendar: utcCalendar) }
+        }
+
+        #expect(summary.completedThisWeek == 1)
+        #expect(listed.map(\.title) == ["recent"])
+    }
 }

@@ -123,6 +123,16 @@ struct TaskFilterTests {
         #expect(matches(TaskFilter(field: .updated, op: .is, values: ["1"]), task))
     }
 
+    @Test func completedWindowReadsTheCompletionDate() {
+        let task = TaskItem(number: 1, title: "A")
+        task.updatedAt = referenceNow.addingTimeInterval(-3600)
+
+        #expect(!matches(TaskFilter(field: .completed, op: .is, values: ["30"]), task))
+        task.completedAt = referenceNow.addingTimeInterval(-20 * 86400)
+        #expect(!matches(TaskFilter(field: .completed, op: .is, values: ["7"]), task))
+        #expect(matches(TaskFilter(field: .completed, op: .is, values: ["30"]), task))
+    }
+
     @Test func filtersRoundTripThroughJSON() throws {
         let filters = [
             TaskFilter(field: .status, op: .isNot, values: ["done"]),

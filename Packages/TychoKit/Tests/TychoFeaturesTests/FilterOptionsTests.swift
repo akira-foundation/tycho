@@ -65,10 +65,13 @@ struct FilterOptionsTests {
         let due = FilterOptions.options(for: .due, members: [], projects: [])
         let created = FilterOptions.options(for: .created, members: [], projects: [])
         let updated = FilterOptions.options(for: .updated, members: [], projects: [])
+        let completed = FilterOptions.options(for: .completed, members: [], projects: [])
 
         #expect(due.map(\.id) == ["overdue", "today", "week", "later", "nodate"])
         #expect(created.map(\.id) == ["1", "7", "30"])
         #expect(created.map(\.title) == ["Last 24 hours", "Last 7 days", "Last 30 days"])
         #expect(updated == created)
+        #expect(completed == created)
+        #expect(FilterOptions.summary(TaskFilter(field: .completed), options: completed) == "Choose completed date")
     }
 }
