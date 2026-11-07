@@ -52,17 +52,13 @@ final class TychoFiltersTests: XCTestCase {
         return item
     }
 
-    private func projectMenuLists(_ title: String) -> Bool {
-        element("project.menu").click()
-        defer { app.typeKey(.escape, modifierFlags: []) }
-        return app.menuItems[title].firstMatch.waitForExistence(timeout: 5)
+    private func savedViewTab(_ title: String) -> XCUIElement {
+        element("savedViews.strip").radioButtons[title].firstMatch
     }
 
-    private func projectMenuOmits(_ title: String) -> Bool {
-        element("project.menu").click()
-        defer { app.typeKey(.escape, modifierFlags: []) }
-        let opened = app.menuItems["Save View…"].firstMatch.waitForExistence(timeout: 5)
-        return opened && !app.menuItems[title].firstMatch.exists
+    private func showsSelectedSavedViewTab(_ title: String) -> Bool {
+        let tab = savedViewTab(title)
+        return tab.waitForExistence(timeout: 5) && eventually { tab.isSelected }
     }
 
     func testAddingAFilterShowsItsValues() {
@@ -153,7 +149,8 @@ final class TychoFiltersTests: XCTestCase {
         name.click()
         name.typeText("Shipped")
         element("saveView.save").click()
-        XCTAssertTrue(projectMenuLists("Shipped"))
+        XCTAssertTrue(showsSelectedSavedViewTab("Shipped"), "a saved view should open as a selected tab")
+        XCTAssertTrue(app.radioButtons["List"].firstMatch.isSelected, "the view's layout should stay selected")
 
         projectMenuItem("Rename View…").click()
         let rename = element("renameView.name")
@@ -162,11 +159,11 @@ final class TychoFiltersTests: XCTestCase {
         rename.typeKey("a", modifierFlags: .command)
         rename.typeText("Released")
         element("renameView.save").click()
-        XCTAssertTrue(projectMenuLists("Released"))
-        XCTAssertTrue(projectMenuOmits("Shipped"))
+        XCTAssertTrue(showsSelectedSavedViewTab("Released"))
+        XCTAssertFalse(savedViewTab("Shipped").exists)
 
         projectMenuItem("Delete View").click()
-        XCTAssertTrue(projectMenuOmits("Released"))
+        XCTAssertTrue(element("savedViews.strip").waitForNonExistence(timeout: 5))
     }
 
     func testHomeOverdueCardOpensTasksWithTheDueChip() {

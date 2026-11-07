@@ -15,16 +15,6 @@ struct ProjectMenu: View {
     var body: some View {
         Menu("Project Options", systemImage: "folder.badge.gearshape") {
             Section("Saved Views") {
-                let views = SavedView.ordered(in: project)
-                if !views.isEmpty {
-                    Picker("Saved Views", selection: savedViewSelection) {
-                        ForEach(views) { view in
-                            Label(view.name, systemImage: "line.3.horizontal.decrease").tag(UUID?.some(view.id))
-                        }
-                    }
-                    .pickerStyle(.inline)
-                    .labelsHidden()
-                }
                 Button("Save View…", systemImage: "plus", action: onSave)
                 if let current {
                     Button("Rename View…", systemImage: "pencil") { onRename(current) }
@@ -41,14 +31,5 @@ struct ProjectMenu: View {
     private var current: SavedView? {
         guard case .savedView(let id) = tab else { return nil }
         return SavedView.ordered(in: project).first { $0.id == id }
-    }
-
-    private var savedViewSelection: Binding<UUID?> {
-        Binding(
-            get: { current?.id },
-            set: { id in
-                guard let id else { return }
-                router.openProject(project.id, tab: .savedView(id))
-            })
     }
 }

@@ -106,9 +106,18 @@ struct SavedViewFlowTests {
         #expect(SaveViewSheet.filterSummary(count: 0).hasPrefix("No filters are active."))
     }
 
-    @Test func thePickerSelectsOnlyBuiltInTabs() {
-        #expect(ProjectTabTarget.pickerSelection(for: .table) == .table)
-        #expect(ProjectTabTarget.pickerSelection(for: .savedView(UUID())) == nil)
+    @Test func thePickerSelectsTheShownLayout() throws {
+        let view = try makeView("High priority")
+
+        #expect(ProjectTabTarget(tab: .table, in: project).pickerSelection == .table)
+        #expect(ProjectTabTarget(tab: .savedView(view.id), in: project).pickerSelection == .table)
+    }
+
+    @Test func theStripSelectsOnlyTheOpenSavedView() {
+        let id = UUID()
+
+        #expect(SavedViewStrip.selectedView(for: .savedView(id)) == id)
+        #expect(SavedViewStrip.selectedView(for: .list) == nil)
     }
 
     @Test func aMissingSavedViewRouteShowsTheBoard() {
@@ -127,7 +136,7 @@ struct SavedViewFlowTests {
         #expect(target.layout == .table)
         #expect(target.savedView?.id == view.id)
         #expect(target.stateKey == TaskViewStates.savedViewKey(view.id))
-        #expect(target.title == "Saved view · Website Redesign")
+        #expect(target.title == "High priority · Website Redesign")
     }
 
     @Test func builtInTabsShareTheProjectState() {
