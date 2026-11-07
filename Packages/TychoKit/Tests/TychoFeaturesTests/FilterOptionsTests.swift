@@ -33,7 +33,7 @@ struct FilterOptionsTests {
         let one = TaskFilter(field: .status, values: ["progress"])
         let two = TaskFilter(field: .status, values: ["todo", "done"])
 
-        #expect(FilterOptions.summary(none, options: options) == "Any status")
+        #expect(FilterOptions.summary(none, options: options) == "Choose status")
         #expect(FilterOptions.summary(one, options: options) == "In Progress")
         #expect(FilterOptions.summary(two, options: options) == "2 statuses")
     }
@@ -46,8 +46,17 @@ struct FilterOptionsTests {
         #expect(FilterOptions.summary(gone, options: []) == "1 project")
     }
 
-    @Test func onlyEnumeratedFieldsListTheirValuesInAMenu() {
-        let menuFields = TaskFilterField.allCases.filter(FilterOptions.listsValuesInMenu)
+    @Test func summaryNamesUnassignedAndCountsMissingValues() {
+        let options = FilterOptions.options(for: .assignee, members: [], projects: [])
+        let unassigned = TaskFilter(field: .assignee, values: [TaskFilter.noAssignee])
+        let withGone = TaskFilter(field: .assignee, values: [TaskFilter.noAssignee, "gone"])
+
+        #expect(FilterOptions.summary(unassigned, options: options) == "Unassigned")
+        #expect(FilterOptions.summary(withGone, options: options) == "2 assignees")
+    }
+
+    @Test func onlyEnumeratedFieldsUseAValuesMenuOnMac() {
+        let menuFields = TaskFilterField.allCases.filter(FilterOptions.showsValuesMenuOnMac)
 
         #expect(menuFields == [.status, .assignee, .priority, .project, .labels])
     }

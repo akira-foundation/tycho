@@ -70,7 +70,7 @@ final class TychoFiltersTests: XCTestCase {
 
         let values = element("filter.values.0")
         XCTAssertTrue(values.waitForExistence(timeout: 5))
-        XCTAssertEqual(values.label, "Any status")
+        XCTAssertEqual(values.label, "Choose status")
         element("filter.clear").click()
         XCTAssertTrue(element("filter.values.0").waitForNonExistence(timeout: 5))
         closeFilter()

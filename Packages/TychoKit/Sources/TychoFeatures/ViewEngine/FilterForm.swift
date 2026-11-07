@@ -129,7 +129,7 @@ struct FilterSection: View {
 
     @ViewBuilder private func values(_ options: [FilterOption]) -> some View {
         #if os(macOS)
-        if FilterOptions.listsValuesInMenu(filter.field) {
+        if FilterOptions.showsValuesMenuOnMac(filter.field) {
             valuesMenu(options)
                 .fixedSize()
                 .accessibilityIdentifier("filter.values.\(index)")

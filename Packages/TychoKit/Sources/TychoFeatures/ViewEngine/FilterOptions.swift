@@ -19,7 +19,7 @@ enum FilterOptions {
         }
     }
 
-    static func listsValuesInMenu(_ field: TaskFilterField) -> Bool {
+    static func showsValuesMenuOnMac(_ field: TaskFilterField) -> Bool {
         switch field {
         case .status, .assignee, .priority, .project, .labels: true
         case .due, .created, .updated: false
@@ -28,7 +28,7 @@ enum FilterOptions {
 
     static func summary(_ filter: TaskFilter, options: [FilterOption]) -> String {
         let noun = noun(for: filter.field)
-        guard let first = filter.values.first else { return "Any \(noun.singular)" }
+        guard let first = filter.values.first else { return "Choose \(noun.singular)" }
         let count = filter.values.count
         if count == 1, let title = options.first(where: { $0.id == first })?.title {
             return title
