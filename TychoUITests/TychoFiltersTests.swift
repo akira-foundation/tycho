@@ -44,11 +44,17 @@ final class TychoFiltersTests: XCTestCase {
         closeFilter()
     }
 
-    private func viewMenuItem(_ title: String) -> XCUIElement {
-        element("project.tab.view.menu").click()
+    private func projectMenuItem(_ title: String) -> XCUIElement {
+        element("project.menu").click()
         let item = app.menuItems[title].firstMatch
         XCTAssertTrue(item.waitForExistence(timeout: 5))
         return item
+    }
+
+    private func projectMenuLists(_ title: String) -> Bool {
+        element("project.menu").click()
+        defer { app.typeKey(.escape, modifierFlags: []) }
+        return app.menuItems[title].firstMatch.waitForExistence(timeout: 5)
     }
 
     func testAddingAFilterShowsItsValues() {
@@ -93,36 +99,29 @@ final class TychoFiltersTests: XCTestCase {
         XCTAssertTrue(eventually { self.websiteRows.count == before })
     }
 
-    func testSavingRenamingAndDeletingAView() throws {
-        let widest = NSScreen.screens.map(\.visibleFrame.width).max() ?? 0
-        try XCTSkipUnless(widest >= 1500, "the project toolbar needs a zoomed window at least 1500 pt wide")
-        app.zoomWindow()
+    func testSavingRenamingAndDeletingAView() {
         app.openWebsiteTab("List")
         addStatusDoneFilter()
 
-        element("project.tab.saveView").click()
+        projectMenuItem("Save View…").click()
         let name = element("saveView.name")
         XCTAssertTrue(name.waitForExistence(timeout: 5))
         name.click()
         name.typeText("Shipped")
         element("saveView.save").click()
-        let saved = element("project.tab.view.Shipped")
-        XCTAssertTrue(saved.waitForExistence(timeout: 5))
+        XCTAssertTrue(projectMenuLists("Shipped"))
 
-        viewMenuItem("Rename view").click()
+        projectMenuItem("Rename View…").click()
         let rename = element("renameView.name")
         XCTAssertTrue(rename.waitForExistence(timeout: 5))
         rename.click()
         rename.typeKey("a", modifierFlags: .command)
         rename.typeText("Released")
         element("renameView.save").click()
-        let renamed = element("project.tab.view.Released")
-        XCTAssertTrue(renamed.waitForExistence(timeout: 5))
-        XCTAssertFalse(saved.exists)
+        XCTAssertTrue(projectMenuLists("Released"))
 
-        viewMenuItem("Delete view").click()
-        XCTAssertTrue(renamed.waitForNonExistence(timeout: 5))
-        XCTAssertTrue(element("project.tab.saveView").exists)
+        projectMenuItem("Delete View").click()
+        XCTAssertFalse(projectMenuLists("Released"))
     }
 
     func testHomeOverdueCardOpensTasksWithTheDueChip() {

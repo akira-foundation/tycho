@@ -53,12 +53,10 @@ final class TychoShortcutsTests: XCTestCase {
         XCTAssertTrue(eventually { outline.exists && outline.frame == shown }, "[ should show the sidebar again")
     }
 
-    func testCommandKStaysOffWhileEditProjectIsOpen() throws {
-        let widest = NSScreen.screens.map(\.visibleFrame.width).max() ?? 0
-        try XCTSkipUnless(widest >= 1500, "Edit Project needs a zoomed window at least 1500 pt wide")
-        app.zoomWindow()
+    func testCommandKStaysOffWhileEditProjectIsOpen() {
         app.openSidebarItem("Website Redesign", revealing: element("project.tab"))
-        app.buttons["Edit Project"].firstMatch.click()
+        element("project.menu").click()
+        app.menuItems["Edit Project…"].firstMatch.click()
         let name = element("project.name")
         XCTAssertTrue(name.waitForExistence(timeout: 5))
         app.typeKey("k", modifierFlags: .command)

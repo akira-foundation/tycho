@@ -40,19 +40,18 @@ struct SaveViewSheet: View {
                         Self.filterSummary(count: count),
                         systemImage: count > 0 ? "line.3.horizontal.decrease" : "info.circle"
                     )
-                    .tychoFont(.sm)
-                    .foregroundStyle(Token.text3.color)
+                    .foregroundStyle(.secondary)
                 }
             }
             .formStyle(.grouped)
-            .navigationTitle("Save view")
+            .navigationTitle("Save View")
             .navigationSubtitle("Save the current filters as a tab on this project.")
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel", role: .cancel) { dismiss() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Save view", role: .confirm, action: save)
+                    Button("Save View", role: .confirm, action: save)
                         .keyboardShortcut(.return, modifiers: .command)
                         .accessibilityIdentifier("saveView.save")
                 }
