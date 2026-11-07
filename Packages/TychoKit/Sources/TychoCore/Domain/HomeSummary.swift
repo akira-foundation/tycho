@@ -15,7 +15,7 @@ public struct HomeSummary {
     public init(projects: [Project], tasks: [TaskItem], now: Date, calendar: Calendar) {
         let liveProjects = projects.filter { !$0.isArchived }
         let active = liveProjects.filter { $0.status != .complete }
-        let visible = tasks.filter { $0.project?.isArchived != true }
+        let visible = tasks.inLiveProjects()
         let open = visible.filter { $0.status != .done }
         let mine = visible.filter { $0.assignee?.isMe == true }
         let isOverdue: (TaskItem) -> Bool = { $0.isOverdue(now: now, calendar: calendar) }
