@@ -22,22 +22,20 @@ public struct StatCard: View {
 
     public var body: some View {
         Button(action: action) {
-            VStack(alignment: .leading, spacing: Spacing.s2) {
+            VStack(alignment: .leading, spacing: 4) {
                 Label(title, systemImage: symbol)
-                    .tychoFont(.xs, weight: .medium)
-                    .foregroundStyle(Token.text3.color)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
                 Text(value)
-                    .tychoFont(.xxl, weight: .semibold)
+                    .font(.title.weight(.semibold))
                     .monospacedDigit()
-                    .foregroundStyle(tone ?? Token.text.color)
+                    .foregroundStyle(tone.map(AnyShapeStyle.init) ?? AnyShapeStyle(.primary))
                 Text(detail)
-                    .tychoFont(.xs)
-                    .foregroundStyle(tone ?? Token.text3.color)
+                    .font(.caption)
+                    .foregroundStyle(tone.map(AnyShapeStyle.init) ?? AnyShapeStyle(.secondary))
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(Spacing.s4)
-            .background(Token.surface.color, in: RoundedRectangle(cornerRadius: Radius.lg, style: .continuous))
-            .shadowCard(radius: Radius.lg)
+            .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
     }
