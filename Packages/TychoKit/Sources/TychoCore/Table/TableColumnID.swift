@@ -52,7 +52,18 @@ public enum TableColumnID: String, CaseIterable, Codable, Sendable, Identifiable
         }
     }
 
-    public static func defaultHidden(inProject: Bool) -> Set<TableColumnID> {
-        inProject ? [.start, .created, .deps, .project] : [.start, .created, .deps]
+    public static let hiddenOnTouch: Set<TableColumnID> = [.priority, .labels, .estimate]
+
+    public static var isTouchPlatform: Bool {
+        #if os(iOS)
+        true
+        #else
+        false
+        #endif
+    }
+
+    public static func defaultHidden(inProject: Bool, onTouch: Bool = isTouchPlatform) -> Set<TableColumnID> {
+        let hidden: Set<TableColumnID> = inProject ? [.start, .created, .deps, .project] : [.start, .created, .deps]
+        return onTouch ? hidden.union(hiddenOnTouch) : hidden
     }
 }

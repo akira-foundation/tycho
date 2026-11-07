@@ -139,6 +139,17 @@ struct TableTests {
         #expect(TableSort.sorted(all.reversed(), by: []).map(\.title) == byId.map(\.title))
     }
 
+    @Test func touchLayoutsHidePriorityLabelsAndEstimateByDefault() {
+        #expect(
+            TableColumnID.defaultHidden(inProject: true, onTouch: true)
+                == [.start, .created, .deps, .project, .priority, .labels, .estimate])
+        #expect(TableColumnID.defaultHidden(inProject: false, onTouch: false) == [.start, .created, .deps])
+        #if os(macOS)
+        #expect(!TableColumnID.isTouchPlatform)
+        #expect(TableColumnID.defaultHidden(inProject: true) == [.start, .created, .deps, .project])
+        #endif
+    }
+
     @Test func decodingToleratesMissingKeysAndUnknownColumns() throws {
         let json = Data(#"{"hidden":["created","retired","deps"]}"#.utf8)
         let state = try JSONDecoder().decode(TaskViewState.self, from: json)
