@@ -154,6 +154,21 @@ final class TychoViewsTests: XCTestCase {
         XCTAssertTrue(element("timeline.header.month").waitForExistence(timeout: 5))
     }
 
+    func testListGroupHeaderCollapsesAndExpands() {
+        app.openWebsiteTab("List")
+        let header = element("group.todo")
+        let row = element("task.WEB-118")
+        XCTAssertTrue(row.waitForExistence(timeout: 5))
+        XCTAssertEqual(header.value as? String, "Expanded")
+
+        header.click()
+        XCTAssertTrue(row.waitForNonExistence(timeout: 5))
+        XCTAssertEqual(header.value as? String, "Collapsed")
+
+        header.click()
+        XCTAssertTrue(row.waitForExistence(timeout: 5))
+    }
+
     func testFilesDuplicateAndDelete() {
         app.openWebsiteTab("Files")
         let original = element("file.sitemap-v2.pdf")
