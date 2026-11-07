@@ -1,6 +1,5 @@
 import SwiftUI
 import TychoCore
-import TychoDesign
 
 @Observable
 @MainActor
@@ -18,12 +17,13 @@ struct TimelinePanes: View {
     let pins: [MilestonePin]
     let curves: [DependencyCurve]
     let sync: TimelineScrollSync
+    @Environment(\.isCompactWidth) private var isCompactWidth
 
     var body: some View {
         @Bindable var sync = sync
         HStack(alignment: .top, spacing: 0) {
             TimelineTaskPane(rows: rows, position: $sync.vertical)
-                .frame(width: 280)
+                .frame(width: isCompactWidth ? 132 : 280)
             Divider()
             ScrollView(.horizontal) {
                 VStack(alignment: .leading, spacing: 0) {
@@ -40,6 +40,11 @@ struct TimelinePanes: View {
                 }
             }
             .scrollPosition($sync.horizontal)
+            .onScrollGeometryChange(for: Bool.self) { geometry in
+                geometry.contentSize.width > geometry.containerSize.width
+            } action: { _, scrollable in
+                if scrollable { Task { sync.scrollHorizontally(to: layout.initialScrollX) } }
+            }
         }
         .onAppear { sync.scrollHorizontally(to: layout.initialScrollX) }
     }

@@ -11,13 +11,11 @@ struct MyTasksView: View {
 
     var body: some View {
         let mine = tasks.inLiveProjects().filter { $0.assignee?.isMe == true }
-        VStack(spacing: 0) {
-            TaskViewHeader(engine: TaskViewEngine(model: model, members: members, projects: projects))
-            content(mine)
-        }
-        .background(Token.bg.color)
-        .tracksLiveProjects(model)
-        .navigationTitle("My Tasks")
+        content(mine)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .taskViewControls(TaskViewEngine(model: model, members: members, projects: projects))
+            .tracksLiveProjects(model)
+            .navigationTitle("My Tasks")
     }
 
     @ViewBuilder private func content(_ mine: [TaskItem]) -> some View {

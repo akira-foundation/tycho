@@ -5,6 +5,7 @@ import TychoDesign
 struct TaskRow: View {
     @Environment(Router.self) private var router
     @Environment(\.density) private var density
+    @Environment(\.isCompactWidth) private var isCompactWidth
     let task: TaskItem
     var showsProject = false
 
@@ -17,20 +18,26 @@ struct TaskRow: View {
                 if showsProject, let project = task.project {
                     ProjectGlyph(symbol: project.symbol, color: project.color.tint, size: 16)
                 }
-                Text(task.key)
-                    .tychoFont(.xs, design: .monospaced)
-                    .foregroundStyle(Token.text4.color)
-                Text(task.title)
-                    .tychoFont(.base)
-                    .foregroundStyle(task.status == .done ? Token.text3.color : Token.text.color)
-                    .strikethrough(task.status == .done, color: Token.text4.color)
-                    .lineLimit(1)
-                Spacer(minLength: Spacing.s2)
-                ForEach(TaskLabel.allCases.filter(task.labels.contains)) { label in
-                    LabelPill(title: label.title, color: label.tint)
+                if isCompactWidth {
+                    VStack(alignment: .leading, spacing: 2) {
+                        title.lineLimit(2)
+                        HStack(spacing: Spacing.s2) {
+                            key
+                            DueText(task: task)
+                        }
+                    }
+                } else {
+                    key
+                    title.lineLimit(1)
                 }
-                PriorityIcon(weight: task.priority.weight)
-                DueText(task: task)
+                Spacer(minLength: Spacing.s2)
+                if !isCompactWidth {
+                    ForEach(TaskLabel.allCases.filter(task.labels.contains)) { label in
+                        LabelPill(title: label.title, color: label.tint)
+                    }
+                    PriorityIcon(weight: task.priority.weight)
+                    DueText(task: task)
+                }
                 if let assignee = task.assignee {
                     Avatar(initials: assignee.initials, color: assignee.tint)
                 }
@@ -41,6 +48,19 @@ struct TaskRow: View {
         .buttonStyle(.plain)
         .accessibilityIdentifier("task.\(task.key)")
     }
+
+    private var key: some View {
+        Text(task.key)
+            .font(.caption.monospaced())
+            .foregroundStyle(.secondary)
+    }
+
+    private var title: some View {
+        Text(task.title)
+            .font(.body)
+            .foregroundStyle(task.status == .done ? .secondary : .primary)
+            .strikethrough(task.status == .done)
+    }
 }
 
 struct DueText: View {
@@ -50,9 +70,10 @@ struct DueText: View {
     var body: some View {
         if let due = task.due {
             Text(dateText.short(due))
-                .tychoFont(.xs)
+                .font(.caption)
                 .monospacedDigit()
-                .foregroundStyle(task.isOverdue(now: .now, calendar: .current) ? Token.red.color : Token.text3.color)
+                .foregroundStyle(
+                    task.isOverdue(now: .now, calendar: .current) ? AnyShapeStyle(.red) : AnyShapeStyle(.secondary))
         }
     }
 }

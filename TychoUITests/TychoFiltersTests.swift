@@ -22,17 +22,26 @@ final class TychoFiltersTests: XCTestCase {
         app.elements(withIdentifierPrefix: "task.WEB-")
     }
 
-    private func addStatusDoneFilter() {
-        element("view.filter").click()
-        let addStatus = element("filter.add.status")
-        XCTAssertTrue(addStatus.waitForExistence(timeout: 5))
-        addStatus.click()
-        let done = element("filter.value.done")
-        XCTAssertTrue(done.waitForExistence(timeout: 5), "adding a filter should open its value list")
-        done.click()
-        XCTAssertTrue(eventually { done.isSelected }, "clicking Done should select it")
+    private func addFilter(_ title: String) {
+        app.filterButton.click()
+        let add = element("filter.add")
+        XCTAssertTrue(add.waitForExistence(timeout: 5))
+        add.click()
+        app.menuItems[title].firstMatch.click()
+    }
+
+    private func closeFilter() {
         app.typeKey(.escape, modifierFlags: [])
         XCTAssertTrue(element("filter.builder").waitForNonExistence(timeout: 5))
+    }
+
+    private func addStatusDoneFilter() {
+        addFilter("Status")
+        let done = element("filter.value.done")
+        XCTAssertTrue(done.waitForExistence(timeout: 5), "adding a filter should show its values")
+        done.click()
+        XCTAssertTrue(eventually { (done.value as? Int) == 1 }, "clicking Done should select it")
+        closeFilter()
     }
 
     private func viewMenuItem(_ title: String) -> XCUIElement {
@@ -42,38 +51,29 @@ final class TychoFiltersTests: XCTestCase {
         return item
     }
 
-    func testAddingAFilterOpensItsValueList() {
+    func testAddingAFilterShowsItsValues() {
         app.openWebsiteTab("List")
-        for attempt in 1...3 {
-            element("view.filter").click()
-            let addStatus = element("filter.add.status")
-            XCTAssertTrue(addStatus.waitForExistence(timeout: 5))
-            addStatus.click()
-            let list = element("filter.values.0")
-            XCTAssertTrue(
-                list.waitForExistence(timeout: 5), "attempt \(attempt): adding Status should open its value list")
-            XCTAssertGreaterThan(list.frame.height, 40, "attempt \(attempt): the value list should show its options")
-            element("filter.clear").click()
-            app.typeKey(.escape, modifierFlags: [])
-            XCTAssertTrue(element("filter.builder").waitForNonExistence(timeout: 5))
-        }
+        addFilter("Status")
+
+        XCTAssertTrue(element("filter.values.0").waitForExistence(timeout: 5))
+        XCTAssertTrue(element("filter.value.done").exists)
+        element("filter.clear").click()
+        XCTAssertTrue(element("filter.values.0").waitForNonExistence(timeout: 5))
+        closeFilter()
     }
 
-    func testReopeningTheBuilderShowsTheFilterCollapsed() {
+    func testReopeningTheFilterKeepsItsFields() {
         app.openWebsiteTab("List")
-        element("view.filter").click()
-        let addStatus = element("filter.add.status")
-        XCTAssertTrue(addStatus.waitForExistence(timeout: 5))
-        addStatus.click()
-        XCTAssertTrue(element("filter.values.0").waitForExistence(timeout: 5))
-        app.typeKey(.escape, modifierFlags: [])
-        XCTAssertTrue(element("filter.builder").waitForNonExistence(timeout: 5))
+        addFilter("Priority")
+        closeFilter()
 
-        element("view.filter").click()
+        app.filterButton.click()
 
-        XCTAssertTrue(element("filter.values.button.0").waitForExistence(timeout: 5))
-        XCTAssertFalse(element("filter.values.0").exists)
+        let field = element("filter.field.0")
+        XCTAssertTrue(field.waitForExistence(timeout: 5))
+        XCTAssertEqual(field.value as? String, "Priority")
         element("filter.clear").click()
+        closeFilter()
     }
 
     func testStatusFilterNarrowsTheListAndClearAllRestoresIt() {
@@ -83,15 +83,13 @@ final class TychoFiltersTests: XCTestCase {
 
         addStatusDoneFilter()
 
-        let chip = element("filter.chip.0")
-        XCTAssertTrue(chip.waitForExistence(timeout: 5))
-        XCTAssertTrue(chip.label.contains("Status"))
         XCTAssertTrue(eventually { self.websiteRows.count > 0 && self.websiteRows.count < before })
         XCTAssertFalse(element("task.WEB-118").exists)
 
-        element("filter.chips.clear").click()
+        app.filterButton.click()
+        element("filter.clear").click()
+        closeFilter()
 
-        XCTAssertTrue(chip.waitForNonExistence(timeout: 5))
         XCTAssertTrue(eventually { self.websiteRows.count == before })
     }
 
@@ -128,19 +126,21 @@ final class TychoFiltersTests: XCTestCase {
     }
 
     func testHomeOverdueCardOpensTasksWithTheDueChip() {
-        app.openSidebarItem("Tasks", revealing: element("tasks.mode"))
-        element("tasks.mode").descendants(matching: .any)["Board"].firstMatch.click()
+        let board = app.radioButtons["Board"].firstMatch
+        app.openSidebarItem("Tasks", revealing: board)
+        board.click()
         XCTAssertTrue(element("column.todo").waitForExistence(timeout: 5))
 
         let overdue = app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Overdue,'")).firstMatch
         app.openSidebarItem("Home", revealing: overdue)
         overdue.click()
 
-        let chip = element("filter.chip.0")
-        XCTAssertTrue(chip.waitForExistence(timeout: 5))
-        XCTAssertTrue(chip.label.contains("Due"))
         XCTAssertTrue(app.elements(withIdentifierPrefix: "group.").firstMatch.waitForExistence(timeout: 5))
         XCTAssertFalse(element("column.todo").exists)
+        app.filterButton.click()
+        let field = element("filter.field.0")
+        XCTAssertTrue(field.waitForExistence(timeout: 5))
+        XCTAssertEqual(field.value as? String, "Due")
     }
 }
 #endif

@@ -188,4 +188,11 @@ struct RouterTests {
         #expect(router.palette == nil)
         #expect(!router.isShowingShortcuts && !router.isEditingText)
     }
+
+    @Test func todayRequestsCountEachTap() {
+        let router = Router()
+        router.scrollTimelineToToday()
+        router.scrollTimelineToToday()
+        #expect(router.timelineTodayRequests == 2)
+    }
 }

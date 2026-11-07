@@ -17,6 +17,7 @@ public final class Router {
     public var calendarMode: CalendarMode = .month
     public var timelineZoom: TimelineZoom = .week
     public var timelineGrouping: TimelineGrouping = .status
+    public private(set) var timelineTodayRequests = 0
     public private(set) var hasOpenedWorkspaceTimeline = false
     public var columnVisibility: NavigationSplitViewVisibility = .automatic
     public private(set) var inspectsInSheet = false
@@ -153,6 +154,10 @@ public final class Router {
         draftDue = due
         closeInspectorSheet()
         isCreatingTask = true
+    }
+
+    public func scrollTimelineToToday() {
+        timelineTodayRequests += 1
     }
 
     public func openWorkspaceTimeline() {

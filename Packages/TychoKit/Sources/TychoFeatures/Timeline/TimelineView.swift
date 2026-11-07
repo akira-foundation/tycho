@@ -1,7 +1,6 @@
 import SwiftData
 import SwiftUI
 import TychoCore
-import TychoDesign
 
 struct TimelineView: View {
     @Environment(Router.self) private var router
@@ -12,7 +11,6 @@ struct TimelineView: View {
     let tasks: [TaskItem]
     let milestones: [Milestone]
     let project: Project?
-    var engine: TaskViewEngine?
     @State private var sync = TimelineScrollSync()
 
     var body: some View {
@@ -21,9 +19,7 @@ struct TimelineView: View {
         let marks = MilestoneMark.marks(from: milestones, includeProject: project == nil)
         let rows = TimelineRows.build(
             tasks: tasks, grouping: grouping, milestoneCount: marks.count, members: members, projects: projects)
-        VStack(spacing: 0) {
-            header(
-                TimelineControls(showsNewTask: project != nil) { sync.scrollHorizontally(to: layout.initialScrollX) })
+        Group {
             if rows.isEmpty {
                 empty
             } else {
@@ -33,19 +29,12 @@ struct TimelineView: View {
                     curves: DependencyPath.curves(rows: rows, layout: layout), sync: sync)
             }
         }
-        .background(Token.bg.color)
-        .onChange(of: router.timelineZoom) { sync.scrollHorizontally(to: makeLayout().initialScrollX) }
+        .onChange(of: router.timelineZoom) { scrollToToday() }
+        .onChange(of: router.timelineTodayRequests) { scrollToToday() }
     }
 
-    @ViewBuilder private func header(_ controls: TimelineControls) -> some View {
-        if let engine {
-            TaskViewHeader(engine: engine) { controls }
-        } else {
-            controls
-                .padding(.horizontal, Spacing.s4)
-                .padding(.vertical, Spacing.s2)
-            Divider()
-        }
+    private func scrollToToday() {
+        sync.scrollHorizontally(to: makeLayout().initialScrollX)
     }
 
     private func makeLayout() -> TimelineLayout {
@@ -53,13 +42,13 @@ struct TimelineView: View {
     }
 
     private var empty: some View {
-        VStack(spacing: Spacing.s3) {
-            EmptyState(
-                title: "Nothing on the timeline", symbol: "chart.bar.xaxis",
-                message: "Give tasks a start and due date to see them here.")
-            Button("New task", systemImage: "plus") { router.newTask() }
-                .buttonStyle(.tycho(.primary))
+        ContentUnavailableView {
+            Label("Nothing on the Timeline", systemImage: "chart.bar.xaxis")
+        } description: {
+            Text("Give tasks a start and due date to see them here.")
+        } actions: {
+            Button("New Task") { router.newTask() }
+                .buttonStyle(.borderedProminent)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }

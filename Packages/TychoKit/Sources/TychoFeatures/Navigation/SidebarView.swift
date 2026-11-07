@@ -34,16 +34,16 @@ struct SidebarView: View {
         }
         .listStyle(.sidebar)
         .navigationTitle("Tycho")
+        #if os(iOS)
         .toolbar {
             ToolbarItem {
                 Button("New Project", systemImage: "plus") { router.newProject() }
             }
-            #if os(iOS)
             ToolbarItem(placement: isCompactWidth ? .topBarLeading : .bottomBar) {
                 Button("Settings", systemImage: "gearshape") { router.showSettings() }
             }
-            #endif
         }
+        #endif
     }
 
     private func row(_ project: Project) -> some View {

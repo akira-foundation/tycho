@@ -71,8 +71,8 @@ final class TychoShortcutsTests: XCTestCase {
     }
 
     func testShortcutKeysTypeIntoTheToolbarSearch() {
-        app.openSidebarItem("Tasks", revealing: element("view.search"))
-        let search = element("view.search")
+        let search = app.searchFields.firstMatch
+        app.openSidebarItem("Tasks", revealing: search)
         let sidebar = app.outlines.firstMatch.frame
         search.click()
         search.typeText("np/?[gc")

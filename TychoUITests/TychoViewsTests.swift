@@ -31,8 +31,8 @@ final class TychoViewsTests: XCTestCase {
 
     func testEveryProjectTabOpens() {
         let markers = [
-            ("Board", "column.todo"), ("List", "group.todo"), ("Table", "table.columns"),
-            ("Calendar", "calendar.title"), ("Timeline", "timeline.zoom"), ("Files", "files.search"),
+            ("Board", "column.todo"), ("List", "group.todo"), ("Table", "table.grid"),
+            ("Calendar", "calendar.title"), ("Timeline", "timeline.header.week"), ("Files", "files.search"),
         ]
         openSidebar("Website Redesign", revealing: "project.tab")
         let picker = element("project.tab")
@@ -105,7 +105,8 @@ final class TychoViewsTests: XCTestCase {
     func testTableEstimateEditsInline() {
         app.openWebsiteTab("Table")
         for column in ["Status", "Priority", "Assignee", "Due date", "Labels"] {
-            element("table.columns").click()
+            app.viewOptionsMenu.click()
+            app.menuItems["Columns"].firstMatch.hover()
             app.menuItems[column].firstMatch.click()
         }
         let estimate = element("table.estimate.WEB-118")

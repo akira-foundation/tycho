@@ -30,6 +30,12 @@ final class TychoPaletteTests: XCTestCase {
         input.placeholderValue ?? ""
     }
 
+    func testTheToolbarHasNoPaletteButtonBesideTheSearchField() {
+        app.openSidebarItem("Tasks", revealing: app.searchFields.firstMatch)
+        XCTAssertFalse(element("toolbar.palette").exists)
+        XCTAssertEqual(app.toolbars.searchFields.count, 1)
+    }
+
     func testCommandKOpensThePaletteAndEnterOpensAResult() {
         let input = openPalette()
         input.typeText("web")

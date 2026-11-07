@@ -19,7 +19,6 @@ struct TaskTableView: View {
 
     var body: some View {
         content(model.apply(tasks, now: .now, calendar: DateText.gregorian))
-            .background(Token.bg.color)
     }
 
     @ViewBuilder private func content(_ visible: [TaskItem]) -> some View {

@@ -36,6 +36,10 @@ extension XCUIApplication {
         picker.descendants(matching: .any)[tab].firstMatch.click()
     }
 
+    var filterButton: XCUIElement { buttons["Filter"].firstMatch }
+
+    var viewOptionsMenu: XCUIElement { menuButtons["View Options"].firstMatch }
+
     func zoomWindow() {
         menuBars.menuBarItems["Window"].click()
         menuItems["Zoom"].firstMatch.click()

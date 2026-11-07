@@ -24,7 +24,7 @@ final class TychoCompactTests: XCTestCase {
             let row = app.collectionViews.staticTexts[detour].firstMatch
             XCTAssertTrue(row.waitForExistence(timeout: 5))
             row.tap()
-            _ = app.navigationBars[detour].waitForExistence(timeout: 3)
+            XCTAssertTrue(app.navigationBars[detour].waitForExistence(timeout: 3), "\(detour) did not open")
         }
         XCTAssertTrue(title.waitForExistence(timeout: 3), "\(name) did not open")
     }
@@ -57,6 +57,17 @@ final class TychoCompactTests: XCTestCase {
         sheetBar.buttons["Cancel"].tap()
 
         XCTAssertTrue(eventually { !sheetBar.exists })
+    }
+
+    func testMyTasksSearchFilterAndOptionsSitInTheBottomBar() {
+        openProject("My Tasks")
+        let controls = [app.buttons["Filter"], app.searchFields.firstMatch, app.buttons["View Options"]]
+        XCTAssertTrue(controls[0].waitForExistence(timeout: 5))
+        let bottom = app.windows.firstMatch.frame.height * 0.8
+        for control in controls {
+            XCTAssertTrue(control.exists)
+            XCTAssertGreaterThan(control.frame.midY, bottom)
+        }
     }
 
     func testSidebarSettingsLivesInTheNavigationBar() {
