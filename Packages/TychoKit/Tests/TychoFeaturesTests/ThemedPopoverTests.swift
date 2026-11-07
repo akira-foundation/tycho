@@ -13,7 +13,9 @@ struct ThemedPopoverTests {
     }
 
     private func openPopover(theme: ThemePreference, systemAppearance: NSAppearance.Name) -> (NSWindow, NSWindow?) {
-        let store = UserDefaults(suiteName: "ThemedPopoverTests.\(theme.rawValue)")!
+        let suite = "ThemedPopoverTests.\(theme.rawValue)"
+        let store = UserDefaults(suiteName: suite)!
+        defer { store.removePersistentDomain(forName: suite) }
         store.set(theme.rawValue, forKey: AppearanceKey.theme)
         let existing = Set(NSApplication.shared.windows.map(ObjectIdentifier.init))
         let root = Color.clear
@@ -45,6 +47,14 @@ struct ThemedPopoverTests {
 
     @Test func popoverFollowsTheForcedDarkTheme() {
         let (window, popover) = openPopover(theme: .dark, systemAppearance: .aqua)
+        defer { window.close() }
+
+        #expect(popover != nil)
+        #expect(isDark(popover) == true)
+    }
+
+    @Test func popoverFollowsTheSystemWhenNoThemeIsForced() {
+        let (window, popover) = openPopover(theme: .system, systemAppearance: .darkAqua)
         defer { window.close() }
 
         #expect(popover != nil)

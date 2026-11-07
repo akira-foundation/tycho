@@ -16,6 +16,7 @@ struct FilterForm: View {
             form
                 .frame(maxHeight: 640)
                 .fixedSize(horizontal: false, vertical: true)
+                .accessibilityIdentifier("filter.form")
         }
         .frame(width: 440)
         .accessibilityIdentifier("filter.builder")

@@ -26,6 +26,7 @@ final class TychoFiltersTests: XCTestCase {
         app.filterButton.click()
         let add = element("filter.add")
         XCTAssertTrue(add.waitForExistence(timeout: 5))
+        XCTAssertTrue(element("filter.title").exists, "the filter popover should show its title")
         add.click()
         app.menuItems[title].firstMatch.click()
     }
@@ -119,7 +120,7 @@ final class TychoFiltersTests: XCTestCase {
         }
 
         XCTAssertTrue(element("filter.values.5").waitForExistence(timeout: 5))
-        XCTAssertLessThanOrEqual(element("filter.builder").frame.height, 660, "the popover should cap its height")
+        XCTAssertLessThanOrEqual(element("filter.form").frame.height, 660, "the popover should cap its height")
         element("filter.clear").click()
         XCTAssertTrue(element("filter.values.0").waitForNonExistence(timeout: 5))
         closeFilter()
