@@ -9,6 +9,7 @@ public enum TaskFilterField: String, Codable, CaseIterable, Sendable {
     case labels
     case created
     case updated
+    case completed
 
     public var title: String {
         switch self {
@@ -20,6 +21,7 @@ public enum TaskFilterField: String, Codable, CaseIterable, Sendable {
         case .labels: "Labels"
         case .created: "Created date"
         case .updated: "Updated date"
+        case .completed: "Completed date"
         }
     }
 
@@ -33,6 +35,7 @@ public enum TaskFilterField: String, Codable, CaseIterable, Sendable {
         case .labels: "tag"
         case .created: "calendar.badge.plus"
         case .updated: "clock.arrow.circlepath"
+        case .completed: "checkmark.circle"
         }
     }
 }
@@ -55,6 +58,11 @@ public struct TaskFilter: Codable, Hashable, Sendable {
     public var field: TaskFilterField
     public var op: TaskFilterOperator
     public var values: [String]
+
+    public static let completedThisWeek = [
+        TaskFilter(field: .status, op: .is, values: [TaskStatus.done.rawValue]),
+        TaskFilter(field: .completed, op: .is, values: [String(RecencyWindow.week.rawValue)]),
+    ]
 
     public init(field: TaskFilterField, op: TaskFilterOperator = .is, values: [String] = []) {
         self.field = field
@@ -79,6 +87,7 @@ public struct TaskFilter: Codable, Hashable, Sendable {
             matchesDue(DueBucket.bucket(for: task, now: now, calendar: calendar))
         case .created: matchesRecency(task.createdAt, now: now)
         case .updated: matchesRecency(task.updatedAt, now: now)
+        case .completed: task.completedAt.map { matchesRecency($0, now: now) } ?? false
         }
     }
 

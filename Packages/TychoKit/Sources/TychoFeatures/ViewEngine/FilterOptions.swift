@@ -13,7 +13,8 @@ enum FilterOptions {
         case .priority: TaskPriority.allCases.map { FilterOption(id: $0.rawValue, title: $0.title) }
         case .labels: TaskLabel.allCases.map { FilterOption(id: $0.rawValue, title: $0.title) }
         case .due: DueBucket.allCases.map { FilterOption(id: $0.rawValue, title: $0.title) }
-        case .created, .updated: RecencyWindow.allCases.map { FilterOption(id: String($0.rawValue), title: $0.title) }
+        case .created, .updated, .completed:
+            RecencyWindow.allCases.map { FilterOption(id: String($0.rawValue), title: $0.title) }
         case .assignee: assigneeOptions(members)
         case .project: projectOptions(projects)
         }
@@ -22,7 +23,7 @@ enum FilterOptions {
     static func showsValuesMenuOnMac(_ field: TaskFilterField) -> Bool {
         switch field {
         case .status, .assignee, .priority, .project, .labels: true
-        case .due, .created, .updated: false
+        case .due, .created, .updated, .completed: false
         }
     }
 
@@ -46,6 +47,7 @@ enum FilterOptions {
         case .labels: ("label", "labels")
         case .created: ("created date", "created dates")
         case .updated: ("updated date", "updated dates")
+        case .completed: ("completed date", "completed dates")
         }
     }
 

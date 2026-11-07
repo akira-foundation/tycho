@@ -8,11 +8,7 @@ public enum TasksPreset: CaseIterable, Sendable {
     public var filters: [TaskFilter] {
         switch self {
         case .open: [TaskFilter(field: .status, op: .isNot, values: [TaskStatus.done.rawValue])]
-        case .done:
-            [
-                TaskFilter(field: .status, op: .is, values: [TaskStatus.done.rawValue]),
-                TaskFilter(field: .updated, op: .is, values: ["7"]),
-            ]
+        case .done: TaskFilter.completedThisWeek
         case .overdue: [TaskFilter(field: .due, op: .is, values: [DueBucket.overdue.rawValue])]
         }
     }
@@ -28,7 +24,7 @@ public enum TasksPreset: CaseIterable, Sendable {
     public func subtitle(projectCount: Int) -> String {
         switch self {
         case .open: "Open tasks across \(projectCount) projects."
-        case .done: "Done tasks updated in the last 7 days across \(projectCount) projects."
+        case .done: "Tasks completed in the last 7 days across \(projectCount) projects."
         case .overdue: "Overdue tasks across \(projectCount) projects."
         }
     }

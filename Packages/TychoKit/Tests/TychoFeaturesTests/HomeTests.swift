@@ -16,12 +16,14 @@ struct HomeTests {
 
     @Test func tabsShowAtMostSevenTasks() {
         let me = Member(name: "Me", email: "", isMe: true)
+        let project = Project(key: "WEB", name: "Web")
         let tasks = (1...10).map { index -> TaskItem in
             let task = TaskItem(number: index, title: "T\(index)")
             task.assignee = me
+            task.project = project
             return task
         }
-        let summary = HomeSummary(projects: [], tasks: tasks, now: .now, calendar: .current)
+        let summary = HomeSummary(projects: [project], tasks: tasks, now: .now, calendar: .current)
         #expect(HomeTab.upcoming.tasks(in: summary).count == 7)
         #expect(HomeTab.allCases.map(\.title) == ["Upcoming", "Overdue", "Completed"])
     }

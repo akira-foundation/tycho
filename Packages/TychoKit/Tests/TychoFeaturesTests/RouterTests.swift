@@ -156,7 +156,7 @@ struct RouterTests {
                 .done,
                 [
                     TaskFilter(field: .status, op: .is, values: ["done"]),
-                    TaskFilter(field: .updated, op: .is, values: ["7"]),
+                    TaskFilter(field: .completed, op: .is, values: ["7"]),
                 ]
             ),
             (.overdue, [TaskFilter(field: .due, op: .is, values: ["overdue"])]),

@@ -56,7 +56,7 @@ struct HomeView: View {
             }
             StatCard(
                 title: "Completed", symbol: "checkmark.circle", value: "\(summary.completedThisWeek)",
-                detail: "this week", tone: nil
+                detail: "last 7 days", tone: nil
             ) {
                 router.openTasks(preset: .done)
             }
