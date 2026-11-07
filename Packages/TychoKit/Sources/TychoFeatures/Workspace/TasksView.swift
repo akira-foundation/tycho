@@ -52,7 +52,7 @@ struct TasksView: View {
 
     private func modePicker(_ mode: TasksMode) -> some View {
         Picker(selection: Binding(get: { mode }, set: { model.state.mode = $0.rawValue })) {
-            ForEach(TasksMode.allCases) { Label($0.title, systemImage: $0.symbol).tag($0) }
+            ForEach(TasksMode.allCases) { SegmentLabel(title: $0.title, symbol: $0.symbol).tag($0) }
         } label: {
             Label("View", systemImage: mode.symbol)
         }
