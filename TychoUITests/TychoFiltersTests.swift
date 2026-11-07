@@ -178,7 +178,7 @@ final class TychoFiltersTests: XCTestCase {
         XCTAssertTrue(showsSelectedSavedViewTab("All Tasks"), "All Tasks should leave the saved view")
     }
 
-    func testHomeOverdueCardOpensTasksWithTheDueChip() {
+    func testHomeOverdueCardOpensTheNamedOverdueList() {
         let board = app.radioButtons["Board"].firstMatch
         app.openSidebarItem("Tasks", revealing: board)
         board.click()
@@ -190,6 +190,8 @@ final class TychoFiltersTests: XCTestCase {
 
         XCTAssertTrue(app.elements(withIdentifierPrefix: "group.").firstMatch.waitForExistence(timeout: 5))
         XCTAssertFalse(element("column.todo").exists)
+        let named = expectation(for: NSPredicate(format: "title == 'Overdue'"), evaluatedWith: app.windows.firstMatch)
+        wait(for: [named], timeout: 5)
         app.filterButton.click()
         let field = element("filter.field.0")
         XCTAssertTrue(field.waitForExistence(timeout: 5))
