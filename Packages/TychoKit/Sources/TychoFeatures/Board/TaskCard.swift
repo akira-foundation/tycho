@@ -28,8 +28,8 @@ struct TaskCard: View {
                 .accessibilityLabel(task.status == .done ? "Reopen" : "Mark complete")
                 .accessibilityIdentifier("card.\(task.key).toggle")
                 Text(task.title)
-                    .tychoFont(.base, weight: .medium)
-                    .foregroundStyle(task.status == .done ? Token.text3.color : Token.text.color)
+                    .font(.subheadline.weight(.medium))
+                    .foregroundStyle(task.status == .done ? AnyShapeStyle(.secondary) : AnyShapeStyle(.primary))
                     .lineLimit(3)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .accessibilityAddTraits(.isButton)
@@ -42,8 +42,8 @@ struct TaskCard: View {
             footer
         }
         .padding(density.metrics.cardPadding)
-        .background(Token.surface.color, in: RoundedRectangle(cornerRadius: Radius.md, style: .continuous))
-        .shadowCard()
+        .background(.background, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 10, style: .continuous).strokeBorder(.separator, lineWidth: 0.5))
         .contentShape(Rectangle())
         .onTapGesture { router.inspect(task.id) }
         .accessibilityElement(children: .contain)
@@ -53,15 +53,16 @@ struct TaskCard: View {
 
     private var footer: some View {
         HStack(spacing: Spacing.s2) {
-            Text(task.key).tychoFont(.xxs, design: .monospaced).foregroundStyle(Token.text4.color)
+            Text(task.key).font(.caption.monospaced()).foregroundStyle(.secondary)
             PriorityIcon(weight: task.priority.weight, size: 12)
             if let summary = Self.subtaskSummary(task) {
-                Label(summary, systemImage: "checklist").tychoFont(.xxs).foregroundStyle(Token.text3.color)
+                Label(summary, systemImage: "checklist").font(.caption).foregroundStyle(.secondary)
             }
             Spacer()
             DueText(task: task)
             if let assignee = task.assignee {
                 Avatar(initials: assignee.initials, color: assignee.tint, size: 20)
+                    .accessibilityLabel(assignee.name)
             }
         }
     }

@@ -26,4 +26,14 @@ struct ComponentTests {
         _ = ProjectGlyph(symbol: "globe", color: .indigo).body
         _ = EmptyState(title: "No tasks", symbol: "tray", message: "Nothing here yet").body
     }
+
+    @Test func everyGlyphAndWeightBuildsWithSystemStyles() {
+        for glyph in [StatusGlyph.dashed, .partial(0.5), .done] {
+            _ = StatusIcon(glyph: glyph, color: .green).body
+        }
+        for weight in 0...4 {
+            _ = PriorityIcon(weight: weight).body
+        }
+        _ = AvatarStack(people: [("SC", .pink), ("JC", .blue), ("EW", .teal), ("LF", .green)], limit: 3).body
+    }
 }

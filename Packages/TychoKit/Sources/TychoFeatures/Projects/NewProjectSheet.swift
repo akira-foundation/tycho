@@ -55,14 +55,14 @@ struct NewProjectSheet: View {
                                 .tag(color)
                         }
                     }
-                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 36))], spacing: Spacing.s2) {
+                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 36))], spacing: 8) {
                         ForEach(ProjectSymbols.all, id: \.self) { symbol in
                             Button {
                                 draft.symbol = symbol
                             } label: {
                                 ProjectGlyph(
                                     symbol: symbol,
-                                    color: draft.symbol == symbol ? draft.color.tint : Token.text3.color, size: 32)
+                                    color: draft.symbol == symbol ? draft.color.tint : Color.secondary, size: 32)
                             }
                             .buttonStyle(.plain)
                             .accessibilityLabel(symbol)
@@ -100,7 +100,7 @@ struct NewProjectSheet: View {
                     }
                 }
                 if let error {
-                    Text(error.userMessage).foregroundStyle(Token.red.color).accessibilityIdentifier("project.error")
+                    Text(error.userMessage).foregroundStyle(.red).accessibilityIdentifier("project.error")
                 }
             }
             .formStyle(.grouped)

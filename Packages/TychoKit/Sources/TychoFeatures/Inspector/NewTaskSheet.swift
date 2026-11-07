@@ -44,7 +44,7 @@ struct NewTaskSheet: View {
                     DatePill(date: draft.due, emptyText: "No date") { draft.due = $0 }
                 }
                 if let error {
-                    Text(error.userMessage).foregroundStyle(Token.red.color)
+                    Text(error.userMessage).foregroundStyle(.red)
                 }
             }
             .formStyle(.grouped)

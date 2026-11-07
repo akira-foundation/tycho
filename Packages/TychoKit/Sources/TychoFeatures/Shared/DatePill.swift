@@ -15,7 +15,7 @@ struct DatePill: View {
     @Environment(\.weekStart) private var weekStart
     let date: Date?
     let emptyText: String
-    var color: Color = Token.text.color
+    var color: Color = .primary
     let onChange: (Date?) -> Void
     @State private var picking = false
 
@@ -29,7 +29,7 @@ struct DatePill: View {
         } label: {
             Text(date.map(dateText.short) ?? emptyText)
                 .monospacedDigit()
-                .foregroundStyle(date == nil ? Token.text4.color : color)
+                .foregroundStyle(date == nil ? AnyShapeStyle(.tertiary) : AnyShapeStyle(color))
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .contentShape(Rectangle())
         }
@@ -38,7 +38,7 @@ struct DatePill: View {
     }
 
     private var picker: some View {
-        VStack(alignment: .leading, spacing: Spacing.s2) {
+        VStack(alignment: .leading, spacing: 8) {
             DatePicker(
                 "Date",
                 selection: Binding(get: { date ?? .now }, set: { commit($0) }),
@@ -51,14 +51,14 @@ struct DatePill: View {
                 Button("Today") { commit(.now) }
                 Spacer()
                 if date != nil {
-                    Button("Clear date", role: .destructive) {
+                    Button("Clear Date", role: .destructive) {
                         onChange(nil)
                         picking = false
                     }
                 }
             }
         }
-        .padding(Spacing.s3)
+        .padding()
     }
 
     private func commit(_ value: Date) {

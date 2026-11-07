@@ -17,16 +17,19 @@ public struct PriorityIcon: View {
             case 4...:
                 Image(systemName: "exclamationmark.square.fill")
                     .font(.system(size: size))
-                    .foregroundStyle(Token.red.color)
+                    .foregroundStyle(.red)
             case ...0:
                 Image(systemName: "minus")
                     .font(.system(size: size * 0.8, weight: .semibold))
-                    .foregroundStyle(Token.text4.color)
+                    .foregroundStyle(.tertiary)
             default:
                 HStack(alignment: .bottom, spacing: 1.5) {
                     ForEach(1...3, id: \.self) { bar in
                         RoundedRectangle(cornerRadius: 1)
-                            .fill(bar <= Self.filledBars(for: weight) ? Token.text2.color : Token.border.color)
+                            .fill(
+                                bar <= Self.filledBars(for: weight)
+                                    ? AnyShapeStyle(.secondary) : AnyShapeStyle(.quaternary)
+                            )
                             .frame(width: 3, height: size * (0.35 + 0.2 * CGFloat(bar)))
                     }
                 }

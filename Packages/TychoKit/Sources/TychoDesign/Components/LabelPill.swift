@@ -12,11 +12,11 @@ public struct LabelPill: View {
     public var body: some View {
         HStack(spacing: Spacing.s1) {
             Circle().fill(color).frame(width: 6, height: 6)
-            Text(title).tychoFont(.xxs, weight: .medium)
+            Text(title).font(.caption2.weight(.medium))
         }
         .padding(.horizontal, 6)
         .frame(height: 20)
-        .foregroundStyle(Token.text2.color)
+        .foregroundStyle(.secondary)
         .background(color.opacity(0.12), in: Capsule())
     }
 }
