@@ -57,7 +57,7 @@ struct EventChip: View {
         }
         .buttonStyle(.plain)
         .help("\(event.title) · \(event.time)")
-        .popover(isPresented: $showing) { EventPopover(event: event) }
+        .themedPopover(isPresented: $showing) { EventPopover(event: event) }
         .accessibilityIdentifier("calendar.event.\(event.title)")
     }
 }

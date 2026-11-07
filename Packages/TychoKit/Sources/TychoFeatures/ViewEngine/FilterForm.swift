@@ -7,12 +7,19 @@ struct FilterForm: View {
 
     var body: some View {
         #if os(macOS)
-        form
-            .frame(maxHeight: 640)
-            .fixedSize(horizontal: false, vertical: true)
-            .frame(width: 440)
-            .presentationBackground(.background)
-            .accessibilityIdentifier("filter.builder")
+        VStack(alignment: .leading, spacing: 0) {
+            Text("Filter")
+                .font(.headline)
+                .accessibilityAddTraits(.isHeader)
+                .accessibilityIdentifier("filter.title")
+                .padding([.horizontal, .top])
+            form
+                .frame(maxHeight: 640)
+                .fixedSize(horizontal: false, vertical: true)
+                .accessibilityIdentifier("filter.form")
+        }
+        .frame(width: 440)
+        .accessibilityIdentifier("filter.builder")
         #else
         NavigationStack {
             form

@@ -16,7 +16,7 @@ struct DependencyPicker: View {
             label.contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .popover(isPresented: $picking) { DependencyList(task: task) }
+        .themedPopover(isPresented: $picking) { DependencyList(task: task) }
         .accessibilityIdentifier("deps.\(task.key)")
     }
 

@@ -41,10 +41,9 @@ struct CalendarField: View {
         }
         .accessibilityLabel(title)
         .accessibilityValue(dateText.long(selection))
-        .popover(isPresented: $isPicking, arrowEdge: .bottom) {
+        .themedPopover(isPresented: $isPicking, arrowEdge: .bottom) {
             CalendarPicker(title: title, selection: pickedSelection)
                 .padding()
-                .presentationBackground(.background)
         }
         #else
         DatePicker(title, selection: normalizedSelection, displayedComponents: .date)

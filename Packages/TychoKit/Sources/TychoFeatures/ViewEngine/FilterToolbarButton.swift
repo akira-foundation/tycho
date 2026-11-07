@@ -8,7 +8,7 @@ struct FilterToolbarButton: View {
         let count = engine.model.state.filters.count
         Button("Filter", systemImage: Self.symbol(filterCount: count)) { isPresented = true }
             .badge(count)
-            .popover(isPresented: $isPresented) { FilterForm(engine: engine) }
+            .themedPopover(isPresented: $isPresented) { FilterForm(engine: engine) }
             .accessibilityIdentifier("view.filter")
     }
 

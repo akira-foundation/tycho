@@ -51,6 +51,6 @@ struct WeekEventCard: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .popover(isPresented: $showing) { EventPopover(event: event) }
+        .themedPopover(isPresented: $showing) { EventPopover(event: event) }
     }
 }

@@ -10,8 +10,15 @@ public enum AppearanceKey {
     public static let dateFormat = "preferences.dateFormat"
 }
 
-struct AppearanceModifier: ViewModifier {
+struct ThemeSchemeModifier: ViewModifier {
     @AppStorage(AppearanceKey.theme) private var theme = ThemePreference.system
+
+    func body(content: Content) -> some View {
+        content.preferredColorScheme(theme.colorScheme)
+    }
+}
+
+struct AppearanceModifier: ViewModifier {
     @AppStorage(AppearanceKey.density) private var density = Density.comfortable
     @AppStorage(AppearanceKey.motion) private var motion = MotionPreference.system
     @AppStorage(AppearanceKey.weekStart) private var weekStart = WeekStart.monday
@@ -19,7 +26,7 @@ struct AppearanceModifier: ViewModifier {
 
     func body(content: Content) -> some View {
         content
-            .preferredColorScheme(theme.colorScheme)
+            .modifier(ThemeSchemeModifier())
             .environment(\.density, density)
             .environment(\.motionPreference, motion)
             .environment(\.weekStart, weekStart)

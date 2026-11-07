@@ -33,7 +33,7 @@ struct DatePill: View {
                 .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .popover(isPresented: $picking) { picker }
+        .themedPopover(isPresented: $picking) { picker }
     }
 
     private var picker: some View {
