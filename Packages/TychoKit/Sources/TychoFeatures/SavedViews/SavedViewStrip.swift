@@ -33,7 +33,6 @@ struct SavedViewStrip: View {
                 .accessibilityIdentifier("savedViews.strip")
             }
             .scrollIndicators(.never)
-            .background(.bar)
         }
     }
 

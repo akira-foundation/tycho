@@ -41,6 +41,42 @@ final class TychoCompactTests: XCTestCase {
         XCTAssertTrue(eventually { picker.label == "Table" })
     }
 
+    func testProjectLargeTitleSitsAboveTheSavedViewStrip() {
+        openProject("Website Redesign")
+        let bar = app.navigationBars["Website Redesign"]
+        let title = bar.staticTexts["Website Redesign"]
+        let subtitle = bar.staticTexts.matching(NSPredicate(format: "label BEGINSWITH 'In Progress'")).firstMatch
+        let strip = app.otherElements["savedViews.strip"]
+        XCTAssertTrue(strip.waitForExistence(timeout: 5))
+
+        XCTAssertTrue(title.isHittable, "the large title should be visible")
+        XCTAssertTrue(subtitle.exists, "the status and progress subtitle should be visible")
+        XCTAssertLessThanOrEqual(title.frame.maxY, strip.frame.minY)
+        XCTAssertGreaterThan(inkShare(title.screenshot().image), 0.1, "the large title should not sit under a blur")
+    }
+
+    private func inkShare(_ image: UIImage) -> Double {
+        guard let cgImage = image.cgImage else { return 0 }
+        let width = cgImage.width
+        let height = cgImage.height
+        var pixels = [UInt8](repeating: 0, count: width * height * 4)
+        let drawn = pixels.withUnsafeMutableBytes { buffer -> Bool in
+            guard
+                let context = CGContext(
+                    data: buffer.baseAddress, width: width, height: height, bitsPerComponent: 8,
+                    bytesPerRow: width * 4, space: CGColorSpaceCreateDeviceRGB(),
+                    bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)
+            else { return false }
+            context.draw(cgImage, in: CGRect(x: 0, y: 0, width: width, height: height))
+            return true
+        }
+        guard drawn else { return 0 }
+        let brightness = { (index: Int) in Int(pixels[index]) + Int(pixels[index + 1]) + Int(pixels[index + 2]) }
+        let background = brightness(0)
+        let ink = stride(from: 0, to: pixels.count, by: 4).filter { abs(brightness($0) - background) > 3 * 128 }
+        return Double(ink.count) / Double(width * height)
+    }
+
     func testNewTaskSheetCancelsFromTheNavigationBar() {
         openProject("Website Redesign")
         app.buttons["New Task"].firstMatch.tap()
