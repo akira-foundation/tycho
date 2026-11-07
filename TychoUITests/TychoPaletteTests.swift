@@ -82,14 +82,13 @@ final class TychoPaletteTests: XCTestCase {
         XCTAssertTrue(eventually { viewAll.isHittable }, "the last item should scroll into view")
         viewAll.click()
 
-        let field = element("search.field")
+        let field = app.searchFields.firstMatch
         XCTAssertTrue(field.waitForExistence(timeout: 5))
         XCTAssertEqual(field.value as? String, "launch")
-        for (scope, title) in [("all", "All"), ("tasks", "Tasks"), ("projects", "Projects"), ("files", "Files")] {
-            let tab = element("search.tab.\(scope)")
-            XCTAssertTrue(tab.waitForExistence(timeout: 5), "missing the \(scope) tab")
-            XCTAssertTrue(tab.label.hasPrefix("\(title) "), "unexpected label \(tab.label)")
-            XCTAssertNotEqual(tab.label, "\(title) 0", "no \(scope) results for launch")
+        for title in ["All", "Tasks", "Projects", "Files"] {
+            let scope = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "\(title) ")).firstMatch
+            XCTAssertTrue(scope.waitForExistence(timeout: 5), "missing the \(title) scope")
+            XCTAssertNotEqual(scope.label, "\(title) 0", "no \(title) results for launch")
         }
     }
 }
