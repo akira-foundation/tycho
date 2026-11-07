@@ -35,13 +35,16 @@ enum TasksMode: String, CaseIterable, Identifiable {
         }
     }
 
-    static func title(filters: [TaskFilter]) -> String {
-        TasksPreset.matching(filters)?.title ?? "Tasks"
+    static func preset(of state: TaskViewState) -> TasksPreset? {
+        state.query.isEmpty ? TasksPreset.matching(state.filters) : nil
     }
 
-    static func subtitle(projectCount: Int, filters: [TaskFilter] = []) -> String {
-        TasksPreset.matching(filters)?.subtitle(projectCount: projectCount)
-            ?? "Every task across \(projectCount) projects."
+    static func title(state: TaskViewState) -> String {
+        preset(of: state)?.title ?? "Tasks"
+    }
+
+    static func subtitle(projectCount: Int, state: TaskViewState) -> String {
+        preset(of: state)?.subtitle(projectCount: projectCount) ?? "Every task across \(projectCount) projects."
     }
 
     static func migrateLegacyPreference(_ defaults: UserDefaults) {

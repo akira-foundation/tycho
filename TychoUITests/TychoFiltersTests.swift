@@ -190,8 +190,8 @@ final class TychoFiltersTests: XCTestCase {
 
         XCTAssertTrue(app.elements(withIdentifierPrefix: "group.").firstMatch.waitForExistence(timeout: 5))
         XCTAssertFalse(element("column.todo").exists)
-        let subtitle = app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH 'Overdue tasks across'"))
-        XCTAssertTrue(subtitle.firstMatch.waitForExistence(timeout: 5), "the list should say it is the Overdue list")
+        let named = expectation(for: NSPredicate(format: "title == 'Overdue'"), evaluatedWith: app.windows.firstMatch)
+        wait(for: [named], timeout: 5)
         app.filterButton.click()
         let field = element("filter.field.0")
         XCTAssertTrue(field.waitForExistence(timeout: 5))

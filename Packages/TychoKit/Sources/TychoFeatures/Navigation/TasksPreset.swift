@@ -28,7 +28,7 @@ public enum TasksPreset: CaseIterable, Sendable {
     public func subtitle(projectCount: Int) -> String {
         switch self {
         case .open: "Open tasks across \(projectCount) projects."
-        case .done: "Tasks completed in the last 7 days across \(projectCount) projects."
+        case .done: "Done tasks updated in the last 7 days across \(projectCount) projects."
         case .overdue: "Overdue tasks across \(projectCount) projects."
         }
     }

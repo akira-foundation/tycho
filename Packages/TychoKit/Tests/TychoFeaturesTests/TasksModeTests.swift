@@ -23,28 +23,43 @@ struct TasksModeTests {
         #expect(TasksMode.allCases.map(\.symbol) == [ProjectBuiltInTab.list, .board, .table].map(\.symbol))
     }
 
+    private func state(_ filters: [TaskFilter], query: String = "") -> TaskViewState {
+        var state = TaskViewState(inProject: false)
+        state.filters = filters
+        state.query = query
+        return state
+    }
+
     @Test func subtitleCountsTheProjects() {
-        #expect(TasksMode.subtitle(projectCount: 7) == "Every task across 7 projects.")
+        #expect(TasksMode.subtitle(projectCount: 7, state: state([])) == "Every task across 7 projects.")
     }
 
     @Test func homePresetsNameTheList() {
         #expect(
-            TasksPreset.allCases.map { TasksMode.title(filters: $0.filters) } == ["Open Tasks", "Completed", "Overdue"])
+            TasksPreset.allCases.map { TasksMode.title(state: state($0.filters)) } == [
+                "Open Tasks", "Completed", "Overdue",
+            ])
         #expect(
-            TasksMode.subtitle(projectCount: 7, filters: TasksPreset.overdue.filters)
+            TasksMode.subtitle(projectCount: 7, state: state(TasksPreset.overdue.filters))
                 == "Overdue tasks across 7 projects.")
         #expect(
-            TasksMode.subtitle(projectCount: 7, filters: TasksPreset.done.filters)
-                == "Tasks completed in the last 7 days across 7 projects.")
+            TasksMode.subtitle(projectCount: 7, state: state(TasksPreset.done.filters))
+                == "Done tasks updated in the last 7 days across 7 projects.")
         #expect(
-            TasksMode.subtitle(projectCount: 7, filters: TasksPreset.open.filters) == "Open tasks across 7 projects.")
+            TasksMode.subtitle(projectCount: 7, state: state(TasksPreset.open.filters))
+                == "Open tasks across 7 projects.")
     }
 
     @Test func changedFiltersFallBackToTheTasksHeading() {
         let edited = TasksPreset.overdue.filters + [TaskFilter(field: .priority, values: ["high"])]
-        #expect(TasksMode.title(filters: edited) == "Tasks")
-        #expect(TasksMode.title(filters: []) == "Tasks")
-        #expect(TasksMode.subtitle(projectCount: 7, filters: edited) == "Every task across 7 projects.")
+        #expect(TasksMode.title(state: state(edited)) == "Tasks")
+        #expect(TasksMode.subtitle(projectCount: 7, state: state(edited)) == "Every task across 7 projects.")
+    }
+
+    @Test func aSearchFallsBackToTheTasksHeading() {
+        let searched = state(TasksPreset.overdue.filters, query: "budget")
+        #expect(TasksMode.title(state: searched) == "Tasks")
+        #expect(TasksMode.subtitle(projectCount: 7, state: searched) == "Every task across 7 projects.")
     }
 
     @Test func modeComesFromTheViewState() {

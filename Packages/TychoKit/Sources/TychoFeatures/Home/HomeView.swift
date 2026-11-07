@@ -100,6 +100,7 @@ struct HomeView: View {
                             ProgressBar(percent: project.progress, color: project.color.tint)
                                 .frame(maxWidth: 160)
                             Text("\(project.progress)%").monospacedDigit().frame(minWidth: 36, alignment: .trailing)
+                                .accessibilityHidden(true)
                         }
                         .alignmentGuide(.firstTextBaseline) { $0[VerticalAlignment.center] }
                     } label: {

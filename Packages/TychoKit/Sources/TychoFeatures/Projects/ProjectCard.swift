@@ -31,6 +31,7 @@ struct ProjectCard: View {
                         .foregroundStyle(.secondary)
                 }
                 Text("\(project.progress)%").font(.caption).monospacedDigit().foregroundStyle(.secondary)
+                    .accessibilityHidden(true)
             }
         }
         .padding()
