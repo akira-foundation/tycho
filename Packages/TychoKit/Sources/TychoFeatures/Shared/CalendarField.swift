@@ -7,10 +7,14 @@ struct CalendarPicker: View {
     @Binding var selection: Date
 
     var body: some View {
+        #if os(macOS)
+        MonthPicker(selection: $selection)
+        #else
         DatePicker(title, selection: $selection, displayedComponents: .date)
             .datePickerStyle(.graphical)
             .labelsHidden()
             .environment(\.calendar, Calendar.picker(weekStart: weekStart))
+        #endif
     }
 }
 
@@ -38,7 +42,7 @@ struct CalendarField: View {
         .accessibilityLabel(title)
         .accessibilityValue(dateText.long(selection))
         .popover(isPresented: $isPicking, arrowEdge: .bottom) {
-            CalendarPicker(title: title, selection: normalizedSelection)
+            CalendarPicker(title: title, selection: pickedSelection)
                 .padding()
                 .presentationBackground(.background)
         }
@@ -47,6 +51,15 @@ struct CalendarField: View {
             .labelsHidden()
             .environment(\.calendar, Calendar.picker(weekStart: weekStart))
         #endif
+    }
+
+    var pickedSelection: Binding<Date> {
+        Binding(
+            get: { selection },
+            set: {
+                normalizedSelection.wrappedValue = $0
+                isPicking = false
+            })
     }
 
     var normalizedSelection: Binding<Date> {

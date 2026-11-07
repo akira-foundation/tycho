@@ -53,12 +53,12 @@ struct CalendarFieldTests {
                 == DateComponents(year: 2026, month: 12, day: 3, hour: 12))
     }
 
-    @Test func openDateFieldShowsAGraphicalCalendar() {
+    @Test func openDateFieldShowsTheMonthGridInAPopover() {
         let window = host(CalendarField(title: "Due", selection: .constant(date), isPicking: true))
         defer { window.close() }
 
-        #expect(views(of: NSDatePicker.self, in: window.contentView).isEmpty)
-        #expect(datePickers().contains { $0.datePickerStyle == .clockAndCalendar })
+        #expect(NSApp.windows.contains { String(describing: type(of: $0)).contains("Popover") && $0.isVisible })
+        #expect(datePickers().isEmpty)
     }
 }
 #endif
