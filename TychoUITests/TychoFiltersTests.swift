@@ -147,7 +147,7 @@ final class TychoFiltersTests: XCTestCase {
         app.filterButton.click()
         let field = element("filter.field.0")
         XCTAssertTrue(field.waitForExistence(timeout: 5))
-        XCTAssertEqual(field.value as? String, "Due")
+        XCTAssertEqual(field.value as? String, "Due date")
     }
 }
 #endif

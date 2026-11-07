@@ -6,7 +6,9 @@ struct ProjectTabPicker: View {
     var body: some View {
         #if os(macOS)
         Picker("View", selection: $selection) {
-            ForEach(ProjectBuiltInTab.allCases, id: \.self) { Text($0.title).tag(Optional($0)) }
+            ForEach(ProjectBuiltInTab.allCases, id: \.self) {
+                SegmentLabel(title: $0.title, symbol: $0.symbol).tag(Optional($0))
+            }
         }
         .pickerStyle(.segmented)
         .accessibilityIdentifier("project.tab")

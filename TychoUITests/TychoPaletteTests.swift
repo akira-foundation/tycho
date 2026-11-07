@@ -85,9 +85,10 @@ final class TychoPaletteTests: XCTestCase {
         XCTAssertTrue(field.waitForExistence(timeout: 5))
         XCTAssertEqual(field.value as? String, "launch")
         for title in ["All", "Tasks", "Projects", "Files"] {
-            let scope = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "\(title) ")).firstMatch
+            let scope = app.buttons.matching(NSPredicate(format: "label MATCHES %@", "(.*, )?\(title) [0-9]+"))
+                .firstMatch
             XCTAssertTrue(scope.waitForExistence(timeout: 5), "missing the \(title) scope")
-            XCTAssertNotEqual(scope.label, "\(title) 0", "no \(title) results for launch")
+            XCTAssertFalse(scope.label.hasSuffix("\(title) 0"), "no \(title) results for launch")
         }
     }
 }
