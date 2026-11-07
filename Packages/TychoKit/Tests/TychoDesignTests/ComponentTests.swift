@@ -36,4 +36,10 @@ struct ComponentTests {
         }
         _ = AvatarStack(people: [("SC", .pink), ("JC", .blue), ("EW", .teal), ("LF", .green)], limit: 3).body
     }
+
+    @Test func theMarkRaysScaleToTheFrameFromTheIconGrid() {
+        let path = TychoMarkRays().path(in: CGRect(x: 0, y: 0, width: 200, height: 200))
+        #expect(TychoMarkRays.segments.count == 8)
+        #expect(path.boundingRect.integral == CGRect(x: 24, y: 12, width: 164, height: 160))
+    }
 }

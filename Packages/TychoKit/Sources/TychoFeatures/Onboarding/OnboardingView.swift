@@ -1,6 +1,7 @@
 import SwiftData
 import SwiftUI
 import TychoCore
+import TychoDesign
 
 struct OnboardingView: View {
     @Environment(\.modelContext) private var context
@@ -18,9 +19,7 @@ struct OnboardingView: View {
     var body: some View {
         VStack(spacing: 28) {
             VStack(spacing: 8) {
-                Image(systemName: "checklist")
-                    .font(.system(size: 56))
-                    .foregroundStyle(.tint)
+                TychoMark(size: 96)
                     .padding(.bottom, 8)
                 Text("Welcome to Tycho").font(.largeTitle.bold())
                 Text("A calm place for projects and tasks.")
