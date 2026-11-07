@@ -11,7 +11,7 @@ final class TychoPaletteTests: XCTestCase {
         app.launchArguments = ["-uiTesting"]
         app.launchShowingWindow()
         app.loadDemoWorkspace()
-        XCTAssertTrue(element("toolbar.palette").waitForExistence(timeout: 5))
+        XCTAssertTrue(app.outlines.firstMatch.waitForExistence(timeout: 5))
     }
 
     private func element(_ identifier: String) -> XCUIElement {
@@ -28,22 +28,6 @@ final class TychoPaletteTests: XCTestCase {
 
     private func placeholder(of input: XCUIElement) -> String {
         input.placeholderValue ?? ""
-    }
-
-    func testToolbarButtonIsCompactAndKeepsTheProjectTabsInADefaultWindow() {
-        let button = element("toolbar.palette")
-        XCTAssertEqual(button.label, "Search or jump to…")
-        XCTAssertLessThan(button.frame.width, 120)
-        XCTAssertFalse(button.staticTexts["⌘K"].exists)
-        app.openSidebarItem("Website Redesign", revealing: element("project.tab"))
-    }
-
-    func testToolbarButtonShowsItsSearchLabelInAWideWindow() throws {
-        let widest = NSScreen.screens.map(\.visibleFrame.width).max() ?? 0
-        try XCTSkipUnless(widest >= 1500, "the label needs a zoomed window at least 1500 pt wide")
-        app.zoomWindow()
-        let button = element("toolbar.palette")
-        XCTAssertTrue(eventually { button.frame.width >= 160 }, "the label should be visible, not only in the tooltip")
     }
 
     func testCommandKOpensThePaletteAndEnterOpensAResult() {

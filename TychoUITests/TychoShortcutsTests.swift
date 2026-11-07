@@ -22,7 +22,7 @@ final class TychoShortcutsTests: XCTestCase {
     }
 
     func testSingleKeysAndGSequencesOutsideFields() {
-        XCTAssertTrue(element("toolbar.palette").waitForExistence(timeout: 5))
+        XCTAssertTrue(app.outlines.firstMatch.waitForExistence(timeout: 5))
         press("gc")
         XCTAssertTrue(element("calendar.title").waitForExistence(timeout: 5))
 
@@ -38,7 +38,7 @@ final class TychoShortcutsTests: XCTestCase {
     }
 
     func testPOpensNewProjectAndBracketTogglesTheSidebarOutsideFields() {
-        XCTAssertTrue(element("toolbar.palette").waitForExistence(timeout: 5))
+        XCTAssertTrue(app.outlines.firstMatch.waitForExistence(timeout: 5))
         press("p")
         XCTAssertTrue(element("project.name").waitForExistence(timeout: 5))
         app.typeKey(.escape, modifierFlags: [])
@@ -86,7 +86,7 @@ final class TychoShortcutsTests: XCTestCase {
     }
 
     func testShortcutKeysTypeIntoThePalette() {
-        XCTAssertTrue(element("toolbar.palette").waitForExistence(timeout: 5))
+        XCTAssertTrue(app.outlines.firstMatch.waitForExistence(timeout: 5))
         let outline = app.outlines.firstMatch
         XCTAssertTrue(outline.waitForExistence(timeout: 5))
         let sidebar = outline.frame
@@ -105,7 +105,7 @@ final class TychoShortcutsTests: XCTestCase {
     }
 
     func testQuestionMarkShowsShortcutsAndGThenCOpensCalendar() {
-        XCTAssertTrue(element("toolbar.palette").waitForExistence(timeout: 5))
+        XCTAssertTrue(app.outlines.firstMatch.waitForExistence(timeout: 5))
         press("?")
         let sheet = element("shortcuts.sheet")
         XCTAssertTrue(sheet.waitForExistence(timeout: 5))
@@ -117,7 +117,7 @@ final class TychoShortcutsTests: XCTestCase {
     }
 
     func testDoneClosesTheShortcutsSheetAndSingleKeysStillWork() {
-        XCTAssertTrue(element("toolbar.palette").waitForExistence(timeout: 5))
+        XCTAssertTrue(app.outlines.firstMatch.waitForExistence(timeout: 5))
         press("?")
         let sheet = element("shortcuts.sheet")
         XCTAssertTrue(sheet.waitForExistence(timeout: 5))
@@ -129,7 +129,7 @@ final class TychoShortcutsTests: XCTestCase {
     }
 
     func testSettingsShowsTheShortcutsSection() {
-        XCTAssertTrue(element("toolbar.palette").waitForExistence(timeout: 5))
+        XCTAssertTrue(app.outlines.firstMatch.waitForExistence(timeout: 5))
         app.typeKey(",", modifierFlags: .command)
         XCTAssertTrue(element("settings.shortcuts").waitForExistence(timeout: 5))
     }

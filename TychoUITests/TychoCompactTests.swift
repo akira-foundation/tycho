@@ -41,14 +41,10 @@ final class TychoCompactTests: XCTestCase {
         XCTAssertTrue(eventually { picker.label == "Table" })
     }
 
-    func testPaletteButtonSitsWithTheTrailingToolbarItems() {
+    func testTheNavigationBarHasNoPaletteButton() {
         openProject("Website Redesign")
-        let picker = app.buttons["project.tab"]
-        let palette = app.buttons["toolbar.palette"]
-        XCTAssertTrue(picker.waitForExistence(timeout: 5))
-        XCTAssertTrue(palette.waitForExistence(timeout: 5))
-
-        XCTAssertGreaterThan(palette.frame.minX, picker.frame.maxX)
+        XCTAssertTrue(app.buttons["project.tab"].waitForExistence(timeout: 5))
+        XCTAssertFalse(app.buttons["toolbar.palette"].exists)
     }
 
     func testNewTaskSheetCancelsFromTheNavigationBar() {

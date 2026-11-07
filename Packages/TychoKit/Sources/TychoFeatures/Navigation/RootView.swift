@@ -14,14 +14,6 @@ struct RootView: View {
             .onChange(of: workspaces.first?.id) { router.resetForNewWorkspace() }
     }
 
-    private var paletteSlot: ToolbarItemPlacement {
-        #if os(iOS)
-        isCompactWidth ? .topBarTrailing : .principal
-        #else
-        .principal
-        #endif
-    }
-
     @ViewBuilder private var content: some View {
         @Bindable var router = router
         if workspaces.isEmpty {
@@ -32,12 +24,8 @@ struct RootView: View {
             } detail: {
                 NavigationStack {
                     RouteDetail(route: router.route)
-                        .toolbar {
-                            ToolbarItem(placement: paletteSlot) { PaletteToolbarButton() }
-                        }
                 }
             }
-            .background(Token.bg.color)
             .uiTestingSplitViewAutosaveOff(TychoDefaults.isUITesting())
             #if os(macOS)
             .onGeometryChange(for: CGFloat.self) {

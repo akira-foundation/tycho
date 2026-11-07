@@ -84,32 +84,3 @@ private struct PaletteContent: View {
         runner.run(item.action, router: router)
     }
 }
-
-struct PaletteToolbarButton: View {
-    @Environment(Router.self) private var router
-
-    var body: some View {
-        Button {
-            router.togglePalette()
-        } label: {
-            #if os(macOS)
-            HStack(spacing: 8) {
-                Image(systemName: "magnifyingglass")
-                if router.showsPaletteLabel {
-                    Text("Search or jump to…")
-                        .tychoFont(.sm)
-                        .lineLimit(1)
-                        .frame(width: PaletteToolbarLayout.labelWidth, alignment: .leading)
-                }
-            }
-            .foregroundStyle(Token.text3.color)
-            .padding(.horizontal, router.showsPaletteLabel ? 9 : 6)
-            #else
-            Label("Search or jump to…", systemImage: "magnifyingglass")
-            #endif
-        }
-        .help("Search or jump to… (⌘K)")
-        .accessibilityLabel("Search or jump to…")
-        .accessibilityIdentifier("toolbar.palette")
-    }
-}
