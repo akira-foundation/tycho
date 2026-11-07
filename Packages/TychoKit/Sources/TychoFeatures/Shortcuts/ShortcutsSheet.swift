@@ -21,7 +21,7 @@ struct ShortcutsSheet: View {
             #endif
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Done") { dismiss() }
+                    Button("Done", role: .close) { dismiss() }
                         .keyboardShortcut(.cancelAction)
                 }
             }

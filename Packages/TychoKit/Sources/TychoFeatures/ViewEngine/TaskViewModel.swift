@@ -14,7 +14,6 @@ final class TaskViewModel {
     @ObservationIgnored var liveProjectIDs: Set<UUID>?
     @ObservationIgnored var liveSavedViewIDs: Set<UUID>?
     private var cached: TaskViewState
-    var editingFilterIndex: Int?
 
     init(key: String, inProject: Bool, defaults: UserDefaults = TychoDefaults.current) {
         self.key = key
@@ -69,7 +68,6 @@ final class TaskViewModel {
         lastData = data
         let next = TaskViewStates.state(for: key, inProject: inProject, in: data)
         guard next != cached else { return }
-        if next.filters != cached.filters { editingFilterIndex = nil }
         cached = next
     }
 
@@ -132,7 +130,6 @@ final class TaskViewModel {
         var next = state
         guard next.filters.indices.contains(index) else { return }
         next.filters.remove(at: index)
-        editingFilterIndex = nil
         state = next
     }
 
@@ -140,7 +137,6 @@ final class TaskViewModel {
         var next = state
         next.filters = []
         next.query = ""
-        editingFilterIndex = nil
         state = next
     }
 

@@ -8,9 +8,7 @@ struct TaskTableView: View {
     @Environment(ToastCenter.self) var toast
     @Query(sort: \Member.name) var members: [Member]
     @Query(filter: #Predicate<Project> { !$0.isArchived }, sort: \Project.sortOrder) private var projects: [Project]
-    #if os(iOS)
-    @Environment(\.horizontalSizeClass) private var sizeClass
-    #endif
+    @Environment(\.isCompactWidth) private var isCompact
     let tasks: [TaskItem]
     let model: TaskViewModel
 
@@ -21,7 +19,6 @@ struct TaskTableView: View {
 
     var body: some View {
         content(model.apply(tasks, now: .now, calendar: DateText.gregorian))
-            .background(Token.bg.color)
     }
 
     @ViewBuilder private func content(_ visible: [TaskItem]) -> some View {
@@ -42,14 +39,6 @@ struct TaskTableView: View {
 
     private var customization: Binding<TableColumnCustomization<TaskItem>> {
         Binding(get: { model.columnCustomization }, set: { model.setColumnCustomization($0) })
-    }
-
-    private var isCompact: Bool {
-        #if os(iOS)
-        sizeClass == .compact
-        #else
-        false
-        #endif
     }
 
     private func grid(_ groups: [TaskViewGroup]) -> some View {
@@ -86,9 +75,9 @@ struct TaskTableView: View {
 
     private var empty: some View {
         VStack(spacing: Spacing.s3) {
-            EmptyState(title: "No tasks here", symbol: "tablecells", message: "Add a task to get things moving.")
-            Button("Add task") { router.newTask() }
-                .buttonStyle(.tycho(.primary))
+            EmptyState(title: "No Tasks", symbol: "tablecells", message: "Add a task to get things moving.")
+            Button("New Task") { router.newTask() }
+                .buttonStyle(.borderedProminent)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }

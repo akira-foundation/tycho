@@ -19,33 +19,29 @@ struct FilesView: View {
 
     var body: some View {
         let files = FileQuery.apply(project.files ?? [], search: search, kind: kind, sort: sort)
-        VStack(spacing: 0) {
-            FilesToolbar(search: $search, kind: $kind, sort: $sort, layout: $layout) { importing = true }
-            Divider()
-            ScrollView {
-                VStack(alignment: .leading, spacing: Spacing.s4) {
-                    FileDropzone(
-                        message: "Drop files here or browse, up to 250 MB each", onBrowse: { importing = true },
-                        onDrop: upload)
-                    content(files)
-                }
-                .padding(Spacing.s6)
+        content(files)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .dropDestination(for: URL.self) { urls, _ in
+                upload(urls)
+                return !urls.isEmpty
             }
-        }
-        .background(Token.bg.color)
-        .fileUploader(isPresented: $importing, project: project)
-        .filePreview(item: $previewing)
-        .blocksNavigation(while: renaming != nil)
-        .alert("Rename file", isPresented: isRenaming) {
-            TextField("File name", text: $renameText).marksTextEditing()
-            Button("Rename", action: commitRename)
-            Button("Cancel", role: .cancel) { renaming = nil }
-        }
-        .confirmationDialog("Delete file?", isPresented: isDeleting, presenting: deleting) { file in
-            Button("Delete file", role: .destructive) { delete(file) }
-        } message: { file in
-            Text(FileMessages.deleteMessage(file))
-        }
+            .modifier(
+                FilesControls(search: $search, kind: $kind, sort: $sort, layout: $layout) { importing = true }
+            )
+            .accessibilityIdentifier("files.content")
+            .fileUploader(isPresented: $importing, project: project)
+            .filePreview(item: $previewing)
+            .blocksNavigation(while: renaming != nil)
+            .alert("Rename File", isPresented: isRenaming) {
+                TextField("File name", text: $renameText).marksTextEditing()
+                Button("Rename", action: commitRename)
+                Button("Cancel", role: .cancel) { renaming = nil }
+            }
+            .confirmationDialog("Delete File?", isPresented: isDeleting, presenting: deleting) { file in
+                Button("Delete File", role: .destructive) { delete(file) }
+            } message: { file in
+                Text(FileMessages.deleteMessage(file))
+            }
     }
 
     @ViewBuilder private func content(_ files: [FileRecord]) -> some View {
@@ -56,16 +52,19 @@ struct FilesView: View {
         }
     }
 
-    private var emptyState: some View {
-        let filtering = FileQuery.isFiltering(search: search, kind: kind)
-        return EmptyState(
-            title: filtering ? "No results found" : "No files yet",
-            symbol: filtering ? "magnifyingglass" : "folder",
-            message: filtering
-                ? "No files match your search."
-                : "Upload designs, documents, and assets to share them with the project."
-        )
-        .frame(minHeight: 320)
+    @ViewBuilder private var emptyState: some View {
+        if FileQuery.isFiltering(search: search, kind: kind) {
+            ContentUnavailableView.search(text: search)
+        } else {
+            ContentUnavailableView {
+                Label("No Files", systemImage: "folder")
+            } description: {
+                Text("Upload designs, documents, and assets to share them with the project.")
+            } actions: {
+                Button("Upload Files") { importing = true }
+                    .buttonStyle(.borderedProminent)
+            }
+        }
     }
 
     private var isRenaming: Binding<Bool> {

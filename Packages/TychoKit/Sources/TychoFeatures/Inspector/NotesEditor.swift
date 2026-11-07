@@ -1,7 +1,6 @@
 import SwiftData
 import SwiftUI
 import TychoCore
-import TychoDesign
 
 struct NotesEditor: View {
     @Environment(\.modelContext) private var context
@@ -12,30 +11,28 @@ struct NotesEditor: View {
     @State private var flushToken = UUID()
 
     var body: some View {
-        VStack(alignment: .leading, spacing: Spacing.s2) {
-            HStack {
-                Text("Description").tychoFont(.sm, weight: .semibold)
-                Spacer()
-                Button(draft.isEditing ? "Done" : "Edit", action: toggleEditing)
-                    .buttonStyle(.borderless)
-                    .accessibilityIdentifier("inspector.notes.edit")
-            }
+        Section {
             switch (draft.isEditing, task.notes.isEmpty) {
             case (true, _):
                 TextEditor(text: $draft.text)
                     .marksTextEditing()
                     .accessibilityIdentifier("inspector.notes.editor")
                     .frame(minHeight: 120)
-                    .scrollContentBackground(.hidden)
-                    .background(Token.sunken.color, in: RoundedRectangle(cornerRadius: Radius.md))
             case (false, true):
-                Text("Add a description…").foregroundStyle(Token.text4.color)
+                Text("No Description").foregroundStyle(.secondary)
             case (false, false):
                 Text(rendered)
                     .textSelection(.enabled)
             }
+        } header: {
+            HStack {
+                Text("Description")
+                Spacer()
+                Button(draft.isEditing ? "Done" : "Edit", action: toggleEditing)
+                    .buttonStyle(.borderless)
+                    .accessibilityIdentifier("inspector.notes.edit")
+            }
         }
-        .tychoFont(.base)
         .onAppear { router.registerInspectorFlush(flushToken, commitDraft) }
         .onDisappear {
             commitDraft()

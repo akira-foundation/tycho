@@ -17,11 +17,16 @@ struct ProjectsView: View {
         Group {
             switch (projects.isEmpty, layout) {
             case (true, _):
-                EmptyState(
-                    title: "No projects yet", symbol: "folder", message: "Create a project to start organising tasks.")
+                ContentUnavailableView {
+                    Label("No Projects", systemImage: "folder")
+                } description: {
+                    Text("Create a project to start organising tasks.")
+                } actions: {
+                    Button("New Project") { router.newProject() }
+                }
             case (false, .grid):
                 ScrollView {
-                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 260), spacing: Spacing.s4)], spacing: Spacing.s4) {
+                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 260), spacing: 16)], spacing: 16) {
                         ForEach(sorted) { project in
                             Button {
                                 router.openProject(project.id, tab: .board)
@@ -32,40 +37,47 @@ struct ProjectsView: View {
                             .contextMenu { menu(for: project) }
                         }
                     }
-                    .padding(Spacing.s6)
+                    .padding()
                 }
             case (false, .list):
                 List(sorted) { project in
                     Button {
                         router.openProject(project.id, tab: .board)
                     } label: {
-                        HStack(spacing: Spacing.s3) {
+                        HStack(spacing: 12) {
                             ProjectGlyph(symbol: project.symbol, color: project.color.tint)
-                            Text(project.name).tychoFont(.base, weight: .medium)
-                            StatusPill(status: project.status)
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(project.name)
+                                Text(project.status.title).font(.caption).foregroundStyle(project.status.tint)
+                            }
                             Spacer()
                             ProgressRing(percent: project.progress, color: project.color.tint)
-                            Text("\(project.progress)%").tychoFont(.xs).monospacedDigit()
+                            Text("\(project.progress)%")
+                                .font(.callout)
+                                .monospacedDigit()
+                                .foregroundStyle(.secondary)
                         }
+                        .contentShape(Rectangle())
                     }
                     .buttonStyle(.plain)
                     .contextMenu { menu(for: project) }
                 }
             }
         }
-        .background(Token.bg.color)
         .navigationTitle("Projects")
         .toolbar {
             ToolbarItem {
-                Picker("Sort", selection: $sort) {
-                    ForEach(ProjectSort.allCases) { Text($0.title).tag($0) }
+                Menu("View Options", systemImage: "ellipsis.circle") {
+                    Picker("View As", selection: $layout) {
+                        ForEach(ProjectLayout.allCases) { Label($0.title, systemImage: $0.symbol).tag($0) }
+                    }
+                    .pickerStyle(.inline)
+                    Picker("Sort By", selection: $sort) {
+                        ForEach(ProjectSort.allCases) { Text($0.title).tag($0) }
+                    }
+                    .pickerStyle(.menu)
                 }
-            }
-            ToolbarItem {
-                Picker("Layout", selection: $layout) {
-                    ForEach(ProjectLayout.allCases) { Image(systemName: $0.symbol).tag($0) }
-                }
-                .pickerStyle(.segmented)
+                .accessibilityIdentifier("projects.options")
             }
             ToolbarItem { Button("New Project", systemImage: "plus") { router.newProject() } }
         }

@@ -29,25 +29,20 @@ struct ProjectTabContent: View {
         let engine = TaskViewEngine(model: model, members: members, projects: projects)
         switch layout {
         case .board:
-            VStack(spacing: 0) {
-                TaskViewHeader(engine: engine)
-                BoardView(tasks: visible(source), project: project)
-            }
+            BoardView(tasks: visible(source), project: project)
+                .taskViewControls(engine)
         case .list:
-            VStack(spacing: 0) {
-                TaskViewHeader(engine: engine, showsGroup: true)
-                list(source)
-            }
+            list(source)
+                .taskViewControls(engine, showsGroup: true)
         case .table:
-            VStack(spacing: 0) {
-                TaskViewHeader(engine: engine, showsGroup: true, showsColumns: true)
-                TaskTableView(tasks: source, model: model)
-            }
+            TaskTableView(tasks: source, model: model)
+                .taskViewControls(engine, showsGroup: true, showsColumns: true)
         case .calendar:
-            CalendarView(tasks: visible(source), events: project.events ?? [], project: project, engine: engine)
+            CalendarView(tasks: visible(source), events: project.events ?? [])
+                .taskViewControls(engine) { CalendarModePicker().pickerStyle(.menu) }
         case .timeline:
-            TimelineView(
-                tasks: visible(source), milestones: project.milestones ?? [], project: project, engine: engine)
+            TimelineView(tasks: visible(source), milestones: project.milestones ?? [], project: project)
+                .taskViewControls(engine) { TimelineOptions(showsZoom: true) }
         case .files:
             FilesView(project: project)
         }

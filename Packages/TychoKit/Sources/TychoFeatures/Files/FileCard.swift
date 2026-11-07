@@ -1,14 +1,16 @@
 import SwiftUI
 import TychoCore
-import TychoDesign
 
 struct FileGrid: View {
     let files: [FileRecord]
     let actions: (FileRecord) -> FileMenuActions
 
     var body: some View {
-        LazyVGrid(columns: [GridItem(.adaptive(minimum: 200), spacing: Spacing.s4)], spacing: Spacing.s4) {
-            ForEach(files) { FileCard(file: $0, actions: actions($0)) }
+        ScrollView {
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: 150), spacing: 20, alignment: .top)], spacing: 24) {
+                ForEach(files) { FileCard(file: $0, actions: actions($0)) }
+            }
+            .padding()
         }
     }
 }
@@ -19,29 +21,20 @@ struct FileCard: View {
     let actions: FileMenuActions
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            FileThumbnail(file: file).aspectRatio(16 / 10, contentMode: .fit)
-            Divider()
-            HStack(alignment: .top, spacing: Spacing.s2) {
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(file.name).tychoFont(.sm, weight: .medium).lineLimit(1)
-                    Text(FileMessages.meta(file, dateText: dateText))
-                        .tychoFont(.xxs)
-                        .foregroundStyle(Token.text3.color)
-                        .lineLimit(1)
-                }
-                Spacer(minLength: 0)
-                FileMenuButton(actions: actions)
-            }
-            .padding(Spacing.s3)
+        VStack(spacing: 6) {
+            FileThumbnail(file: file)
+                .aspectRatio(4 / 3, contentMode: .fit)
+                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+            Text(file.name).font(.callout).lineLimit(2).multilineTextAlignment(.center)
+            Text(FileMessages.meta(file, dateText: dateText))
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .lineLimit(1)
         }
-        .background(Token.surface.color)
-        .clipShape(RoundedRectangle(cornerRadius: Radius.lg, style: .continuous))
-        .shadowCard(radius: Radius.lg)
         .contentShape(Rectangle())
         .onTapGesture(perform: actions.preview)
         .contextMenu { FileMenuItems(actions: actions) }
-        .accessibilityElement(children: .contain)
+        .accessibilityElement(children: .combine)
         .accessibilityAddTraits(.isButton)
         .accessibilityAction(named: "Preview", actions.preview)
         .accessibilityIdentifier("file.\(file.name)")

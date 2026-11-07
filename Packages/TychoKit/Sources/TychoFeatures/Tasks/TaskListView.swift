@@ -33,17 +33,15 @@ struct TaskListView: View {
         List {
             ForEach(groups) { group in
                 let status = statusOf(group)
-                Section {
-                    if !collapsed.contains(group.id) {
-                        ForEach(group.tasks) { task in
-                            row(task, status: status)
-                        }
-                        if let project, let status {
-                            InlineComposer(placeholder: "Add task") { title in
-                                toast.perform {
-                                    _ = try TaskActions(context: context).create(
-                                        TaskDraft(title: title, status: status), in: project)
-                                }
+                Section(isExpanded: expansion(of: group.id)) {
+                    ForEach(group.tasks) { task in
+                        row(task, status: status)
+                    }
+                    if let project, let status {
+                        InlineComposer(placeholder: "Add Task") { title in
+                            toast.perform {
+                                _ = try TaskActions(context: context).create(
+                                    TaskDraft(title: title, status: status), in: project)
                             }
                         }
                     }
@@ -56,8 +54,7 @@ struct TaskListView: View {
                 }
             }
         }
-        .listStyle(.inset)
-        .scrollContentBackground(.hidden)
+        .listStyle(.sidebar)
         .tychoAnimation(value: tasks.movementSignature)
     }
 
@@ -82,30 +79,27 @@ struct TaskListView: View {
     }
 
     private func header(_ group: TaskViewGroup, status: TaskStatus?) -> some View {
-        Button {
-            toggle(group.id)
-        } label: {
-            HStack(spacing: Spacing.s2) {
-                Image(systemName: collapsed.contains(group.id) ? "chevron.right" : "chevron.down").font(.caption2)
-                if let status {
-                    StatusIcon(glyph: status.glyph, color: status.tint)
-                }
-                Text(group.title).tychoFont(.sm, weight: .semibold)
-                Text("\(group.tasks.count)").tychoFont(.xs).foregroundStyle(Token.text4.color)
-                Spacer()
+        HStack(spacing: Spacing.s2) {
+            if let status {
+                StatusIcon(glyph: status.glyph, color: status.tint)
             }
-            .contentShape(Rectangle())
+            Text(group.title)
+            Text("\(group.tasks.count)").foregroundStyle(.secondary)
         }
-        .buttonStyle(.plain)
+        .accessibilityElement(children: .combine)
         .accessibilityIdentifier("group.\(group.id)")
     }
 
-    private func toggle(_ id: String) {
-        if collapsed.contains(id) {
-            collapsed.remove(id)
-        } else {
-            collapsed.insert(id)
-        }
+    private func expansion(of id: String) -> Binding<Bool> {
+        Binding(
+            get: { !collapsed.contains(id) },
+            set: { isExpanded in
+                if isExpanded {
+                    collapsed.remove(id)
+                    return
+                }
+                collapsed.insert(id)
+            })
     }
 
     private func drop(_ items: [TaskTransfer], into status: TaskStatus, before target: TaskItem?) -> Bool {

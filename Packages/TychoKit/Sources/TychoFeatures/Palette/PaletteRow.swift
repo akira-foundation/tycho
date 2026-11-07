@@ -63,9 +63,9 @@ struct PaletteVisualIcon: View {
         case .file(let kind):
             Image(systemName: kind.symbol).foregroundStyle(kind.tint)
         case .symbol(let name):
-            Image(systemName: name).foregroundStyle(Token.text2.color)
+            Image(systemName: name).foregroundStyle(.secondary)
         case nil:
-            Image(systemName: "circle").foregroundStyle(Token.text2.color)
+            Image(systemName: "circle").foregroundStyle(.secondary)
         }
     }
 }

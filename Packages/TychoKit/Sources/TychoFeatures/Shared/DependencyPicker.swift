@@ -23,15 +23,15 @@ struct DependencyPicker: View {
     @ViewBuilder private var label: some View {
         let blockers = task.orderedBlockedBy
         if blockers.isEmpty {
-            Text(emptyText).foregroundStyle(Token.text4.color)
+            Text(emptyText).foregroundStyle(.tertiary)
         } else {
-            HStack(spacing: Spacing.s1) {
+            HStack(spacing: 4) {
                 ForEach(blockers) { blocker in
                     Text(blocker.key)
-                        .tychoFont(.xxs, design: .monospaced)
+                        .font(.caption.monospaced())
                         .padding(.horizontal, 5)
                         .padding(.vertical, 1)
-                        .background(Token.surface3.color, in: RoundedRectangle(cornerRadius: Radius.xs))
+                        .background(.fill.tertiary, in: RoundedRectangle(cornerRadius: 4))
                         .help(blocker.title)
                     if showsTitles {
                         Text(blocker.title).lineLimit(1)
@@ -49,7 +49,7 @@ struct DependencyList: View {
     @State private var query = ""
 
     var body: some View {
-        VStack(alignment: .leading, spacing: Spacing.s2) {
+        VStack(alignment: .leading, spacing: 8) {
             TextField("Blocked by…", text: $query)
                 .marksTextEditing()
                 .textFieldStyle(.roundedBorder)
@@ -67,15 +67,14 @@ struct DependencyList: View {
             }
             .frame(maxHeight: 320)
         }
-        .padding(Spacing.s3)
+        .padding()
         .frame(width: 320)
-        .tychoFont(.sm)
     }
 
     private func row(_ candidate: TaskItem) -> some View {
-        HStack(spacing: Spacing.s2) {
+        HStack(spacing: 8) {
             StatusIcon(glyph: candidate.status.glyph, color: candidate.status.tint, size: 13)
-            Text(candidate.key).tychoFont(.xxs, design: .monospaced).foregroundStyle(Token.text4.color)
+            Text(candidate.key).font(.caption.monospaced()).foregroundStyle(.secondary)
             Text(candidate.title).lineLimit(1)
             Spacer()
             if task.isBlocked(by: candidate) {

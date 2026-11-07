@@ -5,6 +5,7 @@ import TychoDesign
 
 struct TasksView: View {
     @Environment(Router.self) private var router
+    @Environment(\.isCompactWidth) private var isCompactWidth
     @Query private var tasks: [TaskItem]
     @Query(sort: \Member.name) private var members: [Member]
     @Query(filter: #Predicate<Project> { !$0.isArchived }, sort: \Project.sortOrder) private var projects: [Project]
@@ -19,12 +20,6 @@ struct TasksView: View {
         let source = tasks.inLiveProjects()
         let mode = TasksMode.current(in: model)
         VStack(spacing: 0) {
-            PageHeader(title: "Tasks", subtitle: TasksMode.subtitle(projectCount: projects.count)) {}
-            Divider()
-            TaskViewHeader(
-                engine: TaskViewEngine(model: model, members: members, projects: projects),
-                showsGroup: mode != .board, showsColumns: mode == .table
-            ) { extras(mode) }
             switch mode {
             case .list:
                 list(source)
@@ -34,21 +29,34 @@ struct TasksView: View {
                 TaskTableView(tasks: source, model: model)
             }
         }
-        .background(Token.bg.color)
+        .taskViewControls(
+            TaskViewEngine(model: model, members: members, projects: projects),
+            showsGroup: mode != .board, showsColumns: mode == .table
+        ) {
+            if isCompactWidth {
+                modePicker(mode).pickerStyle(.menu)
+            }
+        }
+        .toolbar {
+            if !isCompactWidth {
+                ToolbarItem { modePicker(mode).pickerStyle(.segmented) }
+            }
+            ToolbarItem(placement: .primaryAction) {
+                Button("New Task", systemImage: "plus") { router.newTask() }
+            }
+        }
         .tracksLiveProjects(model)
         .navigationTitle("Tasks")
+        .navigationSubtitle(TasksMode.subtitle(projectCount: projects.count))
     }
 
-    @ViewBuilder private func extras(_ mode: TasksMode) -> some View {
-        Picker("View", selection: Binding(get: { mode }, set: { model.state.mode = $0.rawValue })) {
+    private func modePicker(_ mode: TasksMode) -> some View {
+        Picker(selection: Binding(get: { mode }, set: { model.state.mode = $0.rawValue })) {
             ForEach(TasksMode.allCases) { Label($0.title, systemImage: $0.symbol).tag($0) }
+        } label: {
+            Label("View", systemImage: mode.symbol)
         }
-        .pickerStyle(.segmented)
-        .labelsHidden()
-        .fixedSize()
         .accessibilityIdentifier("tasks.mode")
-        Button("New task", systemImage: "plus") { router.newTask() }
-            .buttonStyle(.tycho(.primary))
     }
 
     private func visible(_ source: [TaskItem]) -> [TaskItem] {

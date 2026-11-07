@@ -33,4 +33,5 @@ enum ProjectLayout: String, CaseIterable, Identifiable {
 
     var id: String { rawValue }
     var symbol: String { self == .grid ? "square.grid.2x2" : "list.bullet" }
+    var title: String { self == .grid ? "Icons" : "List" }
 }

@@ -22,7 +22,7 @@ final class TychoShortcutsTests: XCTestCase {
     }
 
     func testSingleKeysAndGSequencesOutsideFields() {
-        XCTAssertTrue(element("toolbar.palette").waitForExistence(timeout: 5))
+        XCTAssertTrue(app.outlines.firstMatch.waitForExistence(timeout: 5))
         press("gc")
         XCTAssertTrue(element("calendar.title").waitForExistence(timeout: 5))
 
@@ -38,7 +38,7 @@ final class TychoShortcutsTests: XCTestCase {
     }
 
     func testPOpensNewProjectAndBracketTogglesTheSidebarOutsideFields() {
-        XCTAssertTrue(element("toolbar.palette").waitForExistence(timeout: 5))
+        XCTAssertTrue(app.outlines.firstMatch.waitForExistence(timeout: 5))
         press("p")
         XCTAssertTrue(element("project.name").waitForExistence(timeout: 5))
         app.typeKey(.escape, modifierFlags: [])
@@ -53,12 +53,10 @@ final class TychoShortcutsTests: XCTestCase {
         XCTAssertTrue(eventually { outline.exists && outline.frame == shown }, "[ should show the sidebar again")
     }
 
-    func testCommandKStaysOffWhileEditProjectIsOpen() throws {
-        let widest = NSScreen.screens.map(\.visibleFrame.width).max() ?? 0
-        try XCTSkipUnless(widest >= 1500, "Edit Project needs a zoomed window at least 1500 pt wide")
-        app.zoomWindow()
+    func testCommandKStaysOffWhileEditProjectIsOpen() {
         app.openSidebarItem("Website Redesign", revealing: element("project.tab"))
-        app.buttons["Edit Project"].firstMatch.click()
+        element("project.menu").click()
+        app.menuItems["Edit Project…"].firstMatch.click()
         let name = element("project.name")
         XCTAssertTrue(name.waitForExistence(timeout: 5))
         app.typeKey("k", modifierFlags: .command)
@@ -71,8 +69,8 @@ final class TychoShortcutsTests: XCTestCase {
     }
 
     func testShortcutKeysTypeIntoTheToolbarSearch() {
-        app.openSidebarItem("Tasks", revealing: element("view.search"))
-        let search = element("view.search")
+        let search = app.searchFields.firstMatch
+        app.openSidebarItem("Tasks", revealing: search)
         let sidebar = app.outlines.firstMatch.frame
         search.click()
         search.typeText("np/?[gc")
@@ -86,7 +84,7 @@ final class TychoShortcutsTests: XCTestCase {
     }
 
     func testShortcutKeysTypeIntoThePalette() {
-        XCTAssertTrue(element("toolbar.palette").waitForExistence(timeout: 5))
+        XCTAssertTrue(app.outlines.firstMatch.waitForExistence(timeout: 5))
         let outline = app.outlines.firstMatch
         XCTAssertTrue(outline.waitForExistence(timeout: 5))
         let sidebar = outline.frame
@@ -105,7 +103,7 @@ final class TychoShortcutsTests: XCTestCase {
     }
 
     func testQuestionMarkShowsShortcutsAndGThenCOpensCalendar() {
-        XCTAssertTrue(element("toolbar.palette").waitForExistence(timeout: 5))
+        XCTAssertTrue(app.outlines.firstMatch.waitForExistence(timeout: 5))
         press("?")
         let sheet = element("shortcuts.sheet")
         XCTAssertTrue(sheet.waitForExistence(timeout: 5))
@@ -117,7 +115,7 @@ final class TychoShortcutsTests: XCTestCase {
     }
 
     func testDoneClosesTheShortcutsSheetAndSingleKeysStillWork() {
-        XCTAssertTrue(element("toolbar.palette").waitForExistence(timeout: 5))
+        XCTAssertTrue(app.outlines.firstMatch.waitForExistence(timeout: 5))
         press("?")
         let sheet = element("shortcuts.sheet")
         XCTAssertTrue(sheet.waitForExistence(timeout: 5))
@@ -129,7 +127,7 @@ final class TychoShortcutsTests: XCTestCase {
     }
 
     func testSettingsShowsTheShortcutsSection() {
-        XCTAssertTrue(element("toolbar.palette").waitForExistence(timeout: 5))
+        XCTAssertTrue(app.outlines.firstMatch.waitForExistence(timeout: 5))
         app.typeKey(",", modifierFlags: .command)
         XCTAssertTrue(element("settings.shortcuts").waitForExistence(timeout: 5))
     }

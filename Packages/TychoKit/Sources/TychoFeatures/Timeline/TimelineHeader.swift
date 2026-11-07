@@ -1,6 +1,5 @@
 import SwiftUI
 import TychoCore
-import TychoDesign
 
 struct TimelineHeader: View {
     static let height: CGFloat = 48
@@ -11,7 +10,7 @@ struct TimelineHeader: View {
             HStack(spacing: 0) {
                 ForEach(layout.monthBlocks) { block in
                     Text(block.title)
-                        .tychoFont(.xs, weight: .semibold)
+                        .font(.caption.weight(.semibold))
                         .lineLimit(1)
                         .padding(.leading, 6)
                         .frame(width: block.width, height: Self.height / 2, alignment: .leading)
@@ -20,10 +19,10 @@ struct TimelineHeader: View {
             HStack(spacing: 0) {
                 ForEach(layout.headerCells) { cell in
                     Text(cell.title)
-                        .tychoFont(.xxs, weight: cell.isToday ? .semibold : .regular)
+                        .font(.caption2.weight(cell.isToday ? .semibold : .regular))
                         .monospacedDigit()
                         .lineLimit(1)
-                        .foregroundStyle(cell.isToday ? Color.accentColor : Token.text3.color)
+                        .foregroundStyle(cell.isToday ? AnyShapeStyle(Color.accentColor) : AnyShapeStyle(.secondary))
                         .frame(width: cell.width, height: Self.height / 2)
                 }
             }

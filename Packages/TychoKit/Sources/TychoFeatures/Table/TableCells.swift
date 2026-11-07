@@ -63,21 +63,19 @@ struct StatusCell: View {
     let task: TaskItem
 
     var body: some View {
-        Menu {
-            ForEach(TaskStatus.allCases) { status in
-                Button(status.title) { toast.perform { try TaskActions(context: context).setStatus(task, status) } }
+        HStack(spacing: Spacing.s1) {
+            StatusIcon(glyph: task.status.glyph, color: task.status.tint)
+            Menu(task.status.title) {
+                ForEach(TaskStatus.allCases) { status in
+                    Button(status.title) { toast.perform { try TaskActions(context: context).setStatus(task, status) } }
+                }
             }
-        } label: {
-            HStack(spacing: Spacing.s1) {
-                StatusIcon(glyph: task.status.glyph, color: task.status.tint)
-                Text(task.status.title)
-            }
+            .menuStyle(.borderlessButton)
+            .menuIndicator(.hidden)
+            .fixedSize()
+            .accessibilityIdentifier("table.status.\(task.key)")
+            .accessibilityValue(task.status.title)
         }
-        .menuStyle(.borderlessButton)
-        .menuIndicator(.hidden)
-        .fixedSize()
-        .accessibilityIdentifier("table.status.\(task.key)")
-        .accessibilityValue(task.status.title)
     }
 }
 
@@ -87,22 +85,20 @@ struct PriorityCell: View {
     let task: TaskItem
 
     var body: some View {
-        Menu {
-            ForEach(TaskPriority.allCases) { priority in
-                Button(priority.title) {
-                    toast.perform { try TaskActions(context: context).edit(task) { $0.priority = priority } }
+        HStack(spacing: Spacing.s1) {
+            PriorityIcon(weight: task.priority.weight)
+            Menu(task.priority.title) {
+                ForEach(TaskPriority.allCases) { priority in
+                    Button(priority.title) {
+                        toast.perform { try TaskActions(context: context).edit(task) { $0.priority = priority } }
+                    }
                 }
             }
-        } label: {
-            HStack(spacing: Spacing.s1) {
-                PriorityIcon(weight: task.priority.weight)
-                Text(task.priority.title)
-            }
+            .menuStyle(.borderlessButton)
+            .menuIndicator(.hidden)
+            .fixedSize()
+            .accessibilityIdentifier("table.priority.\(task.key)")
         }
-        .menuStyle(.borderlessButton)
-        .menuIndicator(.hidden)
-        .fixedSize()
-        .accessibilityIdentifier("table.priority.\(task.key)")
     }
 }
 
@@ -113,23 +109,22 @@ struct AssigneeCell: View {
     let members: [Member]
 
     var body: some View {
-        Menu {
-            Button("Unassigned") { assign(nil) }
-            ForEach(members) { member in
-                Button(member.name) { assign(member) }
+        HStack(spacing: Spacing.s1) {
+            if let assignee = task.assignee {
+                Avatar(initials: assignee.initials, color: assignee.tint, size: 18)
+                    .accessibilityIdentifier("table.avatar.\(task.key)")
             }
-        } label: {
-            HStack(spacing: Spacing.s1) {
-                if let assignee = task.assignee {
-                    Avatar(initials: assignee.initials, color: assignee.tint, size: 18)
+            Menu(task.assignee?.name ?? "Unassigned") {
+                Button("Unassigned") { assign(nil) }
+                ForEach(members) { member in
+                    Button(member.name) { assign(member) }
                 }
-                Text(task.assignee?.name ?? "Unassigned")
-                    .foregroundStyle(task.assignee == nil ? Token.text4.color : Token.text.color)
-                    .lineLimit(1)
             }
+            .menuStyle(.borderlessButton)
+            .menuIndicator(.hidden)
+            .foregroundStyle(task.assignee == nil ? .secondary : .primary)
+            .accessibilityIdentifier("table.assignee.\(task.key)")
         }
-        .menuStyle(.borderlessButton)
-        .menuIndicator(.hidden)
     }
 
     private func assign(_ member: Member?) {

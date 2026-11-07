@@ -1,6 +1,5 @@
 import SwiftUI
 import TychoCore
-import TychoDesign
 
 enum TimelineBarTint: Equatable {
     case project
@@ -23,8 +22,10 @@ struct TimelineCanvas: View {
     let curves: [DependencyCurve]
 
     var body: some View {
+        let height = Double(rows.count) * TimelineLayout.rowHeight + 40
         ZStack(alignment: .topLeading) {
             TimelineBackdrop(rows: rows, layout: layout)
+                .frame(width: layout.width, height: height)
             TimelineMilestones(pins: pins)
             ForEach(Array(rows.enumerated()), id: \.element.id) { index, row in
                 if case .task(let task) = row, let due = task.due {
@@ -37,15 +38,13 @@ struct TimelineCanvas: View {
             }
             TimelineDependencies(curves: curves)
         }
-        .frame(
-            width: layout.width, height: Double(rows.count) * TimelineLayout.rowHeight + 40, alignment: .topLeading
-        )
+        .frame(width: layout.width, height: height, alignment: .topLeading)
         .coordinateSpace(.named(Self.coordinateSpace))
     }
 
     private func tint(for task: TaskItem) -> Color {
         switch TimelineBarTint.source(for: grouping) {
-        case .project: task.project?.color.tint ?? Token.gray.color
+        case .project: task.project?.color.tint ?? .gray
         case .status: task.status.tint
         }
     }
@@ -56,32 +55,27 @@ struct TimelineBackdrop: View {
     let layout: TimelineLayout
 
     var body: some View {
-        Canvas { context, size in
-            for x in layout.weekendXs {
-                context.fill(
-                    Path(CGRect(x: x, y: 0, width: layout.dayWidth, height: size.height)),
-                    with: .color(Token.surface2.color))
+        ZStack(alignment: .topLeading) {
+            ForEach(layout.weekendXs, id: \.self) { x in
+                Rectangle().fill(Color.primary.opacity(0.04)).frame(width: layout.dayWidth).offset(x: x)
             }
-            for (index, row) in rows.enumerated() where row.isHeader {
-                let rect = CGRect(
-                    x: 0, y: Double(index) * TimelineLayout.rowHeight, width: size.width,
-                    height: TimelineLayout.rowHeight)
-                context.fill(Path(rect), with: .color(Token.sunken.color))
+            ForEach(headerIndices, id: \.self) { index in
+                Rectangle()
+                    .fill(Color.primary.opacity(0.05))
+                    .frame(height: TimelineLayout.rowHeight)
+                    .offset(y: Double(index) * TimelineLayout.rowHeight)
             }
-            for x in layout.weekLineXs {
-                context.stroke(vertical(at: x, height: size.height), with: .color(Token.divider.color), lineWidth: 1)
+            ForEach(layout.weekLineXs, id: \.self) { x in
+                Rectangle().fill(.separator).frame(width: 0.5).offset(x: x)
             }
-            context.stroke(
-                vertical(at: layout.todayLineX, height: size.height), with: .color(Color.accentColor), lineWidth: 1.5)
+            Rectangle().fill(Color.accentColor).frame(width: 1.5).offset(x: layout.todayLineX)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .allowsHitTesting(false)
         .accessibilityHidden(true)
     }
 
-    private func vertical(at x: Double, height: Double) -> Path {
-        Path { path in
-            path.move(to: CGPoint(x: x, y: 0))
-            path.addLine(to: CGPoint(x: x, y: height))
-        }
+    private var headerIndices: [Int] {
+        rows.indices.filter { rows[$0].isHeader }
     }
 }

@@ -18,6 +18,17 @@ public enum ProjectBuiltInTab: String, CaseIterable, Hashable, Sendable {
         case .files: "Files"
         }
     }
+
+    public var symbol: String {
+        switch self {
+        case .board: "rectangle.split.3x1"
+        case .list: "list.bullet"
+        case .table: "tablecells"
+        case .calendar: "calendar"
+        case .timeline: "chart.bar.xaxis"
+        case .files: "folder"
+        }
+    }
 }
 
 public enum ProjectTab: Hashable, Sendable {

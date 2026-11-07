@@ -34,12 +34,12 @@ public struct AvatarStack: View {
         HStack(spacing: -6) {
             ForEach(Array(people.prefix(limit).enumerated()), id: \.offset) { _, person in
                 Avatar(initials: person.0, color: person.1)
-                    .overlay(Circle().strokeBorder(Token.surface.color, lineWidth: 1.5))
+                    .overlay(Circle().strokeBorder(.background, lineWidth: 1.5))
             }
             if people.count > limit {
                 Text("+\(people.count - limit)")
-                    .tychoFont(.xxs, weight: .medium)
-                    .foregroundStyle(Token.text3.color)
+                    .font(.caption2.weight(.medium))
+                    .foregroundStyle(.secondary)
                     .padding(.leading, Spacing.s2)
             }
         }

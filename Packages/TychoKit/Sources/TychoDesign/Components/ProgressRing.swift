@@ -15,7 +15,7 @@ public struct ProgressRing: View {
 
     public var body: some View {
         ZStack {
-            Circle().stroke(Token.border.color, lineWidth: 2)
+            Circle().stroke(.quaternary, lineWidth: 2)
             Circle()
                 .trim(from: 0, to: Self.fraction(percent))
                 .stroke(color, style: StrokeStyle(lineWidth: 2, lineCap: .round))

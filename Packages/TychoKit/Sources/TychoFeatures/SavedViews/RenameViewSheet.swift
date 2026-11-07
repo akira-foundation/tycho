@@ -30,11 +30,10 @@ struct RenameViewSheet: View {
             .navigationTitle("Rename view")
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }.buttonStyle(.tycho(.secondary))
+                    Button("Cancel", role: .cancel) { dismiss() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Save", action: save)
-                        .buttonStyle(.tycho(.primary))
+                    Button("Save", role: .confirm, action: save)
                         .keyboardShortcut(.return, modifiers: .command)
                         .accessibilityIdentifier("renameView.save")
                 }

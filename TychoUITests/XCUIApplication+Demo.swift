@@ -36,6 +36,10 @@ extension XCUIApplication {
         picker.descendants(matching: .any)[tab].firstMatch.click()
     }
 
+    var filterButton: XCUIElement { buttons["Filter"].firstMatch }
+
+    var viewOptionsMenu: XCUIElement { menuButtons["View Options"].firstMatch }
+
     func zoomWindow() {
         menuBars.menuBarItems["Window"].click()
         menuItems["Zoom"].firstMatch.click()
@@ -45,17 +49,6 @@ extension XCUIApplication {
 extension XCUIElement {
     var hasFocus: Bool {
         (value(forKey: "hasKeyboardFocus") as? Bool) == true
-    }
-}
-
-extension XCTestCase {
-    func eventually(timeout: TimeInterval = 5, _ condition: () -> Bool) -> Bool {
-        let deadline = Date().addingTimeInterval(timeout)
-        while Date() < deadline {
-            if condition() { return true }
-            RunLoop.current.run(until: Date().addingTimeInterval(0.1))
-        }
-        return condition()
     }
 }
 #endif

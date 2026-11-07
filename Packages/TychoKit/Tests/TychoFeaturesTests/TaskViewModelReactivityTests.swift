@@ -46,29 +46,6 @@ struct TaskViewModelReactivityTests {
         #expect(model.state == external)
     }
 
-    @Test func filtersChangedElsewhereCloseTheOpenValueList() throws {
-        let defaults = try makeDefaults()
-        let model = TaskViewModel(key: "tasks", inProject: false, defaults: defaults)
-        let other = TaskViewModel(key: "tasks", inProject: false, defaults: defaults)
-        _ = model.addFilter(.status)
-        model.editingFilterIndex = model.addFilter(.priority)
-
-        other.removeFilter(at: 0)
-
-        #expect(model.editingFilterIndex == nil)
-    }
-
-    @Test func otherChangesElsewhereKeepTheOpenValueList() throws {
-        let defaults = try makeDefaults()
-        let model = TaskViewModel(key: "tasks", inProject: false, defaults: defaults)
-        let other = TaskViewModel(key: "tasks", inProject: false, defaults: defaults)
-        model.editingFilterIndex = model.addFilter(.status)
-
-        other.setQuery("x")
-
-        #expect(model.editingFilterIndex == 0)
-    }
-
     @Test func aWriteToAnotherKeyDoesNotNotify() throws {
         let defaults = try makeDefaults()
         let model = TaskViewModel(key: "tasks", inProject: false, defaults: defaults)

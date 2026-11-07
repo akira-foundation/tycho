@@ -44,18 +44,17 @@ struct NewTaskSheet: View {
                     DatePill(date: draft.due, emptyText: "No date") { draft.due = $0 }
                 }
                 if let error {
-                    Text(error.userMessage).foregroundStyle(Token.red.color)
+                    Text(error.userMessage).foregroundStyle(.red)
                 }
             }
             .formStyle(.grouped)
             .navigationTitle("New task")
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }.buttonStyle(.tycho(.secondary))
+                    Button("Cancel", role: .cancel) { dismiss() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Create", action: save)
-                        .buttonStyle(.tycho(.primary))
+                    Button("Create", role: .confirm, action: save)
                         .keyboardShortcut(.return, modifiers: .command)
                         .disabled(project == nil)
                         .accessibilityIdentifier("task.create")
@@ -64,7 +63,7 @@ struct NewTaskSheet: View {
             .overlay {
                 if projects.isEmpty {
                     EmptyState(
-                        title: "No projects yet", symbol: "folder", message: "Create a project before adding tasks.")
+                        title: "No Projects", symbol: "folder", message: "Create a project before adding tasks.")
                 }
             }
         }

@@ -19,15 +19,14 @@ struct FilePreviewSheet: View {
     var body: some View {
         VStack(alignment: .leading, spacing: Spacing.s4) {
             VStack(alignment: .leading, spacing: Spacing.s1) {
-                Text(file.name).tychoFont(.lg, weight: .semibold)
+                Text(file.name).font(.title3.weight(.semibold))
                 Text(FileMessages.previewSubtitle(file, dateText: dateText))
-                    .tychoFont(.sm)
-                    .foregroundStyle(Token.text3.color)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
             }
             FileThumbnail(file: file)
                 .aspectRatio(16 / 9, contentMode: .fit)
-                .clipShape(RoundedRectangle(cornerRadius: Radius.lg, style: .continuous))
-                .overlay(RoundedRectangle(cornerRadius: Radius.lg, style: .continuous).strokeBorder(Token.border.color))
+                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
             if let task = file.task {
                 HStack(spacing: Spacing.s1) {
                     Image(systemName: "link")
@@ -39,22 +38,19 @@ struct FilePreviewSheet: View {
                     .buttonStyle(.plain)
                     .foregroundStyle(Color.accentColor)
                 }
-                .tychoFont(.sm)
-                .foregroundStyle(Token.text3.color)
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
             }
             HStack {
-                Button("Copy link", systemImage: "link") {
+                Button("Copy Link", systemImage: "link") {
                     Pasteboard.copy(FileMessages.link(file))
                     toast.show("Link copied")
                 }
-                .buttonStyle(.tycho(.secondary))
                 if file.hasData {
                     Button("Quick Look", systemImage: "eye", action: openQuickLook)
-                        .buttonStyle(.tycho(.secondary))
                 }
                 Spacer()
-                Button("Close") { dismiss() }
-                    .buttonStyle(.tycho(.primary))
+                Button("Close", role: .close) { dismiss() }
                     .keyboardShortcut(.defaultAction)
             }
         }

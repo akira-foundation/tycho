@@ -55,14 +55,14 @@ struct NewProjectSheet: View {
                                 .tag(color)
                         }
                     }
-                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 36))], spacing: Spacing.s2) {
+                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 36))], spacing: 8) {
                         ForEach(ProjectSymbols.all, id: \.self) { symbol in
                             Button {
                                 draft.symbol = symbol
                             } label: {
                                 ProjectGlyph(
                                     symbol: symbol,
-                                    color: draft.symbol == symbol ? draft.color.tint : Token.text3.color, size: 32)
+                                    color: draft.symbol == symbol ? draft.color.tint : Color.secondary, size: 32)
                             }
                             .buttonStyle(.plain)
                             .accessibilityLabel(symbol)
@@ -100,18 +100,17 @@ struct NewProjectSheet: View {
                     }
                 }
                 if let error {
-                    Text(error.userMessage).foregroundStyle(Token.red.color).accessibilityIdentifier("project.error")
+                    Text(error.userMessage).foregroundStyle(.red).accessibilityIdentifier("project.error")
                 }
             }
             .formStyle(.grouped)
             .navigationTitle(project == nil ? "New project" : "Edit project")
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }.buttonStyle(.tycho(.secondary))
+                    Button("Cancel", role: .cancel) { dismiss() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button(project == nil ? "Create" : "Save", action: save)
-                        .buttonStyle(.tycho(.primary))
+                    Button(project == nil ? "Create" : "Save", role: .confirm, action: save)
                         .keyboardShortcut(.return, modifiers: .command)
                         .disabled(project == nil && workspaces.isEmpty)
                         .accessibilityIdentifier("project.save")

@@ -1,6 +1,5 @@
 import SwiftUI
 import TychoCore
-import TychoDesign
 
 struct SearchResultsList: View {
     @Environment(Router.self) private var router
@@ -11,25 +10,18 @@ struct SearchResultsList: View {
     var body: some View {
         let titles = SearchPageModel.sections(results, scope: scope).map(\.title)
         let groups = groups(visibleFor: scope)
-        VStack(alignment: .leading, spacing: Spacing.s5) {
+        List {
             ForEach(Array(zip(titles, groups).enumerated()), id: \.offset) { _, pair in
                 let (title, items) = pair
-                VStack(alignment: .leading, spacing: Spacing.s2) {
-                    Text(title).tychoFont(.xs, weight: .semibold).foregroundStyle(Token.text3.color)
-                    VStack(spacing: 0) {
-                        ForEach(items) { item in
-                            Button {
-                                open(item.action)
-                            } label: {
-                                PaletteRow(item: item, query: query, isHighlighted: false)
-                            }
-                            .buttonStyle(.plain)
+                Section(title) {
+                    ForEach(items) { item in
+                        Button {
+                            open(item.action)
+                        } label: {
+                            SearchResultRow(item: item, query: query)
                         }
+                        .buttonStyle(.plain)
                     }
-                    .background(Token.surface.color, in: RoundedRectangle(cornerRadius: Radius.md, style: .continuous))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: Radius.md, style: .continuous)
-                            .strokeBorder(Token.border.color, lineWidth: 1))
                 }
             }
         }
@@ -56,5 +48,27 @@ struct SearchResultsList: View {
     private func openFile(_ id: UUID) {
         guard let projectID = results.files.first(where: { $0.id == id })?.project?.id else { return }
         router.openProject(projectID, tab: .files)
+    }
+}
+
+struct SearchResultRow: View {
+    let item: PaletteItem
+    let query: String
+
+    var body: some View {
+        HStack(spacing: 12) {
+            PaletteVisualIcon(visual: item.visual).frame(width: 20)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(PaletteHighlight.title(item.title, query: query)).lineLimit(1)
+                if let subtitle = item.subtitle {
+                    Text(subtitle).font(.caption).foregroundStyle(.secondary).lineLimit(1)
+                }
+            }
+            Spacer(minLength: 8)
+            if let trailing = item.trailing {
+                Text(trailing).font(.caption.monospaced()).foregroundStyle(.secondary)
+            }
+        }
+        .contentShape(Rectangle())
     }
 }

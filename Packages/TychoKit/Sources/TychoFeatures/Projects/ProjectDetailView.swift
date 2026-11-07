@@ -9,6 +9,7 @@ struct ProjectDetailView: View {
     @State private var editing = false
     @State private var isSavingView = false
     @State private var renamingView: SavedView?
+    @Environment(\.isCompactWidth) private var isCompact
     private let tab: ProjectTab
 
     init(projectID: UUID, tab: ProjectTab) {
@@ -19,35 +20,26 @@ struct ProjectDetailView: View {
     var body: some View {
         if let project = matches.first {
             let target = ProjectTabTarget(tab: tab, in: project)
-            VStack(spacing: 0) {
-                header(project)
-                Divider()
-                ProjectTabContent(project: project, target: target)
-                    .id(target.stateKey)
-            }
-            .background(Token.bg.color)
-            .navigationTitle(target.title)
-            .toolbar {
-                ToolbarItem {
-                    Picker("View", selection: builtInSelection(project)) {
-                        ForEach(ProjectBuiltInTab.allCases, id: \.self) { Text($0.title).tag(Optional($0)) }
+            ProjectTabContent(project: project, target: target)
+                .id(target.stateKey)
+                .navigationTitle(target.title)
+                .navigationSubtitle(Self.subtitle(project))
+                .toolbar {
+                    ToolbarItem { ProjectTabPicker(selection: builtInSelection(project)) }
+                    if isCompact { ToolbarSpacer(.fixed) }
+                    ToolbarItem {
+                        ProjectMenu(
+                            project: project, tab: tab, onSave: { isSavingView = true },
+                            onRename: { renamingView = $0 }, onEdit: { editing = true })
                     }
-                    .pickerStyle(.segmented)
-                    .accessibilityIdentifier("project.tab")
+                    ToolbarItem { Button("New Task", systemImage: "plus") { router.newTask() } }
                 }
-                ToolbarItem {
-                    SavedViewTabs(
-                        project: project, tab: tab, onSave: { isSavingView = true }, onRename: { renamingView = $0 })
-                }
-                ToolbarItem { Button("Edit Project", systemImage: "slider.horizontal.3") { editing = true } }
-                ToolbarItem { Button("New Task", systemImage: "plus") { router.newTask() } }
-            }
-            .sheet(isPresented: $editing) { NewProjectSheet(project: project) }
-            .sheet(isPresented: $isSavingView) { SaveViewSheet(project: project) }
-            .sheet(item: $renamingView) { RenameViewSheet(view: $0) }
-            .blocksNavigation(while: editing || isSavingView || renamingView != nil)
+                .sheet(isPresented: $editing) { NewProjectSheet(project: project) }
+                .sheet(isPresented: $isSavingView) { SaveViewSheet(project: project) }
+                .sheet(item: $renamingView) { RenameViewSheet(view: $0) }
+                .blocksNavigation(while: editing || isSavingView || renamingView != nil)
         } else {
-            EmptyState(title: "Project not found", symbol: "questionmark.folder", message: "It may have been deleted.")
+            EmptyState(title: "Project Not Found", symbol: "questionmark.folder", message: "It may have been deleted.")
         }
     }
 
@@ -60,24 +52,7 @@ struct ProjectDetailView: View {
             })
     }
 
-    private func header(_ project: Project) -> some View {
-        HStack(spacing: Spacing.s3) {
-            ProjectGlyph(symbol: project.symbol, color: project.color.tint, size: 28)
-            VStack(alignment: .leading, spacing: 2) {
-                Text(project.name).tychoFont(.xl, weight: .semibold)
-                if !project.summary.isEmpty {
-                    Text(project.summary).tychoFont(.sm).foregroundStyle(Token.text3.color).lineLimit(1)
-                }
-            }
-            Spacer()
-            StatusPill(status: project.status)
-            ProgressRing(percent: project.progress, color: project.color.tint, size: 18)
-            Text("\(project.progress)%").tychoFont(.xs).monospacedDigit().foregroundStyle(Token.text3.color)
-            if let lead = project.lead {
-                Avatar(initials: lead.initials, color: lead.tint)
-            }
-        }
-        .padding(.horizontal, Spacing.s6)
-        .padding(.vertical, Spacing.s4)
+    static func subtitle(_ project: Project) -> String {
+        "\(project.status.title) · \(project.progress)%"
     }
 }

@@ -71,24 +71,16 @@ struct CalendarFeatureTests {
         #expect(ScheduleMessages.moved("Audit", days: -3) == "Moved “Audit” 3 days earlier")
     }
 
-    @Test func theLegendListsEachProjectOnceInSidebarOrder() throws {
-        let context = ModelContext(try TychoSchema.makeContainer(inMemory: true))
-        let web = Project(key: "WEB", name: "Website")
-        let mobile = Project(key: "MOB", name: "Mobile")
-        web.sortOrder = 2
-        mobile.sortOrder = 1
-        context.insert(web)
-        context.insert(mobile)
-        let actions = TaskActions(context: context)
-        let tasks = try [
-            actions.create(TaskDraft(title: "A"), in: web), actions.create(TaskDraft(title: "B"), in: mobile),
-            actions.create(TaskDraft(title: "C"), in: web),
-        ]
-        #expect(CalendarLegend.projects(in: tasks).map(\.key) == ["MOB", "WEB"])
-    }
-
     @Test func weekColumnsNameTheirWeekday() {
         let cells = CalendarGrid.week(containing: now, weekStart: .sunday, today: now, calendar: utc)
         #expect(cells.map(CalendarWeekView.weekdayName) == ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"])
+    }
+
+    @Test func compactDotsTakeTheProjectColour() {
+        let project = Project(key: "WEB", name: "Website")
+        let task = TaskItem(number: 1, title: "A")
+        task.project = project
+        #expect(CalendarDayCell.tint(of: .task(task)) == project.color.tint)
+        #expect(CalendarDayCell.tint(of: .task(TaskItem(number: 2, title: "B"))) == .gray)
     }
 }

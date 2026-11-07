@@ -1,10 +1,10 @@
 import SwiftUI
 import TychoCore
-import TychoDesign
 
 struct CalendarMonthGrid: View {
     @Environment(Router.self) private var router
     @Environment(\.weekStart) private var weekStart
+    @Environment(\.isCompactWidth) private var isCompactWidth
     let tasks: [TaskItem]
     let events: [CalendarEvent]
     private let columns = Array(repeating: GridItem(.flexible(), spacing: 0), count: 7)
@@ -17,11 +17,13 @@ struct CalendarMonthGrid: View {
             HStack(spacing: 0) {
                 ForEach(CalendarGrid.weekdayLabels(weekStart: weekStart), id: \.self) { label in
                     Text(label)
-                        .tychoFont(.xs, weight: .medium)
-                        .foregroundStyle(Token.text3.color)
-                        .frame(maxWidth: .infinity, minHeight: 28)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .frame(maxWidth: .infinity, alignment: isCompactWidth ? .center : .trailing)
+                        .padding(.horizontal, 6)
                 }
             }
+            .padding(.bottom, 4)
             Divider()
             ScrollView {
                 LazyVGrid(columns: columns, spacing: 0) {

@@ -1,39 +1,24 @@
 import SwiftUI
 import TychoCore
-import TychoDesign
 
 struct WeekTaskCard: View {
     @Environment(Router.self) private var router
     let task: TaskItem
 
     var body: some View {
-        let tint = task.project?.color.tint ?? Token.gray.color
         let done = task.status == .done
-        VStack(alignment: .leading, spacing: Spacing.s1) {
-            HStack(spacing: Spacing.s1) {
-                Circle().fill(tint).frame(width: 6, height: 6)
-                Text(task.title)
-                    .lineLimit(2)
-                    .strikethrough(done)
-                    .foregroundStyle(done ? Token.text3.color : Token.text.color)
+        VStack(alignment: .leading, spacing: 2) {
+            HStack(spacing: 4) {
+                Circle().fill(task.project?.color.tint ?? .gray).frame(width: 6, height: 6)
+                Text(task.title).lineLimit(2).strikethrough(done)
             }
-            .tychoFont(.xs, weight: .medium)
-            HStack(spacing: Spacing.s1) {
-                StatusIcon(glyph: task.status.glyph, color: task.status.tint, size: 11)
-                PriorityIcon(weight: task.priority.weight, size: 11)
-                Text(task.project?.name ?? "").lineLimit(1).frame(maxWidth: .infinity, alignment: .leading)
-                if let assignee = task.assignee {
-                    Avatar(initials: assignee.initials, color: assignee.tint, size: 16)
-                }
-            }
-            .tychoFont(.xxs)
-            .foregroundStyle(Token.text3.color)
+            .font(.callout)
+            .foregroundStyle(done ? .secondary : .primary)
+            Text(task.project?.name ?? task.key).font(.caption).foregroundStyle(.secondary).lineLimit(1)
         }
-        .padding(Spacing.s2)
+        .padding(6)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Token.surface.color, in: RoundedRectangle(cornerRadius: Radius.sm))
-        .overlay(alignment: .leading) { Rectangle().fill(tint).frame(width: 2) }
-        .shadowCard()
+        .background(.fill.quaternary, in: RoundedRectangle(cornerRadius: 6))
         .contentShape(Rectangle())
         .onTapGesture { router.inspect(task.id) }
         .draggable(TaskTransfer(id: task.id))
@@ -52,19 +37,17 @@ struct WeekEventCard: View {
         Button {
             showing = true
         } label: {
-            VStack(alignment: .leading, spacing: Spacing.s1) {
-                HStack(spacing: Spacing.s1) {
-                    Circle().fill(event.project?.color.tint ?? Token.gray.color).frame(width: 6, height: 6)
+            VStack(alignment: .leading, spacing: 2) {
+                HStack(spacing: 4) {
+                    Circle().fill(event.project?.color.tint ?? .gray).frame(width: 6, height: 6)
                     Text(event.title).lineLimit(2)
                 }
-                .tychoFont(.xs, weight: .medium)
-                Label("\(event.time) · \(event.project?.name ?? "")", systemImage: "clock")
-                    .tychoFont(.xxs)
-                    .foregroundStyle(Token.text3.color)
+                .font(.callout)
+                Text(event.time).font(.caption).monospacedDigit().foregroundStyle(.secondary)
             }
-            .padding(Spacing.s2)
+            .padding(6)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(Token.sunken.color, in: RoundedRectangle(cornerRadius: Radius.sm))
+            .background(.fill.quaternary, in: RoundedRectangle(cornerRadius: 6))
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)

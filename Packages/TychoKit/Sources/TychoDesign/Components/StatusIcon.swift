@@ -31,7 +31,7 @@ public struct StatusIcon: View {
                 Circle().fill(color)
                 Image(systemName: "checkmark")
                     .font(.system(size: size * 0.55, weight: .bold))
-                    .foregroundStyle(Token.textInv.color)
+                    .foregroundStyle(.white)
             }
         }
         .frame(width: size, height: size)

@@ -10,10 +10,10 @@ public enum TimelineGrouping: String, CaseIterable, Sendable, Identifiable {
 
     public var title: String {
         switch self {
-        case .status: "Group: Status"
-        case .assignee: "Group: Assignee"
-        case .project: "Group: Project"
-        case .none: "No grouping"
+        case .status: "Status"
+        case .assignee: "Assignee"
+        case .project: "Project"
+        case .none: "None"
         }
     }
 

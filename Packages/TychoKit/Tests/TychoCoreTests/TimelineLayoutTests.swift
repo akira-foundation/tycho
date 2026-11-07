@@ -60,7 +60,7 @@ struct TimelineLayoutTests {
         #expect(TimelineZoom.allCases.map(\.title) == ["Weeks", "Months"])
         #expect(
             TimelineGrouping.allCases.map(\.title) == [
-                "Group: Status", "Group: Assignee", "Group: Project", "No grouping",
+                "Status", "Assignee", "Project", "None",
             ])
         #expect(TimelineGrouping.project.effective(inProject: true) == .status)
         #expect(TimelineGrouping.project.effective(inProject: false) == .project)

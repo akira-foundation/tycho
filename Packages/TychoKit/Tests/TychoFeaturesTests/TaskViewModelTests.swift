@@ -75,25 +75,6 @@ struct TaskViewModelTests {
         #expect(model.state.filters == [TaskFilter(field: .status), TaskFilter(field: .assignee)])
     }
 
-    @Test func removingOrClearingFiltersClosesTheOpenValueList() throws {
-        let model = try makeModel()
-        model.editingFilterIndex = model.addFilter(.status)
-        model.removeFilter(at: 0)
-        #expect(model.editingFilterIndex == nil)
-
-        model.editingFilterIndex = model.addFilter(.assignee)
-        model.clearFilters()
-        #expect(model.editingFilterIndex == nil)
-    }
-
-    @Test func theOpenValueListIsNotSaved() throws {
-        let defaults = try makeDefaults()
-        let model = try makeModel(defaults: defaults)
-        model.editingFilterIndex = model.addFilter(.status)
-
-        #expect(try makeModel(defaults: defaults).editingFilterIndex == nil)
-    }
-
     @Test func updateAndRemoveFilterIgnoreOutOfRangeIndexes() throws {
         let model = try makeModel()
         _ = model.addFilter(.status)

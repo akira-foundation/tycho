@@ -6,9 +6,7 @@ import TychoDesign
 struct RootView: View {
     @Environment(Router.self) private var router
     @Query(sort: \Workspace.createdAt) private var workspaces: [Workspace]
-    #if os(iOS)
-    @Environment(\.horizontalSizeClass) private var sizeClass
-    #endif
+    @Environment(\.isCompactWidth) private var isCompactWidth
 
     var body: some View {
         content
@@ -26,12 +24,8 @@ struct RootView: View {
             } detail: {
                 NavigationStack {
                     RouteDetail(route: router.route)
-                        .toolbar {
-                            ToolbarItem(placement: .principal) { PaletteToolbarButton() }
-                        }
                 }
             }
-            .background(Token.bg.color)
             .uiTestingSplitViewAutosaveOff(TychoDefaults.isUITesting())
             #if os(macOS)
             .onGeometryChange(for: CGFloat.self) {
@@ -40,19 +34,12 @@ struct RootView: View {
                 router.updateWindowWidth($0)
             }
             #else
-            .onChange(of: sizeClass, initial: true) {
-                router.updateHorizontalSizeClass(isCompact: sizeClass == .compact)
+            .onChange(of: isCompactWidth, initial: true) {
+                router.updateHorizontalSizeClass(isCompact: isCompactWidth)
             }
             #endif
             .overlay { PaletteOverlay() }
             .shortcutReceiver()
-            .toolbar {
-                ToolbarItem {
-                    Button("Inspector", systemImage: "sidebar.right") { router.closeInspector() }
-                        .disabled(router.inspectedTaskID == nil)
-                        .accessibilityIdentifier("toolbar.inspector")
-                }
-            }
             .inspector(
                 isPresented: Binding(
                     get: { showsInspectorColumn },
@@ -60,7 +47,7 @@ struct RootView: View {
                 )
             ) {
                 if showsInspectorColumn, let id = router.inspectedTaskID {
-                    TaskInspectorView(taskID: id)
+                    inspectorColumn(id)
                         .id(id)
                         .inspectorColumnWidth(
                             min: InspectorLayout.minimumColumnWidth,
@@ -75,13 +62,15 @@ struct RootView: View {
                 )
             ) {
                 if showsInspectorSheet, let id = router.inspectedTaskID {
-                    TaskInspectorView(taskID: id, presentedAsSheet: true)
-                        .id(id)
-                        #if os(macOS)
+                    NavigationStack {
+                        TaskInspectorView(taskID: id, presentedAsSheet: true)
+                    }
+                    .id(id)
+                    #if os(macOS)
                     .frame(
                         minWidth: InspectorLayout.minimumColumnWidth, idealWidth: InspectorLayout.idealColumnWidth,
                         minHeight: 560)
-                        #endif
+                    #endif
                 }
             }
             .sheet(isPresented: $router.isCreatingProject) { NewProjectSheet(project: nil) }
@@ -97,7 +86,7 @@ struct RootView: View {
 
     private var inspectsInSheet: Bool {
         #if os(iOS)
-        sizeClass == .compact
+        isCompactWidth
         #else
         router.inspectsInSheet
         #endif
@@ -116,6 +105,14 @@ struct RootView: View {
         router.inspectedTaskID != nil && inspectsInSheet
         #else
         router.isInspectorSheetPresented
+        #endif
+    }
+
+    @ViewBuilder private func inspectorColumn(_ id: UUID) -> some View {
+        #if os(iOS)
+        NavigationStack { TaskInspectorView(taskID: id) }
+        #else
+        TaskInspectorView(taskID: id)
         #endif
     }
 }

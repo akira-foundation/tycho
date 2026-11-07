@@ -3,6 +3,10 @@ import Testing
 
 @testable import TychoFeatures
 
+#if canImport(AppKit)
+import AppKit
+#endif
+
 struct AppRouteTests {
     @Test func projectRoutesCompareByIdAndTab() {
         let id = UUID()
@@ -12,6 +16,15 @@ struct AppRouteTests {
 
     @Test func projectTabsFollowTheOriginalOrder() {
         #expect(ProjectBuiltInTab.allCases.map(\.title) == ["Board", "List", "Table", "Calendar", "Timeline", "Files"])
+    }
+
+    @Test func everyProjectTabHasItsOwnSymbol() {
+        let symbols = ProjectBuiltInTab.allCases.map(\.symbol)
+        #expect(Set(symbols).count == ProjectBuiltInTab.allCases.count)
+        #expect(!symbols.contains(""))
+        #if canImport(AppKit)
+        #expect(symbols.allSatisfy { NSImage(systemSymbolName: $0, accessibilityDescription: nil) != nil })
+        #endif
     }
 
     @Test func savedViewTabsRoundTripThroughTheRoute() {

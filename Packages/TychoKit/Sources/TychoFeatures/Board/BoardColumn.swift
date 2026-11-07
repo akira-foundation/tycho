@@ -21,7 +21,7 @@ struct BoardColumn: View {
                         ForEach(group.tasks) { task in
                             TaskCard(task: task)
                                 .draggable(TaskTransfer(id: task.id)) {
-                                    TaskCard(task: task).frame(width: 260).shadowDrag()
+                                    TaskCard(task: task).frame(width: 260)
                                 }
                                 .dropDestination(for: TaskTransfer.self) { items, _ in
                                     return drop(items, before: task)
@@ -29,7 +29,7 @@ struct BoardColumn: View {
                                 .contextMenu { TaskMenu(task: task) }
                         }
                         if let project {
-                            InlineComposer(placeholder: "Add task") { title in
+                            InlineComposer(placeholder: "Add Task") { title in
                                 toast.perform {
                                     _ = try TaskActions(context: context).create(
                                         TaskDraft(title: title, status: group.status), in: project)
@@ -46,8 +46,8 @@ struct BoardColumn: View {
         .frame(width: collapsed ? 48 : 280)
         .frame(maxHeight: .infinity, alignment: .top)
         .background(
-            targeted ? Token.surface3.color : Token.surface2.color,
-            in: RoundedRectangle(cornerRadius: Radius.lg, style: .continuous)
+            targeted ? AnyShapeStyle(.fill.tertiary) : AnyShapeStyle(.fill.quinary),
+            in: RoundedRectangle(cornerRadius: 12, style: .continuous)
         )
         .dropDestination(for: TaskTransfer.self) { items, _ in
             drop(items, before: nil)
@@ -62,8 +62,8 @@ struct BoardColumn: View {
         HStack(spacing: Spacing.s2) {
             StatusIcon(glyph: group.status.glyph, color: group.status.tint)
             if !collapsed {
-                Text(group.status.title).tychoFont(.sm, weight: .semibold)
-                Text("\(group.tasks.count)").tychoFont(.xs).foregroundStyle(Token.text4.color)
+                Text(group.status.title).font(.subheadline.weight(.semibold))
+                Text("\(group.tasks.count)").font(.subheadline).foregroundStyle(.secondary)
                 Spacer()
             }
             Button(
@@ -73,8 +73,8 @@ struct BoardColumn: View {
                 collapsed.toggle()
             }
             .labelStyle(.iconOnly)
-            .buttonStyle(.plain)
-            .foregroundStyle(Token.text4.color)
+            .buttonStyle(.borderless)
+            .foregroundStyle(.secondary)
         }
         .padding(.horizontal, Spacing.s1)
         .frame(height: 30)

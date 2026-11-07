@@ -22,58 +22,71 @@ final class TychoFiltersTests: XCTestCase {
         app.elements(withIdentifierPrefix: "task.WEB-")
     }
 
-    private func addStatusDoneFilter() {
-        element("view.filter").click()
-        let addStatus = element("filter.add.status")
-        XCTAssertTrue(addStatus.waitForExistence(timeout: 5))
-        addStatus.click()
-        let done = element("filter.value.done")
-        XCTAssertTrue(done.waitForExistence(timeout: 5), "adding a filter should open its value list")
-        done.click()
-        XCTAssertTrue(eventually { done.isSelected }, "clicking Done should select it")
+    private func addFilter(_ title: String) {
+        app.filterButton.click()
+        let add = element("filter.add")
+        XCTAssertTrue(add.waitForExistence(timeout: 5))
+        add.click()
+        app.menuItems[title].firstMatch.click()
+    }
+
+    private func closeFilter() {
         app.typeKey(.escape, modifierFlags: [])
         XCTAssertTrue(element("filter.builder").waitForNonExistence(timeout: 5))
     }
 
-    private func viewMenuItem(_ title: String) -> XCUIElement {
-        element("project.tab.view.menu").click()
+    private func addStatusDoneFilter() {
+        addFilter("Status")
+        let done = element("filter.value.done")
+        XCTAssertTrue(done.waitForExistence(timeout: 5), "adding a filter should show its values")
+        done.click()
+        XCTAssertTrue(eventually { (done.value as? Int) == 1 }, "clicking Done should select it")
+        closeFilter()
+    }
+
+    private func projectMenuItem(_ title: String) -> XCUIElement {
+        element("project.menu").click()
         let item = app.menuItems[title].firstMatch
         XCTAssertTrue(item.waitForExistence(timeout: 5))
         return item
     }
 
-    func testAddingAFilterOpensItsValueList() {
-        app.openWebsiteTab("List")
-        for attempt in 1...3 {
-            element("view.filter").click()
-            let addStatus = element("filter.add.status")
-            XCTAssertTrue(addStatus.waitForExistence(timeout: 5))
-            addStatus.click()
-            let list = element("filter.values.0")
-            XCTAssertTrue(
-                list.waitForExistence(timeout: 5), "attempt \(attempt): adding Status should open its value list")
-            XCTAssertGreaterThan(list.frame.height, 40, "attempt \(attempt): the value list should show its options")
-            element("filter.clear").click()
-            app.typeKey(.escape, modifierFlags: [])
-            XCTAssertTrue(element("filter.builder").waitForNonExistence(timeout: 5))
-        }
+    private func projectMenuLists(_ title: String) -> Bool {
+        element("project.menu").click()
+        defer { app.typeKey(.escape, modifierFlags: []) }
+        return app.menuItems[title].firstMatch.waitForExistence(timeout: 5)
     }
 
-    func testReopeningTheBuilderShowsTheFilterCollapsed() {
+    private func projectMenuOmits(_ title: String) -> Bool {
+        element("project.menu").click()
+        defer { app.typeKey(.escape, modifierFlags: []) }
+        let opened = app.menuItems["Save View…"].firstMatch.waitForExistence(timeout: 5)
+        return opened && !app.menuItems[title].firstMatch.exists
+    }
+
+    func testAddingAFilterShowsItsValues() {
         app.openWebsiteTab("List")
-        element("view.filter").click()
-        let addStatus = element("filter.add.status")
-        XCTAssertTrue(addStatus.waitForExistence(timeout: 5))
-        addStatus.click()
+        addFilter("Status")
+
         XCTAssertTrue(element("filter.values.0").waitForExistence(timeout: 5))
-        app.typeKey(.escape, modifierFlags: [])
-        XCTAssertTrue(element("filter.builder").waitForNonExistence(timeout: 5))
-
-        element("view.filter").click()
-
-        XCTAssertTrue(element("filter.values.button.0").waitForExistence(timeout: 5))
-        XCTAssertFalse(element("filter.values.0").exists)
+        XCTAssertTrue(element("filter.value.done").exists)
         element("filter.clear").click()
+        XCTAssertTrue(element("filter.values.0").waitForNonExistence(timeout: 5))
+        closeFilter()
+    }
+
+    func testReopeningTheFilterKeepsItsFields() {
+        app.openWebsiteTab("List")
+        addFilter("Priority")
+        closeFilter()
+
+        app.filterButton.click()
+
+        let field = element("filter.field.0")
+        XCTAssertTrue(field.waitForExistence(timeout: 5))
+        XCTAssertEqual(field.value as? String, "Priority")
+        element("filter.clear").click()
+        closeFilter()
     }
 
     func testStatusFilterNarrowsTheListAndClearAllRestoresIt() {
@@ -83,64 +96,58 @@ final class TychoFiltersTests: XCTestCase {
 
         addStatusDoneFilter()
 
-        let chip = element("filter.chip.0")
-        XCTAssertTrue(chip.waitForExistence(timeout: 5))
-        XCTAssertTrue(chip.label.contains("Status"))
         XCTAssertTrue(eventually { self.websiteRows.count > 0 && self.websiteRows.count < before })
         XCTAssertFalse(element("task.WEB-118").exists)
 
-        element("filter.chips.clear").click()
+        app.filterButton.click()
+        element("filter.clear").click()
+        closeFilter()
 
-        XCTAssertTrue(chip.waitForNonExistence(timeout: 5))
         XCTAssertTrue(eventually { self.websiteRows.count == before })
     }
 
-    func testSavingRenamingAndDeletingAView() throws {
-        let widest = NSScreen.screens.map(\.visibleFrame.width).max() ?? 0
-        try XCTSkipUnless(widest >= 1500, "the project toolbar needs a zoomed window at least 1500 pt wide")
-        app.zoomWindow()
+    func testSavingRenamingAndDeletingAView() {
         app.openWebsiteTab("List")
         addStatusDoneFilter()
 
-        element("project.tab.saveView").click()
+        projectMenuItem("Save View…").click()
         let name = element("saveView.name")
         XCTAssertTrue(name.waitForExistence(timeout: 5))
         name.click()
         name.typeText("Shipped")
         element("saveView.save").click()
-        let saved = element("project.tab.view.Shipped")
-        XCTAssertTrue(saved.waitForExistence(timeout: 5))
+        XCTAssertTrue(projectMenuLists("Shipped"))
 
-        viewMenuItem("Rename view").click()
+        projectMenuItem("Rename View…").click()
         let rename = element("renameView.name")
         XCTAssertTrue(rename.waitForExistence(timeout: 5))
         rename.click()
         rename.typeKey("a", modifierFlags: .command)
         rename.typeText("Released")
         element("renameView.save").click()
-        let renamed = element("project.tab.view.Released")
-        XCTAssertTrue(renamed.waitForExistence(timeout: 5))
-        XCTAssertFalse(saved.exists)
+        XCTAssertTrue(projectMenuLists("Released"))
+        XCTAssertTrue(projectMenuOmits("Shipped"))
 
-        viewMenuItem("Delete view").click()
-        XCTAssertTrue(renamed.waitForNonExistence(timeout: 5))
-        XCTAssertTrue(element("project.tab.saveView").exists)
+        projectMenuItem("Delete View").click()
+        XCTAssertTrue(projectMenuOmits("Released"))
     }
 
     func testHomeOverdueCardOpensTasksWithTheDueChip() {
-        app.openSidebarItem("Tasks", revealing: element("tasks.mode"))
-        element("tasks.mode").descendants(matching: .any)["Board"].firstMatch.click()
+        let board = app.radioButtons["Board"].firstMatch
+        app.openSidebarItem("Tasks", revealing: board)
+        board.click()
         XCTAssertTrue(element("column.todo").waitForExistence(timeout: 5))
 
         let overdue = app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Overdue,'")).firstMatch
         app.openSidebarItem("Home", revealing: overdue)
         overdue.click()
 
-        let chip = element("filter.chip.0")
-        XCTAssertTrue(chip.waitForExistence(timeout: 5))
-        XCTAssertTrue(chip.label.contains("Due"))
         XCTAssertTrue(app.elements(withIdentifierPrefix: "group.").firstMatch.waitForExistence(timeout: 5))
         XCTAssertFalse(element("column.todo").exists)
+        app.filterButton.click()
+        let field = element("filter.field.0")
+        XCTAssertTrue(field.waitForExistence(timeout: 5))
+        XCTAssertEqual(field.value as? String, "Due")
     }
 }
 #endif

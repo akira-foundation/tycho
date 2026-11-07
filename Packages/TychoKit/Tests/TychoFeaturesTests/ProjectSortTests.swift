@@ -36,4 +36,9 @@ struct ProjectSortTests {
     func suggestsAKeyFromTheName(name: String, key: String) {
         #expect(ProjectSymbols.suggestedKey(for: name) == key)
     }
+
+    @Test func layoutsNameTheirViewOption() {
+        #expect(ProjectLayout.allCases.map(\.title) == ["Icons", "List"])
+        #expect(ProjectLayout.allCases.map(\.symbol) == ["square.grid.2x2", "list.bullet"])
+    }
 }

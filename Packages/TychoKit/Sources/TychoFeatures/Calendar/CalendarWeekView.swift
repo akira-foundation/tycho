@@ -1,7 +1,6 @@
 import SwiftData
 import SwiftUI
 import TychoCore
-import TychoDesign
 
 struct CalendarWeekView: View {
     @Environment(Router.self) private var router
@@ -42,9 +41,9 @@ struct CalendarWeekColumn: View {
             header
             Divider()
             ScrollView {
-                VStack(alignment: .leading, spacing: Spacing.s1) {
+                VStack(alignment: .leading, spacing: 4) {
                     if items.isEmpty {
-                        Text("No tasks").tychoFont(.xs).foregroundStyle(Token.text4.color).padding(Spacing.s1)
+                        Text("No Tasks").font(.caption).foregroundStyle(.tertiary).padding(4)
                     }
                     ForEach(items) { item in
                         switch item {
@@ -53,10 +52,10 @@ struct CalendarWeekColumn: View {
                         }
                     }
                 }
-                .padding(Spacing.s1)
+                .padding(4)
             }
             .frame(maxHeight: .infinity)
-            .background(targeted ? Token.surface3.color : Color.clear)
+            .background(targeted ? Color.accentColor.opacity(0.12) : Color.clear)
             .dropDestination(for: TaskTransfer.self) { transfers, _ in
                 return CalendarDropHandler(context: context).announceDrop(
                     transfers.map(\.id), on: cell.date, in: tasks, toast: toast, dateText: dateText)
@@ -70,26 +69,27 @@ struct CalendarWeekColumn: View {
     }
 
     private var header: some View {
-        HStack(spacing: Spacing.s1) {
+        HStack(spacing: 4) {
+            Text(CalendarWeekView.weekdayName(for: cell)).font(.callout).foregroundStyle(.secondary)
             dayNumber
-            Text(CalendarWeekView.weekdayName(for: cell)).tychoFont(.xs).foregroundStyle(Token.text3.color)
             Spacer()
             Button("Add task on \(dateText.short(cell.date))", systemImage: "plus") {
                 router.newTask(due: DayTime.noon(of: cell.date, calendar: DateText.gregorian))
             }
             .labelStyle(.iconOnly)
-            .buttonStyle(.plain)
-            .foregroundStyle(Token.text3.color)
+            .buttonStyle(.borderless)
         }
-        .padding(.horizontal, Spacing.s2)
+        .padding(.horizontal, 8)
         .frame(height: 40)
     }
 
     private var dayNumber: some View {
         Text("\(cell.day)")
-            .tychoFont(.lg, weight: .semibold)
+            .font(.title3.weight(.semibold))
             .monospacedDigit()
-            .foregroundStyle(cell.isToday ? Color.accentColor : Token.text.color)
+            .foregroundStyle(cell.isToday ? AnyShapeStyle(.white) : AnyShapeStyle(.primary))
+            .frame(minWidth: 30, minHeight: 30)
+            .background(cell.isToday ? Color.accentColor : Color.clear, in: Circle())
             .accessibilityLabel(cell.isToday ? "Today, \(cell.day)" : "\(cell.day)")
             .accessibilityAddTraits(cell.isToday ? .isSelected : [])
     }
