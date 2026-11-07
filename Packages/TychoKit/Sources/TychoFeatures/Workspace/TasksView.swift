@@ -46,8 +46,8 @@ struct TasksView: View {
             }
         }
         .tracksLiveProjects(model)
-        .navigationTitle("Tasks")
-        .navigationSubtitle(TasksMode.subtitle(projectCount: projects.count))
+        .navigationTitle(TasksMode.title(filters: model.state.filters))
+        .navigationSubtitle(TasksMode.subtitle(projectCount: projects.count, filters: model.state.filters))
     }
 
     private func modePicker(_ mode: TasksMode) -> some View {

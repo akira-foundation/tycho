@@ -35,7 +35,14 @@ enum TasksMode: String, CaseIterable, Identifiable {
         }
     }
 
-    static func subtitle(projectCount: Int) -> String { "Every task across \(projectCount) projects." }
+    static func title(filters: [TaskFilter]) -> String {
+        TasksPreset.matching(filters)?.title ?? "Tasks"
+    }
+
+    static func subtitle(projectCount: Int, filters: [TaskFilter] = []) -> String {
+        TasksPreset.matching(filters)?.subtitle(projectCount: projectCount)
+            ?? "Every task across \(projectCount) projects."
+    }
 
     static func migrateLegacyPreference(_ defaults: UserDefaults) {
         guard let legacy = defaults.string(forKey: legacyKey) else { return }

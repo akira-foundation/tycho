@@ -27,6 +27,26 @@ struct TasksModeTests {
         #expect(TasksMode.subtitle(projectCount: 7) == "Every task across 7 projects.")
     }
 
+    @Test func homePresetsNameTheList() {
+        #expect(
+            TasksPreset.allCases.map { TasksMode.title(filters: $0.filters) } == ["Open Tasks", "Completed", "Overdue"])
+        #expect(
+            TasksMode.subtitle(projectCount: 7, filters: TasksPreset.overdue.filters)
+                == "Overdue tasks across 7 projects.")
+        #expect(
+            TasksMode.subtitle(projectCount: 7, filters: TasksPreset.done.filters)
+                == "Tasks completed in the last 7 days across 7 projects.")
+        #expect(
+            TasksMode.subtitle(projectCount: 7, filters: TasksPreset.open.filters) == "Open tasks across 7 projects.")
+    }
+
+    @Test func changedFiltersFallBackToTheTasksHeading() {
+        let edited = TasksPreset.overdue.filters + [TaskFilter(field: .priority, values: ["high"])]
+        #expect(TasksMode.title(filters: edited) == "Tasks")
+        #expect(TasksMode.title(filters: []) == "Tasks")
+        #expect(TasksMode.subtitle(projectCount: 7, filters: edited) == "Every task across 7 projects.")
+    }
+
     @Test func modeComesFromTheViewState() {
         var state = TaskViewState(inProject: false)
         #expect(TasksMode(state: state) == .list)
