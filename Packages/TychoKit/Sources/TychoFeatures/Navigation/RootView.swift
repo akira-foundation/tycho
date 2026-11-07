@@ -40,13 +40,6 @@ struct RootView: View {
             #endif
             .overlay { PaletteOverlay() }
             .shortcutReceiver()
-            .toolbar {
-                ToolbarItem {
-                    Button("Inspector", systemImage: "sidebar.right") { router.closeInspector() }
-                        .disabled(router.inspectedTaskID == nil)
-                        .accessibilityIdentifier("toolbar.inspector")
-                }
-            }
             .inspector(
                 isPresented: Binding(
                     get: { showsInspectorColumn },
@@ -69,13 +62,15 @@ struct RootView: View {
                 )
             ) {
                 if showsInspectorSheet, let id = router.inspectedTaskID {
-                    TaskInspectorView(taskID: id, presentedAsSheet: true)
-                        .id(id)
-                        #if os(macOS)
+                    NavigationStack {
+                        TaskInspectorView(taskID: id, presentedAsSheet: true)
+                    }
+                    .id(id)
+                    #if os(macOS)
                     .frame(
                         minWidth: InspectorLayout.minimumColumnWidth, idealWidth: InspectorLayout.idealColumnWidth,
                         minHeight: 560)
-                        #endif
+                    #endif
                 }
             }
             .sheet(isPresented: $router.isCreatingProject) { NewProjectSheet(project: nil) }

@@ -1,7 +1,6 @@
 import SwiftData
 import SwiftUI
 import TychoCore
-import TychoDesign
 
 struct SubtaskRow: View {
     @Environment(\.modelContext) private var context
@@ -10,28 +9,28 @@ struct SubtaskRow: View {
     @State private var title = ""
 
     var body: some View {
-        HStack(spacing: Spacing.s2) {
+        HStack(spacing: 8) {
             Button {
                 toast.perform { try SubtaskActions(context: context).toggle(subtask) }
             } label: {
-                Image(systemName: subtask.isDone ? "checkmark.square.fill" : "square")
-                    .foregroundStyle(subtask.isDone ? Token.stDone.color : Token.text4.color)
+                Image(systemName: subtask.isDone ? "checkmark.circle.fill" : "circle")
+                    .foregroundStyle(subtask.isDone ? AnyShapeStyle(Color.accentColor) : AnyShapeStyle(.secondary))
+                    .imageScale(.large)
             }
             .buttonStyle(.plain)
             TextField("Subtask", text: $title)
                 .marksTextEditing()
                 .textFieldStyle(.plain)
                 .strikethrough(subtask.isDone)
+                .foregroundStyle(subtask.isDone ? .secondary : .primary)
                 .onSubmit(commit)
             Button("Delete", systemImage: "trash") {
                 toast.perform { try SubtaskActions(context: context).delete(subtask) }
             }
             .labelStyle(.iconOnly)
-            .buttonStyle(.plain)
-            .foregroundStyle(Token.text4.color)
+            .buttonStyle(.borderless)
+            .foregroundStyle(.secondary)
         }
-        .tychoFont(.base)
-        .frame(minHeight: 28)
         .onAppear { title = subtask.title }
     }
 

@@ -9,33 +9,31 @@ struct AttachmentsSection: View {
     let task: TaskItem
     @State private var importing = false
     @State private var previewing: FileRecord?
-    private let columns = [GridItem(.adaptive(minimum: 140), spacing: Spacing.s2)]
 
     var body: some View {
         let files = task.orderedAttachments
-        VStack(alignment: .leading, spacing: Spacing.s2) {
-            HStack {
-                Text("Attachments").tychoFont(.sm, weight: .semibold)
-                Text("\(files.count)").tychoFont(.xs).foregroundStyle(Token.text4.color)
-                Spacer()
-                Button("Upload", systemImage: "arrow.up.doc") { importing = true }
-                    .buttonStyle(.borderless)
-            }
-            if !files.isEmpty {
-                LazyVGrid(columns: columns, spacing: Spacing.s2) {
-                    ForEach(files) { file in
-                        Button {
-                            previewing = file
-                        } label: {
-                            AttachmentCard(file: file)
-                        }
-                        .buttonStyle(.plain)
-                    }
+        Section {
+            ForEach(files) { file in
+                Button {
+                    previewing = file
+                } label: {
+                    AttachmentCard(file: file)
                 }
+                .buttonStyle(.plain)
             }
-            FileDropzone(
-                message: "Drop files or click to attach", onBrowse: { importing = true }, onDrop: upload,
-                identifier: "inspector.attachments.dropzone")
+            Button("Add Attachment…", systemImage: "paperclip") { importing = true }
+                .buttonStyle(.borderless)
+                .accessibilityIdentifier("inspector.attachments.add")
+        } header: {
+            HStack {
+                Text("Attachments")
+                Spacer()
+                Text("\(files.count)").monospacedDigit()
+            }
+        }
+        .dropDestination(for: URL.self) { urls, _ in
+            upload(urls)
+            return !urls.isEmpty
         }
         .fileUploader(isPresented: $importing, project: task.project, task: task)
         .filePreview(item: $previewing)
@@ -52,17 +50,16 @@ struct AttachmentCard: View {
     static func caption(for file: FileRecord) -> String { "\(file.kind.title) · \(file.sizeText)" }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            FileThumbnail(file: file).aspectRatio(16 / 10, contentMode: .fit)
+        HStack(spacing: 10) {
+            FileThumbnail(file: file)
+                .frame(width: 40, height: 30)
+                .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
             VStack(alignment: .leading, spacing: 2) {
-                Text(file.name).tychoFont(.xs, weight: .medium).lineLimit(1)
-                Text(Self.caption(for: file)).tychoFont(.xxs).foregroundStyle(Token.text4.color)
+                Text(file.name).lineLimit(1)
+                Text(Self.caption(for: file)).font(.caption).foregroundStyle(.secondary)
             }
-            .padding(Spacing.s2)
+            Spacer(minLength: 0)
         }
-        .background(Token.surface2.color)
-        .clipShape(RoundedRectangle(cornerRadius: Radius.md, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: Radius.md, style: .continuous).strokeBorder(Token.border.color))
         .contentShape(Rectangle())
         .accessibilityElement(children: .combine)
         .accessibilityAddTraits(.isButton)

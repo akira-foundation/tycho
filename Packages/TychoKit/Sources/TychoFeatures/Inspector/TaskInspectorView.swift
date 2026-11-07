@@ -1,7 +1,6 @@
 import SwiftData
 import SwiftUI
 import TychoCore
-import TychoDesign
 
 struct TaskInspectorView: View {
     @Environment(\.modelContext) private var context
@@ -22,26 +21,26 @@ struct TaskInspectorView: View {
 
     var body: some View {
         if let task = matches.first {
-            ScrollView {
-                VStack(alignment: .leading, spacing: Spacing.s5) {
-                    header(task)
-                    TextField("Title", text: $title)
+            Form {
+                Section {
+                    TextField("Title", text: $title, axis: .vertical)
                         .marksTextEditing()
-                        .tychoFont(.xl, weight: .semibold)
-                        .textFieldStyle(.plain)
+                        .font(.title3.weight(.semibold))
+                        .labelsHidden()
                         .onSubmit { commitTitle(task) }
                         .accessibilityIdentifier("inspector.title")
-                    PropertyGrid(task: task)
-                    Divider()
-                    NotesEditor(task: task)
-                    Divider()
-                    SubtaskList(task: task)
-                    Divider()
-                    AttachmentsSection(task: task)
                 }
-                .padding(Spacing.s5)
+                TaskPropertiesSection(task: task)
+                NotesEditor(task: task)
+                SubtaskList(task: task)
+                AttachmentsSection(task: task)
             }
-            .background(Token.surface.color)
+            .formStyle(.grouped)
+            .navigationTitle(task.key)
+            #if os(iOS)
+            .navigationBarTitleDisplayMode(.inline)
+            #endif
+            .toolbar { actions(task) }
             .toastOverlay(toast, enabled: presentedAsSheet)
             .onAppear {
                 syncTitle(task)
@@ -60,38 +59,41 @@ struct TaskInspectorView: View {
                 }
             }
         } else {
-            EmptyState(title: "No task selected", symbol: "sidebar.right", message: "Pick a task to see its details.")
+            ContentUnavailableView(
+                "No Task Selected", systemImage: "sidebar.right", description: Text("Pick a task to see its details."))
         }
     }
 
-    private func header(_ task: TaskItem) -> some View {
-        HStack {
-            Text(task.key).tychoFont(.xs, design: .monospaced).foregroundStyle(Token.text4.color)
-            Spacer()
-            Button(
-                task.isFavorite ? "Unfavorite" : "Favorite",
-                systemImage: task.isFavorite ? "star.fill" : "star"
-            ) {
-                toast.perform { try TaskActions(context: context).toggleFavorite(task) }
-            }
-            .labelStyle(.iconOnly)
-            .accessibilityIdentifier("inspector.favorite")
-            Button(
-                task.status == .done ? "Reopen" : "Mark complete",
-                systemImage: task.status == .done ? "arrow.uturn.backward.circle" : "checkmark.circle"
-            ) {
-                toast.perform { try TaskActions(context: context).toggleDone(task) }
-            }
-            .labelStyle(.iconOnly)
-            .accessibilityIdentifier("inspector.complete")
-            Button("Delete", systemImage: "trash", role: .destructive) { confirmingDelete = true }
-                .labelStyle(.iconOnly)
+    @ToolbarContentBuilder private func actions(_ task: TaskItem) -> some ToolbarContent {
+        ToolbarItem(placement: .cancellationAction) {
             Button("Close", systemImage: "xmark", role: .close) { router.closeInspector() }
-                .labelStyle(.iconOnly)
                 .keyboardShortcut(.cancelAction)
                 .accessibilityIdentifier("inspector.close")
         }
-        .buttonStyle(.borderless)
+        ToolbarItem(placement: .primaryAction) {
+            ControlGroup {
+                Button(
+                    task.isFavorite ? "Unfavorite" : "Favorite",
+                    systemImage: task.isFavorite ? "star.fill" : "star"
+                ) {
+                    toast.perform { try TaskActions(context: context).toggleFavorite(task) }
+                }
+                .accessibilityIdentifier("inspector.favorite")
+                Button(
+                    task.status == .done ? "Reopen" : "Mark Complete",
+                    systemImage: task.status == .done ? "arrow.uturn.backward.circle" : "checkmark.circle"
+                ) {
+                    toast.perform { try TaskActions(context: context).toggleDone(task) }
+                }
+                .accessibilityIdentifier("inspector.complete")
+                Menu("More", systemImage: "ellipsis") {
+                    Button("Delete Task", systemImage: "trash", role: .destructive) { confirmingDelete = true }
+                        .accessibilityIdentifier("inspector.delete")
+                }
+                .accessibilityIdentifier("inspector.more")
+            }
+            .labelStyle(.iconOnly)
+        }
     }
 
     private func syncTitle(_ task: TaskItem) {

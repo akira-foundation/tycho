@@ -1,5 +1,4 @@
 import SwiftUI
-import TychoDesign
 
 struct InlineComposer: View {
     let placeholder: String
@@ -8,8 +7,8 @@ struct InlineComposer: View {
     @FocusState private var focused: Bool
 
     var body: some View {
-        HStack(spacing: Spacing.s2) {
-            Image(systemName: "plus").foregroundStyle(Token.text4.color)
+        HStack(spacing: 8) {
+            Image(systemName: "plus").foregroundStyle(.secondary)
             TextField(placeholder, text: $text)
                 .marksTextEditing(isFocused: focused)
                 .textFieldStyle(.plain)
@@ -27,7 +26,6 @@ struct InlineComposer: View {
                     return .handled
                 }
         }
-        .tychoFont(.base)
-        .frame(height: 32)
+        .frame(minHeight: 32)
     }
 }

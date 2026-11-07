@@ -9,13 +9,7 @@ struct SubtaskList: View {
     let task: TaskItem
 
     var body: some View {
-        VStack(alignment: .leading, spacing: Spacing.s1) {
-            HStack {
-                Text("Subtasks").tychoFont(.sm, weight: .semibold)
-                if let summary = TaskCard.subtaskSummary(task) {
-                    Text(summary).tychoFont(.xs).foregroundStyle(Token.text4.color)
-                }
-            }
+        Section {
             ForEach(task.orderedSubtasks) { subtask in
                 SubtaskRow(subtask: subtask)
                     .draggable(subtask.id.uuidString)
@@ -23,8 +17,16 @@ struct SubtaskList: View {
                         reorder(items, onto: subtask)
                     }
             }
-            InlineComposer(placeholder: "Add subtask") { title in
+            InlineComposer(placeholder: "Add Subtask") { title in
                 toast.perform { try SubtaskActions(context: context).add(title, to: task) }
+            }
+        } header: {
+            HStack {
+                Text("Subtasks")
+                Spacer()
+                if let summary = TaskCard.subtaskSummary(task) {
+                    Text(summary).monospacedDigit()
+                }
             }
         }
     }
