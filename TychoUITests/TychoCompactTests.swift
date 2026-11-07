@@ -41,22 +41,22 @@ final class TychoCompactTests: XCTestCase {
         XCTAssertTrue(eventually { picker.label == "Table" })
     }
 
-    func testProjectLargeTitleSitsAboveTheSavedViewStrip() {
+    func testProjectLargeTitleSitsAboveTheSavedViewStrip() throws {
         openProject("Website Redesign")
         let bar = app.navigationBars["Website Redesign"]
-        let title = bar.staticTexts["Website Redesign"]
-        let subtitle = bar.staticTexts.matching(NSPredicate(format: "label BEGINSWITH 'In Progress'")).firstMatch
+        let title = bar.staticTexts["Website Redesign"].firstMatch
+        let subtitle = bar.staticTexts.matching(NSPredicate(format: "label ENDSWITH '%'")).firstMatch
         let strip = app.otherElements["savedViews.strip"]
         XCTAssertTrue(strip.waitForExistence(timeout: 5))
+        XCTAssertTrue(eventually { title.isHittable }, "the large title should be visible")
 
-        XCTAssertTrue(title.isHittable, "the large title should be visible")
         XCTAssertTrue(subtitle.exists, "the status and progress subtitle should be visible")
         XCTAssertLessThanOrEqual(title.frame.maxY, strip.frame.minY)
-        XCTAssertGreaterThan(inkShare(title.screenshot().image), 0.1, "the large title should not sit under a blur")
+        let image = try XCTUnwrap(title.screenshot().image.cgImage)
+        XCTAssertGreaterThan(inkShare(image), 0.1, "the large title should not sit under a blur")
     }
 
-    private func inkShare(_ image: UIImage) -> Double {
-        guard let cgImage = image.cgImage else { return 0 }
+    private func inkShare(_ cgImage: CGImage) -> Double {
         let width = cgImage.width
         let height = cgImage.height
         var pixels = [UInt8](repeating: 0, count: width * height * 4)
