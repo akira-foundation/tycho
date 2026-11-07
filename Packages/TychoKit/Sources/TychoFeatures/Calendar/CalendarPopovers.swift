@@ -82,7 +82,7 @@ private struct DayListRow<Leading: View>: View {
 
     var body: some View {
         HStack(spacing: Spacing.s2) {
-            leading.lineLimit(1)
+            leading.lineLimit(1).layoutPriority(1)
             Spacer(minLength: Spacing.s2)
             Text(trailing).monospacedDigit().foregroundStyle(.secondary).lineLimit(1)
         }
