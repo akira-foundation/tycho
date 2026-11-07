@@ -23,7 +23,7 @@ struct ProjectDetailView: View {
             ProjectTabContent(project: project, target: target)
                 .id(target.stateKey)
                 .safeAreaInset(edge: .top, spacing: 0) {
-                    SavedViewStrip(project: project, tab: tab) { isSavingView = true }
+                    SavedViewStrip(project: project, tab: tab, layout: target.layout) { isSavingView = true }
                 }
                 .navigationTitle(target.title)
                 .navigationSubtitle(Self.subtitle(project))

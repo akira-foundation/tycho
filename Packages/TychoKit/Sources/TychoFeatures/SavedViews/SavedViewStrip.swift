@@ -6,6 +6,7 @@ struct SavedViewStrip: View {
     @Environment(Router.self) private var router
     let project: Project
     let tab: ProjectTab
+    let layout: ProjectBuiltInTab
     let onSave: () -> Void
 
     var body: some View {
@@ -14,6 +15,7 @@ struct SavedViewStrip: View {
             ScrollView(.horizontal) {
                 HStack(spacing: Spacing.s2) {
                     Picker("Saved Views", selection: selection) {
+                        Text("All Tasks").tag(UUID?.none)
                         ForEach(views) { Text($0.name).tag(UUID?.some($0.id)) }
                     }
                     .pickerStyle(.segmented)
@@ -27,10 +29,11 @@ struct SavedViewStrip: View {
                 }
                 .padding(.horizontal)
                 .padding(.vertical, Spacing.s2)
+                .accessibilityElement(children: .contain)
+                .accessibilityIdentifier("savedViews.strip")
             }
             .scrollIndicators(.never)
             .background(.bar)
-            .accessibilityIdentifier("savedViews.strip")
         }
     }
 
@@ -42,9 +45,10 @@ struct SavedViewStrip: View {
     private var selection: Binding<UUID?> {
         Binding(
             get: { Self.selectedView(for: tab) },
-            set: { id in
-                guard let id else { return }
-                router.openProject(project.id, tab: .savedView(id))
-            })
+            set: { router.openProject(project.id, tab: Self.tab(opening: $0, layout: layout)) })
+    }
+
+    static func tab(opening savedViewID: UUID?, layout: ProjectBuiltInTab) -> ProjectTab {
+        savedViewID.map { .savedView($0) } ?? .builtIn(layout)
     }
 }

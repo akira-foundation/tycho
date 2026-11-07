@@ -143,14 +143,16 @@ final class TychoFiltersTests: XCTestCase {
         app.openWebsiteTab("List")
         addStatusDoneFilter()
 
-        projectMenuItem("Save View…").click()
+        XCTAssertTrue(savedViewTab("High priority").waitForExistence(timeout: 5), "the demo view should show as a tab")
+        element("savedViews.add").click()
         let name = element("saveView.name")
         XCTAssertTrue(name.waitForExistence(timeout: 5))
         name.click()
         name.typeText("Shipped")
         element("saveView.save").click()
         XCTAssertTrue(showsSelectedSavedViewTab("Shipped"), "a saved view should open as a selected tab")
-        XCTAssertTrue(app.radioButtons["List"].firstMatch.isSelected, "the view's layout should stay selected")
+        let list = app.radioButtons["List"].firstMatch
+        XCTAssertTrue(eventually { list.isSelected }, "the view's layout should stay selected")
 
         projectMenuItem("Rename View…").click()
         let rename = element("renameView.name")
@@ -163,7 +165,13 @@ final class TychoFiltersTests: XCTestCase {
         XCTAssertFalse(savedViewTab("Shipped").exists)
 
         projectMenuItem("Delete View").click()
-        XCTAssertTrue(element("savedViews.strip").waitForNonExistence(timeout: 5))
+        XCTAssertTrue(savedViewTab("Released").waitForNonExistence(timeout: 5))
+        XCTAssertTrue(showsSelectedSavedViewTab("All Tasks"), "deleting the open view should return to all tasks")
+
+        savedViewTab("High priority").click()
+        XCTAssertTrue(showsSelectedSavedViewTab("High priority"))
+        savedViewTab("All Tasks").click()
+        XCTAssertTrue(showsSelectedSavedViewTab("All Tasks"), "All Tasks should leave the saved view")
     }
 
     func testHomeOverdueCardOpensTasksWithTheDueChip() {

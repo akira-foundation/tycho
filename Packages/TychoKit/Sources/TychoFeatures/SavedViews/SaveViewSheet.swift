@@ -45,7 +45,7 @@ struct SaveViewSheet: View {
             }
             .formStyle(.grouped)
             .navigationTitle("Save View")
-            .navigationSubtitle("Save the current filters as a tab on this project.")
+            .navigationSubtitle("Save the current filters as a view on this project.")
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel", role: .cancel) { dismiss() }
