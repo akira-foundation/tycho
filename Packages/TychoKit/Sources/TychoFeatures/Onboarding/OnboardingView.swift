@@ -1,7 +1,6 @@
 import SwiftData
 import SwiftUI
 import TychoCore
-import TychoDesign
 
 struct OnboardingView: View {
     @Environment(\.modelContext) private var context
@@ -17,41 +16,46 @@ struct OnboardingView: View {
     }
 
     var body: some View {
-        VStack(spacing: Spacing.s6) {
-            VStack(spacing: Spacing.s2) {
-                Text("Welcome to Tycho").tychoFont(.xxl, weight: .semibold)
+        VStack(spacing: 28) {
+            VStack(spacing: 8) {
+                Image(systemName: "checklist")
+                    .font(.system(size: 56))
+                    .foregroundStyle(.tint)
+                    .padding(.bottom, 8)
+                Text("Welcome to Tycho").font(.largeTitle.bold())
                 Text("A calm place for projects and tasks.")
-                    .tychoFont(.md)
-                    .foregroundStyle(Token.text3.color)
+                    .font(.title3)
+                    .foregroundStyle(.secondary)
             }
+            .multilineTextAlignment(.center)
             #if os(macOS)
             .focusable()
             .focusEffectDisabled()
             #endif
-            VStack(alignment: .leading, spacing: Spacing.s2) {
-                Text("Your name").tychoFont(.xs, weight: .medium).foregroundStyle(Token.text3.color)
-                TextField("Your name", text: $name)
-                    .textFieldStyle(.roundedBorder)
-                    .marksTextEditing()
-                    .accessibilityIdentifier("onboarding.name")
-            }
-            .frame(maxWidth: 320)
-            HStack(spacing: Spacing.s3) {
-                Button("Start empty") {
+            TextField("Your Name", text: $name)
+                .textFieldStyle(.roundedBorder)
+                .textContentType(.name)
+                .marksTextEditing()
+                .frame(maxWidth: 320)
+                .accessibilityIdentifier("onboarding.name")
+            VStack(spacing: 12) {
+                Button("Start Empty") {
                     toast.perform { try EmptySeed.load(into: context, ownerName: name) }
                 }
-                .buttonStyle(.tycho(.primary, size: .lg))
+                .buttonStyle(.borderedProminent)
                 .disabled(name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 .accessibilityIdentifier("onboarding.empty")
-                Button("Load demo") {
+                Button("Load Demo") {
                     toast.perform { try DemoSeed.load(into: context, now: .now, calendar: .current, ownerName: name) }
                 }
-                .buttonStyle(.tycho(.secondary, size: .lg))
+                .buttonStyle(.bordered)
                 .accessibilityIdentifier("onboarding.demo")
             }
+            .controlSize(.large)
+            .frame(maxWidth: 320)
+            .buttonSizing(.flexible)
         }
-        .padding(Spacing.s10)
+        .padding(40)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Token.bg.color)
     }
 }
