@@ -65,6 +65,18 @@ struct TaskInspectorView: View {
     }
 
     @ToolbarContentBuilder private func actions(_ task: TaskItem) -> some ToolbarContent {
+        #if os(macOS)
+        if presentedAsSheet {
+            sheetActions(task)
+        } else {
+            windowActions(task)
+        }
+        #else
+        windowActions(task)
+        #endif
+    }
+
+    @ToolbarContentBuilder private func windowActions(_ task: TaskItem) -> some ToolbarContent {
         ToolbarItem(placement: .cancellationAction) {
             Button("Close", systemImage: "xmark", role: .close) { router.closeInspector() }
                 .keyboardShortcut(.cancelAction)
@@ -72,28 +84,55 @@ struct TaskInspectorView: View {
         }
         ToolbarItem(placement: .primaryAction) {
             ControlGroup {
-                Button(
-                    task.isFavorite ? "Unfavorite" : "Favorite",
-                    systemImage: task.isFavorite ? "star.fill" : "star"
-                ) {
-                    toast.perform { try TaskActions(context: context).toggleFavorite(task) }
-                }
-                .accessibilityIdentifier("inspector.favorite")
-                Button(
-                    task.status == .done ? "Reopen" : "Mark Complete",
-                    systemImage: task.status == .done ? "arrow.uturn.backward.circle" : "checkmark.circle"
-                ) {
-                    toast.perform { try TaskActions(context: context).toggleDone(task) }
-                }
-                .accessibilityIdentifier("inspector.complete")
-                Menu("More", systemImage: "ellipsis.circle") {
-                    Button("Delete Task", systemImage: "trash", role: .destructive) { confirmingDelete = true }
-                        .accessibilityIdentifier("inspector.delete")
-                }
-                .accessibilityIdentifier("inspector.more")
+                favoriteButton(task)
+                completeButton(task)
+                moreMenu
             }
             .labelStyle(.iconOnly)
         }
+    }
+
+    #if os(macOS)
+    @ToolbarContentBuilder private func sheetActions(_ task: TaskItem) -> some ToolbarContent {
+        ToolbarItemGroup(placement: .automatic) {
+            moreMenu.labelStyle(.iconOnly).menuIndicator(.hidden).fixedSize()
+            favoriteButton(task)
+            completeButton(task)
+        }
+        ToolbarItem(placement: .confirmationAction) {
+            Button("Done") { router.closeInspector() }
+                .keyboardShortcut(.cancelAction)
+                .accessibilityIdentifier("inspector.close")
+        }
+    }
+    #endif
+
+    private func favoriteButton(_ task: TaskItem) -> some View {
+        Button(
+            task.isFavorite ? "Unfavorite" : "Favorite",
+            systemImage: task.isFavorite ? "star.fill" : "star"
+        ) {
+            toast.perform { try TaskActions(context: context).toggleFavorite(task) }
+        }
+        .accessibilityIdentifier("inspector.favorite")
+    }
+
+    private func completeButton(_ task: TaskItem) -> some View {
+        Button(
+            task.status == .done ? "Reopen" : "Mark Complete",
+            systemImage: task.status == .done ? "arrow.uturn.backward.circle" : "checkmark.circle"
+        ) {
+            toast.perform { try TaskActions(context: context).toggleDone(task) }
+        }
+        .accessibilityIdentifier("inspector.complete")
+    }
+
+    private var moreMenu: some View {
+        Menu("More", systemImage: "ellipsis.circle") {
+            Button("Delete Task", systemImage: "trash", role: .destructive) { confirmingDelete = true }
+                .accessibilityIdentifier("inspector.delete")
+        }
+        .accessibilityIdentifier("inspector.more")
     }
 
     private func syncTitle(_ task: TaskItem) {

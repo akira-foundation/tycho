@@ -54,8 +54,9 @@ struct TaskListView: View {
                 }
             }
         }
-        .listStyle(.sidebar)
+        .contentListStyle()
         .tychoAnimation(value: tasks.movementSignature)
+        .tychoAnimation(value: collapsed)
     }
 
     @ViewBuilder private func row(_ task: TaskItem, status: TaskStatus?) -> some View {
@@ -78,8 +79,33 @@ struct TaskListView: View {
         return TaskStatus(rawValue: group.id)
     }
 
-    private func header(_ group: TaskViewGroup, status: TaskStatus?) -> some View {
+    @ViewBuilder private func header(_ group: TaskViewGroup, status: TaskStatus?) -> some View {
+        #if os(macOS)
+        let isExpanded = expansion(of: group.id)
+        Button {
+            isExpanded.wrappedValue.toggle()
+        } label: {
+            headerLabel(group, status: status, isExpanded: isExpanded.wrappedValue)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityValue(isExpanded.wrappedValue ? "Expanded" : "Collapsed")
+        .accessibilityIdentifier("group.\(group.id)")
+        #else
+        headerLabel(group, status: status, isExpanded: nil)
+            .accessibilityIdentifier("group.\(group.id)")
+        #endif
+    }
+
+    private func headerLabel(_ group: TaskViewGroup, status: TaskStatus?, isExpanded: Bool?) -> some View {
         HStack(spacing: Spacing.s2) {
+            if let isExpanded {
+                Image(systemName: "chevron.right")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.secondary)
+                    .rotationEffect(.degrees(isExpanded ? 90 : 0))
+            }
             if let status {
                 StatusIcon(glyph: status.glyph, color: status.tint)
             }
@@ -87,7 +113,6 @@ struct TaskListView: View {
             Text("\(group.tasks.count)").foregroundStyle(.secondary)
         }
         .accessibilityElement(children: .combine)
-        .accessibilityIdentifier("group.\(group.id)")
     }
 
     private func expansion(of id: String) -> Binding<Bool> {
@@ -109,5 +134,15 @@ struct TaskListView: View {
                 items.map(\.id), into: status, before: target, in: tasks)
         }
         return handled
+    }
+}
+
+extension View {
+    @ViewBuilder fileprivate func contentListStyle() -> some View {
+        #if os(macOS)
+        self.listStyle(.inset)
+        #else
+        self.listStyle(.sidebar)
+        #endif
     }
 }

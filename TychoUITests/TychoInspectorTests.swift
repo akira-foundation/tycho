@@ -60,7 +60,7 @@ final class TychoInspectorTests: XCTestCase {
         loadDemo()
         app.openWebsiteTab("List")
         let title = openInspector(from: element("task.WEB-118"))
-        XCTAssertEqual(element("inspector.close").label, "Close")
+        XCTAssertEqual(element("inspector.close").label, "Done")
         mouseClick("inspector.close")
 
         XCTAssertTrue(title.waitForNonExistence(timeout: 5))
@@ -96,6 +96,7 @@ final class TychoInspectorTests: XCTestCase {
         app.openWebsiteTab("List")
         _ = openInspector(from: element("task.WEB-118"))
         XCTAssertTrue(app.sheets.count == 0, "the inspector should be a column in a zoomed window")
+        XCTAssertEqual(element("inspector.close").label, "Close")
         typeUnsavedNotes("Unsaved notes")
 
         app.windows.firstMatch.buttons[XCUIIdentifierCloseWindow].click()
@@ -139,6 +140,23 @@ final class TychoInspectorTests: XCTestCase {
         mouseClick("inspector.favorite")
 
         XCTAssertTrue(favorite.waitForLabelChange(from: before))
+    }
+
+    func testSheetActionsCompleteAndOfferDelete() {
+        loadDemo()
+        app.openWebsiteTab("Table")
+        _ = openInspector(from: element("table.title.WEB-118"))
+        let complete = app.buttons["inspector.complete"].firstMatch
+        XCTAssertTrue(complete.waitForExistence(timeout: 5))
+        let before = complete.label
+        mouseClick("inspector.complete")
+        XCTAssertTrue(complete.waitForLabelChange(from: before))
+
+        let more = app.descendants(matching: .any)["inspector.more"].firstMatch
+        XCTAssertTrue(more.waitForExistence(timeout: 5))
+        more.click()
+        XCTAssertTrue(app.menuItems["inspector.delete"].firstMatch.waitForExistence(timeout: 5))
+        app.typeKey(.escape, modifierFlags: [])
     }
 
     func testCloseButtonDismissesTheInspectorInANewWorkspaceTable() {
