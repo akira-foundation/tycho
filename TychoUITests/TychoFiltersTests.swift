@@ -89,6 +89,25 @@ final class TychoFiltersTests: XCTestCase {
         closeFilter()
     }
 
+    func testTwoFiltersShowWholeInsideTheScreen() {
+        app.openWebsiteTab("List")
+        addFilter("Status")
+        element("filter.add").click()
+        app.menuItems["Priority"].firstMatch.click()
+
+        let clear = element("filter.clear")
+        XCTAssertTrue(element("filter.value.low").waitForExistence(timeout: 5))
+        XCTAssertTrue(element("filter.value.low").isHittable, "the second filter should show without scrolling")
+        XCTAssertTrue(clear.isHittable, "the whole form should show without scrolling")
+        let screens = NSScreen.screens.map(\.frame)
+        let builder = element("filter.builder").frame
+        XCTAssertTrue(
+            screens.contains { $0.minX <= builder.minX && builder.maxX <= $0.maxX },
+            "the filter popover should stay inside one screen")
+        clear.click()
+        closeFilter()
+    }
+
     func testStatusFilterNarrowsTheListAndClearAllRestoresIt() {
         app.openWebsiteTab("List")
         XCTAssertTrue(element("task.WEB-118").waitForExistence(timeout: 5))
