@@ -46,7 +46,7 @@ struct BoardColumn: View {
         .frame(width: collapsed ? 48 : 280)
         .frame(maxHeight: .infinity, alignment: .top)
         .background(
-            targeted ? AnyShapeStyle(.fill.tertiary) : AnyShapeStyle(.fill.quinary),
+            targeted ? AnyShapeStyle(.fill.secondary) : AnyShapeStyle(.fill.quaternary),
             in: RoundedRectangle(cornerRadius: 12, style: .continuous)
         )
         .dropDestination(for: TaskTransfer.self) { items, _ in

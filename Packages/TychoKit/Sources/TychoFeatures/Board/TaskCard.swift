@@ -44,6 +44,7 @@ struct TaskCard: View {
         .padding(density.metrics.cardPadding)
         .background(.background, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
         .overlay(RoundedRectangle(cornerRadius: 10, style: .continuous).strokeBorder(.separator, lineWidth: 0.5))
+        .shadow(color: .black.opacity(0.06), radius: 1, y: 1)
         .contentShape(Rectangle())
         .onTapGesture { router.inspect(task.id) }
         .accessibilityElement(children: .contain)
