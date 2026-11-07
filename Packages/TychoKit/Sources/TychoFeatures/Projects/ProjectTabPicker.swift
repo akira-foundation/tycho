@@ -11,6 +11,7 @@ struct ProjectTabPicker: View {
             }
         }
         .pickerStyle(.segmented)
+        .labelStyle(.iconOnly)
         .accessibilityIdentifier("project.tab")
         #else
         Menu {

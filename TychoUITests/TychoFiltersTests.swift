@@ -89,6 +89,42 @@ final class TychoFiltersTests: XCTestCase {
         closeFilter()
     }
 
+    func testTwoFiltersShowWholeInsideTheScreen() {
+        app.openWebsiteTab("List")
+        addFilter("Status")
+        element("filter.add").click()
+        app.menuItems["Priority"].firstMatch.click()
+
+        let clear = element("filter.clear")
+        XCTAssertTrue(element("filter.value.low").waitForExistence(timeout: 5))
+        XCTAssertTrue(element("filter.value.low").isHittable, "the second filter should show without scrolling")
+        XCTAssertTrue(clear.isHittable, "the whole form should show without scrolling")
+        let screens = NSScreen.screens.map(\.frame)
+        let builder = element("filter.builder").frame
+        XCTAssertTrue(
+            screens.contains { $0.minX <= builder.minX && builder.maxX <= $0.maxX },
+            "the filter popover should stay inside one screen")
+        clear.click()
+        closeFilter()
+    }
+
+    func testManyFiltersScrollInsideACappedPopover() {
+        app.openWebsiteTab("List")
+        addFilter("Status")
+        for title in ["Priority", "Labels", "Assignee", "Project", "Due date"] {
+            element("filter.add").click()
+            let item = app.menuItems[title].firstMatch
+            XCTAssertTrue(item.waitForExistence(timeout: 5))
+            item.click()
+        }
+
+        XCTAssertTrue(element("filter.values.5").waitForExistence(timeout: 5))
+        XCTAssertLessThanOrEqual(element("filter.builder").frame.height, 660, "the popover should cap its height")
+        element("filter.clear").click()
+        XCTAssertTrue(element("filter.values.0").waitForNonExistence(timeout: 5))
+        closeFilter()
+    }
+
     func testStatusFilterNarrowsTheListAndClearAllRestoresIt() {
         app.openWebsiteTab("List")
         XCTAssertTrue(element("task.WEB-118").waitForExistence(timeout: 5))
