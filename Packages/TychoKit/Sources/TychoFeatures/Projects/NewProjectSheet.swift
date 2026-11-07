@@ -81,22 +81,20 @@ struct NewProjectSheet: View {
                         .toggleStyle(TychoToggleStyle())
                         .accessibilityIdentifier("project.hasStart")
                     if hasStart {
-                        DatePicker(
-                            "Start",
-                            selection: Binding(
-                                get: { draft.start ?? .now }, set: { draft.start = DatePill.normalized($0) }),
-                            displayedComponents: .date
-                        )
+                        LabeledContent("Start") {
+                            CalendarField(
+                                title: "Start",
+                                selection: Binding(get: { draft.start ?? .now }, set: { draft.start = $0 }))
+                        }
                         .accessibilityIdentifier("project.start")
                     }
                     Toggle("Due date", isOn: $hasDue)
                         .toggleStyle(TychoToggleStyle())
                     if hasDue {
-                        DatePicker(
-                            "Due",
-                            selection: Binding(
-                                get: { draft.due ?? .now }, set: { draft.due = DatePill.normalized($0) }),
-                            displayedComponents: .date)
+                        LabeledContent("Due") {
+                            CalendarField(
+                                title: "Due", selection: Binding(get: { draft.due ?? .now }, set: { draft.due = $0 }))
+                        }
                     }
                 }
                 if let error {

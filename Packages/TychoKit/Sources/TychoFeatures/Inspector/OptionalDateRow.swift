@@ -2,7 +2,6 @@ import SwiftUI
 import TychoCore
 
 struct OptionalDateRow: View {
-    @Environment(\.weekStart) private var weekStart
     let title: String
     let date: Date?
     let onChange: (Date?) -> Void
@@ -11,12 +10,7 @@ struct OptionalDateRow: View {
         LabeledContent(title) {
             if let date {
                 HStack(spacing: 6) {
-                    DatePicker(
-                        title, selection: Binding(get: { date }, set: { onChange(DatePill.normalized($0)) }),
-                        displayedComponents: .date
-                    )
-                    .labelsHidden()
-                    .environment(\.calendar, Calendar.picker(weekStart: weekStart))
+                    CalendarField(title: title, selection: Binding(get: { date }, set: { onChange($0) }))
                     Button("Remove \(title)", systemImage: "xmark.circle.fill") { onChange(nil) }
                         .labelStyle(.iconOnly)
                         .buttonStyle(.borderless)
