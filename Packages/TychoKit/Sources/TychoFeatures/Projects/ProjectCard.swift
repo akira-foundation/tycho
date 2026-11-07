@@ -34,7 +34,9 @@ struct ProjectCard: View {
             }
         }
         .padding()
-        .background(.fill.quinary, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .background(.background, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous).strokeBorder(.separator, lineWidth: 0.5))
+        .shadow(color: .black.opacity(0.06), radius: 1, y: 1)
         .contentShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
     }
 }
