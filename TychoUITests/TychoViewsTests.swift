@@ -42,6 +42,17 @@ final class TychoViewsTests: XCTestCase {
         }
     }
 
+    func testProjectTabsShowIconsNamedByTitle() {
+        openSidebar("Website Redesign", revealing: "project.tab")
+        app.zoomWindow()
+        let picker = element("project.tab")
+        for tab in ["Board", "List", "Table", "Calendar", "Timeline", "Files"] {
+            let segment = picker.radioButtons[tab].firstMatch
+            XCTAssertTrue(segment.exists, "\(tab) segment should be named by its title")
+            XCTAssertLessThanOrEqual(segment.frame.width, 48, "\(tab) segment should show only its icon")
+        }
+    }
+
     func testTableHeaderSortsByPriority() {
         app.openWebsiteTab("Table")
         let handoff = element("table.title.WEB-124")
