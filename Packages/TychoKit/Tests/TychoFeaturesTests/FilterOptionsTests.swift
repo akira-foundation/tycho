@@ -27,22 +27,29 @@ struct FilterOptionsTests {
         #expect(options.first?.id == first.id.uuidString)
     }
 
-    @Test func summaryShowsAnyNamesOrCount() {
+    @Test func summaryShowsAPlaceholderTheNameOrACount() {
         let options = FilterOptions.options(for: .status, members: [], projects: [])
         let none = TaskFilter(field: .status)
+        let one = TaskFilter(field: .status, values: ["progress"])
         let two = TaskFilter(field: .status, values: ["todo", "done"])
-        let three = TaskFilter(field: .status, values: ["todo", "done", "review"])
 
-        #expect(FilterOptions.summary(none, options: options) == "any")
-        #expect(FilterOptions.summary(two, options: options) == "To Do, Done")
-        #expect(FilterOptions.summary(three, options: options) == "3 selected")
+        #expect(FilterOptions.summary(none, options: options) == "Any status")
+        #expect(FilterOptions.summary(one, options: options) == "In Progress")
+        #expect(FilterOptions.summary(two, options: options) == "2 statuses")
     }
 
-    @Test func summaryOfAMissingValueIsACount() {
-        let options = FilterOptions.options(for: .project, members: [], projects: [])
-        let filter = TaskFilter(field: .project, values: ["gone"])
+    @Test func summaryCountsUseTheFieldNoun() {
+        let priorities = TaskFilter(field: .priority, values: ["high", "urgent"])
+        let gone = TaskFilter(field: .project, values: ["gone"])
 
-        #expect(FilterOptions.summary(filter, options: options) == "1 selected")
+        #expect(FilterOptions.summary(priorities, options: []) == "2 priorities")
+        #expect(FilterOptions.summary(gone, options: []) == "1 project")
+    }
+
+    @Test func onlyEnumeratedFieldsListTheirValuesInAMenu() {
+        let menuFields = TaskFilterField.allCases.filter(FilterOptions.listsValuesInMenu)
+
+        #expect(menuFields == [.status, .assignee, .priority, .project, .labels])
     }
 
     @Test func dueAndRecencyOptionsFollowTheOriginal() {

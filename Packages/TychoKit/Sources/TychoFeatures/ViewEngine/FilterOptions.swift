@@ -19,12 +19,34 @@ enum FilterOptions {
         }
     }
 
+    static func listsValuesInMenu(_ field: TaskFilterField) -> Bool {
+        switch field {
+        case .status, .assignee, .priority, .project, .labels: true
+        case .due, .created, .updated: false
+        }
+    }
+
     static func summary(_ filter: TaskFilter, options: [FilterOption]) -> String {
-        guard !filter.values.isEmpty else { return "any" }
-        let countText = "\(filter.values.count) selected"
-        guard filter.values.count <= 2 else { return countText }
-        let titles = filter.values.compactMap { value in options.first { $0.id == value }?.title }
-        return titles.isEmpty ? countText : titles.joined(separator: ", ")
+        let noun = noun(for: filter.field)
+        guard let first = filter.values.first else { return "Any \(noun.singular)" }
+        let count = filter.values.count
+        if count == 1, let title = options.first(where: { $0.id == first })?.title {
+            return title
+        }
+        return "\(count) \(count == 1 ? noun.singular : noun.plural)"
+    }
+
+    private static func noun(for field: TaskFilterField) -> (singular: String, plural: String) {
+        switch field {
+        case .status: ("status", "statuses")
+        case .assignee: ("assignee", "assignees")
+        case .priority: ("priority", "priorities")
+        case .due: ("due date", "due dates")
+        case .project: ("project", "projects")
+        case .labels: ("label", "labels")
+        case .created: ("created date", "created dates")
+        case .updated: ("updated date", "updated dates")
+        }
     }
 
     private static func assigneeOptions(_ members: [Member]) -> [FilterOption] {

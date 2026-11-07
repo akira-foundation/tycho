@@ -84,19 +84,7 @@ struct FilterSection: View {
                 ForEach(TaskFilterOperator.allCases, id: \.self) { Text($0.title).tag($0) }
             }
             .accessibilityIdentifier("filter.op.\(index)")
-            LabeledContent("Values") {
-                #if os(macOS)
-                LazyVGrid(columns: [GridItem(.adaptive(minimum: 110), alignment: .leading)], alignment: .leading) {
-                    toggles(options)
-                }
-                .accessibilityElement(children: .contain)
-                .accessibilityIdentifier("filter.values.\(index)")
-                #else
-                Menu(FilterOptions.summary(filter, options: options)) { toggles(options) }
-                    .menuActionDismissBehavior(.disabled)
-                    .accessibilityIdentifier("filter.values.button.\(index)")
-                #endif
-            }
+            LabeledContent("Values") { values(options) }
             #if os(iOS)
             removeButton
             #endif
@@ -137,6 +125,30 @@ struct FilterSection: View {
 
     private var condition: Binding<TaskFilterOperator> {
         Binding(get: { filter.op }, set: { op in engine.model.updateFilter(at: index) { $0.op = op } })
+    }
+
+    @ViewBuilder private func values(_ options: [FilterOption]) -> some View {
+        #if os(macOS)
+        if FilterOptions.listsValuesInMenu(filter.field) {
+            valuesMenu(options)
+                .fixedSize()
+                .accessibilityIdentifier("filter.values.\(index)")
+        } else {
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: 110), alignment: .leading)], alignment: .leading) {
+                toggles(options)
+            }
+            .accessibilityElement(children: .contain)
+            .accessibilityIdentifier("filter.values.\(index)")
+        }
+        #else
+        valuesMenu(options)
+            .menuActionDismissBehavior(.disabled)
+            .accessibilityIdentifier("filter.values.button.\(index)")
+        #endif
+    }
+
+    private func valuesMenu(_ options: [FilterOption]) -> some View {
+        Menu(FilterOptions.summary(filter, options: options)) { toggles(options) }
     }
 
     private func toggles(_ options: [FilterOption]) -> some View {

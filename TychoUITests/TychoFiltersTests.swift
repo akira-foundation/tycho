@@ -38,10 +38,13 @@ final class TychoFiltersTests: XCTestCase {
 
     private func addStatusDoneFilter() {
         addFilter("Status")
-        let done = element("filter.value.done")
-        XCTAssertTrue(done.waitForExistence(timeout: 5), "adding a filter should show its values")
+        let values = element("filter.values.0")
+        XCTAssertTrue(values.waitForExistence(timeout: 5), "adding a filter should show its values")
+        values.click()
+        let done = app.menuItems["Done"].firstMatch
+        XCTAssertTrue(done.waitForExistence(timeout: 5), "the values menu should list each status")
         done.click()
-        XCTAssertTrue(eventually { (done.value as? Int) == 1 }, "clicking Done should select it")
+        XCTAssertTrue(eventually { values.label == "Done" }, "choosing Done should name it in the menu")
         closeFilter()
     }
 
@@ -65,8 +68,9 @@ final class TychoFiltersTests: XCTestCase {
         app.openWebsiteTab("List")
         addFilter("Status")
 
-        XCTAssertTrue(element("filter.values.0").waitForExistence(timeout: 5))
-        XCTAssertTrue(element("filter.value.done").exists)
+        let values = element("filter.values.0")
+        XCTAssertTrue(values.waitForExistence(timeout: 5))
+        XCTAssertEqual(values.label, "Any status")
         element("filter.clear").click()
         XCTAssertTrue(element("filter.values.0").waitForNonExistence(timeout: 5))
         closeFilter()
@@ -93,8 +97,8 @@ final class TychoFiltersTests: XCTestCase {
         app.menuItems["Priority"].firstMatch.click()
 
         let clear = element("filter.clear")
-        XCTAssertTrue(element("filter.value.low").waitForExistence(timeout: 5))
-        XCTAssertTrue(element("filter.value.low").isHittable, "the second filter should show without scrolling")
+        XCTAssertTrue(element("filter.values.1").waitForExistence(timeout: 5))
+        XCTAssertTrue(element("filter.values.1").isHittable, "the second filter should show without scrolling")
         XCTAssertTrue(clear.isHittable, "the whole form should show without scrolling")
         let screens = NSScreen.screens.map(\.frame)
         let builder = element("filter.builder").frame
