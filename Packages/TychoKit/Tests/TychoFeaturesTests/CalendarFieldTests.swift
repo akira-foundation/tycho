@@ -28,6 +28,10 @@ struct CalendarFieldTests {
         return [match] + nested
     }
 
+    private func visiblePopovers() -> Int {
+        NSApp.windows.filter { String(describing: type(of: $0)).contains("Popover") && $0.isVisible }.count
+    }
+
     private func datePickers() -> [NSDatePicker] {
         NSApp.windows.flatMap { views(of: NSDatePicker.self, in: $0.contentView?.superview) }
     }
@@ -54,10 +58,11 @@ struct CalendarFieldTests {
     }
 
     @Test func openDateFieldShowsTheMonthGridInAPopover() {
+        let popoversBefore = visiblePopovers()
         let window = host(CalendarField(title: "Due", selection: .constant(date), isPicking: true))
         defer { window.close() }
 
-        #expect(NSApp.windows.contains { String(describing: type(of: $0)).contains("Popover") && $0.isVisible })
+        #expect(visiblePopovers() > popoversBefore)
         #expect(datePickers().isEmpty)
     }
 }

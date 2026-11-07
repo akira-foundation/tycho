@@ -22,6 +22,16 @@ struct MonthPickerTests {
         #expect(weeks.flatMap(\.self).contains { $0.isInMonth && $0.day == 30 })
     }
 
+    @Test func aMonthSpanningSixWeeksKeepsAllSixRows() {
+        var stored = day(2026, 8, 15)
+        let picker = MonthPicker(selection: Binding(get: { stored }, set: { stored = $0 }))
+
+        let weeks = MonthPicker.weeks(of: picker.cells(around: stored))
+
+        #expect(weeks.count == 6)
+        #expect(weeks.last?.contains { $0.isInMonth && $0.day == 31 } == true)
+    }
+
     @Test func onlyTheSelectedDayIsMarked() {
         var stored = day(2026, 11, 15)
         let picker = MonthPicker(selection: Binding(get: { stored }, set: { stored = $0 }))

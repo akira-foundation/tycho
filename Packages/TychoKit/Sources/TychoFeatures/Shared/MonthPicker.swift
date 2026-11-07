@@ -41,10 +41,11 @@ struct MonthPicker: View {
         HStack(spacing: Spacing.s1) {
             Text(CalendarGrid.title(.month, anchor: anchor, weekStart: weekStart, calendar: calendar))
                 .font(.headline)
+                .accessibilityAddTraits(.isHeader)
                 .accessibilityIdentifier("calendar.picker.title")
             Spacer()
             Button("Previous Month", systemImage: "chevron.left") { step(by: -1) }
-            Button("Today", systemImage: "circle.fill") { anchor = .now }
+            Button("This Month", systemImage: "circle.fill") { anchor = .now }
                 .imageScale(.small)
             Button("Next Month", systemImage: "chevron.right") { step(by: 1) }
         }

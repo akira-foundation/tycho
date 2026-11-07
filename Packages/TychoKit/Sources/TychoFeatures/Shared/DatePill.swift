@@ -38,7 +38,14 @@ struct DatePill: View {
 
     private var picker: some View {
         VStack(alignment: .leading, spacing: 8) {
-            CalendarPicker(title: "Date", selection: Binding(get: { date ?? .now }, set: { commit($0) }))
+            CalendarPicker(
+                title: "Date",
+                selection: Binding(
+                    get: { date ?? .now },
+                    set: {
+                        commit($0)
+                        picking = false
+                    }))
             HStack {
                 Button("Today") { commit(.now) }
                 Spacer()
