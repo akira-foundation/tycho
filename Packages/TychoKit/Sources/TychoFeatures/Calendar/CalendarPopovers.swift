@@ -17,6 +17,7 @@ struct DayListPopover: View {
             tasks: tasks.inLiveProjects(), calendar: DateText.gregorian)
         NavigationStack {
             List(items) { row($0) }
+                .accessibilityIdentifier("calendar.daylist")
                 .navigationTitle(dateText.long(day))
                 #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
@@ -32,8 +33,6 @@ struct DayListPopover: View {
         #else
         .frame(width: 300, height: 260)
         #endif
-        .accessibilityElement(children: .contain)
-        .accessibilityIdentifier("calendar.daylist")
     }
 
     @ViewBuilder private func row(_ item: CalendarItem) -> some View {
