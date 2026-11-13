@@ -8,10 +8,13 @@ struct MenuSwatchTests {
     private func pixel(_ image: CGImage, x: Int, y: Int) -> [UInt8] {
         var bytes = [UInt8](repeating: 0, count: 4)
         let space = CGColorSpace(name: CGColorSpace.sRGB)!
-        let context = CGContext(
-            data: &bytes, width: 1, height: 1, bitsPerComponent: 8, bytesPerRow: 4, space: space,
-            bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)!
-        context.draw(image, in: CGRect(x: -x, y: -(image.height - 1 - y), width: image.width, height: image.height))
+        bytes.withUnsafeMutableBytes { buffer in
+            let context = CGContext(
+                data: buffer.baseAddress, width: 1, height: 1, bitsPerComponent: 8, bytesPerRow: 4, space: space,
+                bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)!
+            context.draw(
+                image, in: CGRect(x: -x, y: -(image.height - 1 - y), width: image.width, height: image.height))
+        }
         return bytes
     }
 
