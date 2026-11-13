@@ -5,7 +5,6 @@ import TychoDesign
 
 struct DependencyPicker: View {
     let task: TaskItem
-    let showsTitles: Bool
     let emptyText: String
     @State private var picking = false
 
@@ -20,24 +19,19 @@ struct DependencyPicker: View {
         .accessibilityIdentifier("deps.\(task.key)")
     }
 
+    static func summary(of blockers: [TaskItem]) -> String {
+        blockers.map(\.key).joined(separator: ", ")
+    }
+
     @ViewBuilder private var label: some View {
         let blockers = task.orderedBlockedBy
         if blockers.isEmpty {
             Text(emptyText).foregroundStyle(.tertiary)
         } else {
-            HStack(spacing: 4) {
-                ForEach(blockers) { blocker in
-                    Text(blocker.key)
-                        .font(.caption.monospaced())
-                        .padding(.horizontal, 5)
-                        .padding(.vertical, 1)
-                        .background(.fill.tertiary, in: RoundedRectangle(cornerRadius: 4))
-                        .help(blocker.title)
-                    if showsTitles {
-                        Text(blocker.title).lineLimit(1)
-                    }
-                }
-            }
+            Text(Self.summary(of: blockers))
+                .font(.body.monospaced())
+                .foregroundStyle(.secondary)
+                .help(blockers.map(\.title).joined(separator: ", "))
         }
     }
 }
@@ -50,38 +44,41 @@ struct DependencyList: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            TextField("Blocked by…", text: $query)
+            TextField("Search", text: $query)
                 .marksTextEditing()
-                .textFieldStyle(.roundedBorder)
-            ScrollView {
-                LazyVStack(alignment: .leading, spacing: 0) {
-                    ForEach(DependencyActions.candidates(for: task, matching: query)) { candidate in
-                        Button {
-                            toast.perform { try DependencyActions(context: context).toggle(candidate, for: task) }
-                        } label: {
-                            row(candidate)
-                        }
-                        .buttonStyle(.plain)
+            List(DependencyActions.candidates(for: task, matching: query)) { candidate in
+                Toggle(isOn: binding(for: candidate)) {
+                    HStack(spacing: 8) {
+                        StatusIcon(glyph: candidate.status.glyph, color: candidate.status.tint, size: 13)
+                        Text(candidate.key).font(.body.monospaced()).foregroundStyle(.secondary)
+                        Text(candidate.title).lineLimit(1)
                     }
                 }
+                .checkboxToggleStyle()
             }
-            .frame(maxHeight: 320)
+            .frame(minHeight: 160, idealHeight: 280, maxHeight: 280)
         }
         .padding()
         .frame(width: 320)
     }
 
-    private func row(_ candidate: TaskItem) -> some View {
-        HStack(spacing: 8) {
-            StatusIcon(glyph: candidate.status.glyph, color: candidate.status.tint, size: 13)
-            Text(candidate.key).font(.caption.monospaced()).foregroundStyle(.secondary)
-            Text(candidate.title).lineLimit(1)
-            Spacer()
-            if task.isBlocked(by: candidate) {
-                Image(systemName: "checkmark").foregroundStyle(Color.accentColor)
+    private func binding(for candidate: TaskItem) -> Binding<Bool> {
+        Binding(
+            get: { task.isBlocked(by: candidate) },
+            set: { requested in
+                guard requested != task.isBlocked(by: candidate) else { return }
+                toast.perform { try DependencyActions(context: context).toggle(candidate, for: task) }
             }
-        }
-        .frame(height: 28)
-        .contentShape(Rectangle())
+        )
+    }
+}
+
+extension View {
+    @ViewBuilder fileprivate func checkboxToggleStyle() -> some View {
+        #if os(macOS)
+        self.toggleStyle(.checkbox)
+        #else
+        self
+        #endif
     }
 }

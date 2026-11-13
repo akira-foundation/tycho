@@ -34,7 +34,7 @@ extension TaskTableView {
             TableColumn("Labels", sortUsing: TaskComparator(field: .manual)) { cell(LabelsCell(task: $0)) }
                 .tychoColumn(.labels)
             TableColumn("Dependencies", sortUsing: TaskComparator(field: .manual)) {
-                cell(DependencyPicker(task: $0, showsTitles: false, emptyText: "—"))
+                cell(DependencyPicker(task: $0, emptyText: "—"))
             }
             .tychoColumn(.deps)
             TableColumn("Estimate", sortUsing: TaskComparator(field: .estimate)) { cell(EstimateCell(task: $0)) }

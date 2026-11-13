@@ -59,7 +59,7 @@ struct TaskPropertiesSection: View {
         }
         Section {
             LabeledContent("Labels") { labelsMenu }
-            LabeledContent("Blocked By") { DependencyPicker(task: task, showsTitles: false, emptyText: "None") }
+            LabeledContent("Blocked By") { DependencyPicker(task: task, emptyText: "None") }
         }
     }
 
