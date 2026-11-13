@@ -49,6 +49,18 @@ final class TychoViewsTests: XCTestCase {
         XCTAssertTrue(element("column.backlog").waitForExistence(timeout: 5))
     }
 
+    func testBoardColumnAddOpensTheNewTaskSheetWithThatStatus() {
+        openSidebar("Website Redesign", revealing: "column.review.add")
+        element("column.review.add").click()
+        let sheet = app.sheets.firstMatch
+        XCTAssertTrue(sheet.waitForExistence(timeout: 5))
+        XCTAssertTrue(sheet.popUpButtons.matching(NSPredicate(format: "value == %@", "Review")).firstMatch.exists)
+        app.typeKey(.escape, modifierFlags: [])
+        XCTAssertTrue(sheet.waitForNonExistence(timeout: 5))
+        let composers = app.textFields.matching(NSPredicate(format: "placeholderValue == %@", "Add Task"))
+        XCTAssertEqual(composers.count, 0)
+    }
+
     func testEveryProjectTabOpens() {
         let markers = [
             ("Board", "column.todo"), ("List", "group.todo"), ("Table", "table.grid"),

@@ -6,6 +6,7 @@ import TychoDesign
 struct BoardColumn: View {
     @Environment(\.modelContext) private var context
     @Environment(ToastCenter.self) private var toast
+    @Environment(Router.self) private var router
     let group: TaskGroup
     let project: Project?
     let allTasks: [TaskItem]
@@ -25,15 +26,6 @@ struct BoardColumn: View {
                                 return drop(items, before: task)
                             }
                             .contextMenu { TaskMenu(task: task) }
-                    }
-                    if let project {
-                        InlineComposer(placeholder: "Add Task") { title in
-                            toast.perform {
-                                _ = try TaskActions(context: context).create(
-                                    TaskDraft(title: title, status: group.status), in: project)
-                            }
-                        }
-                        .padding(.horizontal, Spacing.s2)
                     }
                 }
                 .padding(.bottom, Spacing.s4)
@@ -61,6 +53,15 @@ struct BoardColumn: View {
             Text(group.status.title).font(.subheadline.weight(.semibold))
             Text("\(group.tasks.count)").font(.subheadline).foregroundStyle(.secondary)
             Spacer()
+            if project != nil {
+                Button("Add Task to \(group.status.title)", systemImage: "plus") {
+                    router.newTask(status: group.status)
+                }
+                .labelStyle(.iconOnly)
+                .buttonStyle(.borderless)
+                .help("Add Task")
+                .accessibilityIdentifier("column.\(group.status.rawValue).add")
+            }
         }
         .padding(.horizontal, Spacing.s1)
         .frame(height: 30)
