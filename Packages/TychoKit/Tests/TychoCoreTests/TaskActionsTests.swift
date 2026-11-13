@@ -14,6 +14,38 @@ struct TaskActionsTests {
         return (context, project, TaskActions(context: context, now: { referenceNow }))
     }
 
+    @Test func createKeepsTheDescription() throws {
+        let (_, project, actions) = try setUp()
+        var draft = TaskDraft(title: "Audit")
+        draft.notes = "First line\nSecond line"
+
+        let task = try actions.create(draft, in: project)
+
+        #expect(task.notes == "First line\nSecond line")
+    }
+
+    @Test func turningTheDueOnPicksNoonTodayAndOffClearsIt() {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(identifier: "UTC")!
+        var draft = TaskDraft(title: "Audit")
+
+        draft.setHasDue(true, today: referenceNow, calendar: calendar)
+        #expect(draft.due == DayTime.noon(of: referenceNow, calendar: calendar))
+
+        draft.setHasDue(false, today: referenceNow, calendar: calendar)
+        #expect(draft.due == nil)
+    }
+
+    @Test func turningTheDueOnKeepsADateAlreadyChosen() {
+        let chosen = Date(timeIntervalSince1970: 1_800_000_000)
+        var draft = TaskDraft(title: "Audit")
+        draft.due = chosen
+
+        draft.setHasDue(true, today: referenceNow, calendar: Calendar(identifier: .gregorian))
+
+        #expect(draft.due == chosen)
+    }
+
     @Test func createNumbersSequentiallyAndAppendsToTheStatusGroup() throws {
         let (_, project, actions) = try setUp()
         let first = try actions.create(TaskDraft(title: "Audit"), in: project)
