@@ -9,6 +9,10 @@ struct NotesDraft {
         syncedNotes = storedNotes
     }
 
+    mutating func discardEdits() {
+        text = syncedNotes
+    }
+
     mutating func commit(storedNotes: () -> String, save: (String) -> Void) {
         guard hasUnsavedText else { return }
         if text != storedNotes() { save(text) }

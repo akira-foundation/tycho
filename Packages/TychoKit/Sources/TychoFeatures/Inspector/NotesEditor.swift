@@ -54,7 +54,10 @@ struct NotesEditor: View {
     }
 
     private func recordEdit() {
-        guard text != loadedText else { return }
+        guard text != loadedText else {
+            draft.discardEdits()
+            return
+        }
         draft.text = NotesMarkdown.markdown(text, context: fontContext)
     }
 

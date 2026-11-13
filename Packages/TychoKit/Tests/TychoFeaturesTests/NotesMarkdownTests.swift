@@ -14,7 +14,7 @@ struct NotesMarkdownTests {
 
     @Test(arguments: [
         "Plain notes",
-        "Ship **v2** with *care*, ~~not~~ `rush` and [docs](https://example.com).",
+        "Ship **v2** with *care*, ~~not~~ `rush` and [docs](<https://example.com>).",
         "***Both*** at once",
         "- one\n- two\n\n1. first",
         "snake_case stays readable",
@@ -55,5 +55,32 @@ struct NotesMarkdownTests {
         let markdown = NotesMarkdown.markdown(AttributedString("2 * 3 = [six]"), context: context)
         #expect(markdown == #"2 \* 3 = \[six\]"#)
         #expect(String(NotesMarkdown.attributed(markdown).characters) == "2 * 3 = [six]")
+    }
+
+    @Test func entitiesAndAngleBracketsStayLiteral() {
+        let literal = "Tom &amp; Jerry <https://example.com>"
+        let markdown = NotesMarkdown.markdown(AttributedString(literal), context: context)
+        #expect(String(NotesMarkdown.attributed(markdown).characters) == literal)
+    }
+
+    @Test func codeContainingBackticksSurvivesARoundTrip() {
+        var text = AttributedString("run a`b now")
+        let range = text.range(of: "a`b")!
+        text[range].font = NotesMarkdown.codeFont
+        let restored = NotesMarkdown.attributed(NotesMarkdown.markdown(text, context: context))
+        let code = restored.runs.first { restored[$0.range].characters.contains("`") }
+        #expect(String(restored.characters) == "run a`b now")
+        #expect(code.map { String(restored[$0.range].characters) } == "a`b")
+        #expect(code?.font == NotesMarkdown.codeFont)
+    }
+
+    @Test func linksWithParenthesesSurviveARoundTrip() throws {
+        let url = try #require(URL(string: "https://en.wikipedia.org/wiki/Swift_(language)"))
+        var text = AttributedString("see wiki")
+        let range = text.range(of: "wiki")!
+        text[range].link = url
+        let restored = NotesMarkdown.attributed(NotesMarkdown.markdown(text, context: context))
+        #expect(String(restored.characters) == "see wiki")
+        #expect(restored.runs.compactMap(\.link) == [url])
     }
 }

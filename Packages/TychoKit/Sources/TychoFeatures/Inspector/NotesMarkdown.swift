@@ -39,7 +39,7 @@ enum NotesMarkdown {
     }
 
     private static func needsEscape(_ character: Character, at index: Int, in characters: [Character]) -> Bool {
-        guard character == "_" else { return "\\*`[]~".contains(character) }
+        guard character == "_" else { return "\\*`[]~<&".contains(character) }
         let before = index > characters.startIndex ? characters[index - 1] : " "
         let after = index + 1 < characters.endIndex ? characters[index + 1] : " "
         return !(before.isLetter || before.isNumber) || !(after.isLetter || after.isNumber)
@@ -91,9 +91,16 @@ private struct NotesRunStyle {
     }
 
     private func emphasized(_ core: String) -> String {
-        guard !isCode else { return "`\(core)`" }
+        guard !isCode else { return coded(core) }
         let marker = String(repeating: "*", count: (isItalic ? 1 : 0) + (isBold ? 2 : 0))
         return marker + NotesMarkdown.escaped(core) + marker
+    }
+
+    private func coded(_ core: String) -> String {
+        let longestRun = core.split { $0 != "`" }.map(\.count).max() ?? 0
+        let fence = String(repeating: "`", count: longestRun + 1)
+        let padding = core.hasPrefix("`") || core.hasSuffix("`") ? " " : ""
+        return fence + padding + core + padding + fence
     }
 
     private func struck(_ body: String) -> String {
@@ -102,6 +109,6 @@ private struct NotesRunStyle {
 
     private func linked(_ body: String) -> String {
         guard let link else { return body }
-        return "[\(body)](\(link.absoluteString))"
+        return "[\(body)](<\(link.absoluteString)>)"
     }
 }

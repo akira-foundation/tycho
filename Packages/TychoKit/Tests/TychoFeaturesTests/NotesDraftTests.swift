@@ -53,4 +53,15 @@ struct NotesDraftTests {
         #expect(saved.isEmpty)
         #expect(!draft.hasUnsavedText)
     }
+
+    @Test func discardingEditsLeavesNothingToSave() {
+        var draft = NotesDraft()
+        draft.begin(with: "Buy milk")
+        draft.text = "Buy milkx"
+
+        draft.discardEdits()
+
+        #expect(draft.text == "Buy milk")
+        #expect(!draft.hasUnsavedText)
+    }
 }
