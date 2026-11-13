@@ -20,11 +20,14 @@ struct RenameViewSheet: View {
     var body: some View {
         NavigationStack {
             Form {
-                TextField("View name", text: $name)
-                    .marksTextEditing(isFocused: isNameFocused)
-                    .focused($isNameFocused)
-                    .onSubmit(save)
-                    .accessibilityIdentifier("renameView.name")
+                Section {
+                    TextField("View Name", text: $name)
+                        .labelsHidden()
+                        .marksTextEditing(isFocused: isNameFocused)
+                        .focused($isNameFocused)
+                        .onSubmit(save)
+                        .accessibilityIdentifier("renameView.name")
+                }
             }
             .formStyle(.grouped)
             .navigationTitle("Rename view")
