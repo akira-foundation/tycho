@@ -42,25 +42,24 @@ struct NotesFlushTests {
             RunLoop.main.run(until: Date().addingTimeInterval(seconds))
         }
 
-        func notesField() throws -> NSTextField {
-            var found: [NSTextField] = []
+        func notesEditor() throws -> NSTextView {
+            var found: [NSTextView] = []
             collect(window.contentView, into: &found)
             return try #require(found.first)
         }
 
         func type(_ text: String) throws {
-            let field = try notesField()
-            window.makeFirstResponder(field)
-            let editor = try #require(field.currentEditor() as? NSTextView)
+            let editor = try notesEditor()
+            window.makeFirstResponder(editor)
             editor.selectAll(nil)
             editor.insertText(text, replacementRange: NSRange(location: NSNotFound, length: 0))
             settle(0.3)
         }
 
-        private func collect(_ view: NSView?, into fields: inout [NSTextField]) {
+        private func collect(_ view: NSView?, into editors: inout [NSTextView]) {
             guard let view else { return }
-            if let field = view as? NSTextField, field.isEditable { fields.append(field) }
-            for subview in view.subviews { collect(subview, into: &fields) }
+            if let editor = view as? NSTextView, editor.isEditable { editors.append(editor) }
+            for subview in view.subviews { collect(subview, into: &editors) }
         }
     }
 
