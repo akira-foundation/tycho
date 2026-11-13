@@ -3,6 +3,7 @@ import Foundation
 public struct TaskViewState: Codable, Equatable, Sendable {
     public var sort: [TaskComparator] = []
     public var hidden: Set<TableColumnID>
+    public var hiddenStatuses: Set<TaskStatus> = []
     public var columns: Data?
     public var query: String = ""
     public var filters: [TaskFilter] = []
@@ -12,6 +13,7 @@ public struct TaskViewState: Codable, Equatable, Sendable {
     private enum CodingKeys: String, CodingKey {
         case sort
         case hidden
+        case hiddenStatuses
         case columns
         case query
         case filters
@@ -36,12 +38,15 @@ public struct TaskViewState: Codable, Equatable, Sendable {
         hidden =
             rawHidden.map { Set($0.compactMap(TableColumnID.init(rawValue:))) }
             ?? TableColumnID.defaultHidden(inProject: false)
+        let rawHiddenStatuses = (try? container.decodeIfPresent([String].self, forKey: .hiddenStatuses)) ?? []
+        hiddenStatuses = Set(rawHiddenStatuses.compactMap(TaskStatus.init(rawValue:)))
     }
 
     public func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(sort, forKey: .sort)
         try container.encode(TableColumnID.allCases.filter { hidden.contains($0) }, forKey: .hidden)
+        try container.encode(TaskStatus.allCases.filter { hiddenStatuses.contains($0) }, forKey: .hiddenStatuses)
         try container.encodeIfPresent(columns, forKey: .columns)
         try container.encode(query, forKey: .query)
         try container.encode(filters, forKey: .filters)
@@ -64,6 +69,19 @@ public struct TaskViewState: Codable, Equatable, Sendable {
         } else {
             hidden.insert(column)
         }
+    }
+
+    public var visibleStatuses: [TaskStatus] {
+        TaskStatus.allCases.filter { !hiddenStatuses.contains($0) }
+    }
+
+    public mutating func setVisible(_ visible: Bool, for status: TaskStatus) {
+        guard !visible else {
+            hiddenStatuses.remove(status)
+            return
+        }
+        guard visibleStatuses != [status] else { return }
+        hiddenStatuses.insert(status)
     }
 
     public mutating func resetWidths() {

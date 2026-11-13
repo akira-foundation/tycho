@@ -24,7 +24,7 @@ struct TasksView: View {
             case .list:
                 list(source)
             case .board:
-                BoardView(tasks: visible(source), project: nil)
+                BoardView(tasks: visible(source), project: nil, hiddenStatuses: model.state.hiddenStatuses)
             case .table:
                 TaskTableView(tasks: source, model: model)
             }
@@ -35,6 +35,9 @@ struct TasksView: View {
         ) {
             if isCompactWidth {
                 modePicker(mode).pickerStyle(.menu)
+            }
+            if mode == .board {
+                BoardColumnsMenu(model: model)
             }
         }
         .toolbar {

@@ -35,6 +35,20 @@ final class TychoViewsTests: XCTestCase {
         XCTAssertTrue(element("project.tab").waitForExistence(timeout: 5))
     }
 
+    func testBoardColumnsHideAndShowFromViewOptions() {
+        openSidebar("Website Redesign", revealing: "column.backlog")
+        let toggleBacklog = {
+            self.element("view.options").click()
+            self.element("board.columns").click()
+            self.app.menuItems["Backlog"].firstMatch.click()
+        }
+        toggleBacklog()
+        XCTAssertTrue(element("column.backlog").waitForNonExistence(timeout: 5))
+        XCTAssertTrue(element("column.todo").exists)
+        toggleBacklog()
+        XCTAssertTrue(element("column.backlog").waitForExistence(timeout: 5))
+    }
+
     func testEveryProjectTabOpens() {
         let markers = [
             ("Board", "column.todo"), ("List", "group.todo"), ("Table", "table.grid"),
