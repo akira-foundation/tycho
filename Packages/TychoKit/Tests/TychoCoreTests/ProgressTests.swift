@@ -24,6 +24,24 @@ struct ProgressTests {
         #expect(project.progress == 33)
     }
 
+    @Test func projectCountsDoneAndTotalTasks() {
+        let project = Project(key: "AA", name: "A")
+        project.tasks = (0..<5).map { index in
+            let task = TaskItem(number: index, title: "t")
+            task.status = index < 2 ? .done : .progress
+            return task
+        }
+        #expect(project.taskCount == 5)
+        #expect(project.doneTaskCount == 2)
+    }
+
+    @Test func projectWithoutTasksCountsZero() {
+        let project = Project(key: "AA", name: "A")
+        #expect(project.taskCount == 0)
+        #expect(project.doneTaskCount == 0)
+        #expect(project.progress == 0)
+    }
+
     @Test func dueTodayIsNeverOverdueWhateverTheHour() {
         let task = TaskItem(number: 1, title: "x")
         task.due = day(0, hour: 0)
