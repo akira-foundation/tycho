@@ -27,11 +27,3 @@ enum ProjectSort: String, CaseIterable, Identifiable {
         }
     }
 }
-
-enum ProjectLayout: String, CaseIterable, Identifiable {
-    case grid, list
-
-    var id: String { rawValue }
-    var symbol: String { self == .grid ? "square.grid.2x2" : "list.bullet" }
-    var title: String { self == .grid ? "Icons" : "List" }
-}

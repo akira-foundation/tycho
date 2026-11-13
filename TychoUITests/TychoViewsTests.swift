@@ -29,6 +29,12 @@ final class TychoViewsTests: XCTestCase {
         app.menuItems.matching(NSPredicate(format: "title == %@ AND enabled == true", title)).firstMatch
     }
 
+    func testProjectsSummaryOpensAProject() {
+        openSidebar("Projects", revealing: "project.row.WEB")
+        element("project.row.WEB").click()
+        XCTAssertTrue(element("project.tab").waitForExistence(timeout: 5))
+    }
+
     func testEveryProjectTabOpens() {
         let markers = [
             ("Board", "column.todo"), ("List", "group.todo"), ("Table", "table.grid"),

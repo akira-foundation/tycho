@@ -9,14 +9,11 @@ struct ProjectsView: View {
     @Environment(\.modelContext) private var context
     @Query(filter: #Predicate<Project> { !$0.isArchived }) private var projects: [Project]
     @AppStorage("projects.sort") private var sort = ProjectSort.recent
-    @AppStorage("projects.layout") private var layout = ProjectLayout.grid
     @State private var pendingDelete: Project?
 
     var body: some View {
-        let sorted = sort.sorted(projects)
         Group {
-            switch (projects.isEmpty, layout) {
-            case (true, _):
+            if projects.isEmpty {
                 ContentUnavailableView {
                     Label("No Projects", systemImage: "folder")
                 } description: {
@@ -24,60 +21,39 @@ struct ProjectsView: View {
                 } actions: {
                     Button("New Project") { router.newProject() }
                 }
-            case (false, .grid):
-                ScrollView {
-                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 260), spacing: 16)], spacing: 16) {
-                        ForEach(sorted) { project in
-                            Button {
-                                router.openProject(project.id, tab: .board)
-                            } label: {
-                                ProjectCard(project: project)
+            } else {
+                Form {
+                    ForEach(ProjectGroup.summary(projects, sort: sort)) { group in
+                        ForEach(Array(group.projects.enumerated()), id: \.element.id) { offset, project in
+                            Section {
+                                Button {
+                                    router.openProject(project.id, tab: .board)
+                                } label: {
+                                    ProjectSummaryRow(project: project)
+                                }
+                                .buttonStyle(.plain)
+                                .contextMenu { menu(for: project) }
+                                .accessibilityIdentifier("project.row.\(project.key)")
+                            } header: {
+                                if offset == 0 { Text(group.title) }
                             }
-                            .buttonStyle(.plain)
-                            .contextMenu { menu(for: project) }
                         }
                     }
-                    .padding()
                 }
-            case (false, .list):
-                List(sorted) { project in
-                    Button {
-                        router.openProject(project.id, tab: .board)
-                    } label: {
-                        HStack(spacing: 12) {
-                            ProjectGlyph(symbol: project.symbol, color: project.color.tint)
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(project.name)
-                                Text(project.status.title).font(.caption).foregroundStyle(project.status.tint)
-                            }
-                            Spacer()
-                            ProgressRing(percent: project.progress, color: project.color.tint)
-                            Text("\(project.progress)%")
-                                .font(.callout)
-                                .monospacedDigit()
-                                .foregroundStyle(.secondary)
-                        }
-                        .contentShape(Rectangle())
-                    }
-                    .buttonStyle(.plain)
-                    .contextMenu { menu(for: project) }
-                }
+                .formStyle(.grouped)
             }
         }
         .navigationTitle("Projects")
+        .navigationSubtitle(ProjectGroup.subtitle(projects))
         .toolbar {
             ToolbarItem {
-                Menu("View Options", systemImage: "ellipsis.circle") {
-                    Picker("View As", selection: $layout) {
-                        ForEach(ProjectLayout.allCases) { Label($0.title, systemImage: $0.symbol).tag($0) }
-                    }
-                    .pickerStyle(.inline)
+                Menu("Sort By", systemImage: "arrow.up.arrow.down") {
                     Picker("Sort By", selection: $sort) {
                         ForEach(ProjectSort.allCases) { Text($0.title).tag($0) }
                     }
-                    .pickerStyle(.menu)
+                    .pickerStyle(.inline)
                 }
-                .accessibilityIdentifier("projects.options")
+                .accessibilityIdentifier("projects.sort")
             }
             ToolbarItem { Button("New Project", systemImage: "plus") { router.newProject() } }
         }
