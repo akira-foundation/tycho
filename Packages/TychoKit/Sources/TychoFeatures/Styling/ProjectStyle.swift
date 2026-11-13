@@ -3,17 +3,25 @@ import TychoCore
 import TychoDesign
 
 extension ProjectStatus {
-    public var token: Token {
+    public var symbol: String {
+        switch self {
+        case .planning: "circle.dashed"
+        case .active: "circle.lefthalf.filled"
+        case .risk: "exclamationmark.triangle.fill"
+        case .hold: "pause.circle.fill"
+        case .complete: "checkmark.circle.fill"
+        }
+    }
+
+    public var tint: Color {
         switch self {
         case .planning: .gray
         case .active: .blue
         case .risk: .red
-        case .hold: .amber
+        case .hold: .orange
         case .complete: .green
         }
     }
-
-    public var tint: Color { token.color }
 }
 
 extension ProjectColor {
