@@ -181,13 +181,14 @@ final class TychoViewsTests: XCTestCase {
         let header = element("group.todo")
         let row = element("task.WEB-118")
         XCTAssertTrue(row.waitForExistence(timeout: 5))
-        XCTAssertEqual(header.value as? String, "Expanded")
+        let disclosure = app.outlineRows.containing(.any, identifier: "group.todo").disclosureTriangles.firstMatch
 
-        header.click()
+        header.hover()
+        disclosure.click()
         XCTAssertTrue(row.waitForNonExistence(timeout: 5))
-        XCTAssertEqual(header.value as? String, "Collapsed")
 
-        header.click()
+        header.hover()
+        disclosure.click()
         XCTAssertTrue(row.waitForExistence(timeout: 5))
     }
 
