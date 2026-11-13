@@ -97,7 +97,8 @@ struct HomeView: View {
                 } label: {
                     LabeledContent {
                         HStack(spacing: 8) {
-                            ProgressBar(percent: project.progress, color: project.color.tint)
+                            ProgressView(value: Double(project.progress), total: 100)
+                                .tint(project.color.tint)
                                 .frame(maxWidth: 160)
                             Text("\(project.progress)%").monospacedDigit().frame(minWidth: 36, alignment: .trailing)
                                 .accessibilityHidden(true)
