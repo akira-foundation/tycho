@@ -74,6 +74,19 @@ final class TychoViewsTests: XCTestCase {
         }
     }
 
+    func testEveryMyTasksModeOpens() {
+        let markers = [
+            ("Board", "column.todo"), ("Table", "table.grid"), ("Calendar", "calendar.title"),
+            ("List", "group.completed"),
+        ]
+        openSidebar("My Tasks", revealing: "mytasks.mode")
+        let picker = element("mytasks.mode")
+        for (mode, marker) in markers {
+            picker.radioButtons[mode].firstMatch.click()
+            XCTAssertTrue(element(marker).waitForExistence(timeout: 5), "\(mode) did not open")
+        }
+    }
+
     func testProjectTabsShowIconsNamedByTitle() {
         openSidebar("Website Redesign", revealing: "project.tab")
         app.zoomWindow()

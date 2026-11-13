@@ -1,37 +1,24 @@
 import Foundation
 import TychoCore
 
-enum TasksMode: String, CaseIterable, Identifiable {
+enum TasksMode: String, TaskViewMode {
     case list
     case board
     case table
 
     static let legacyKey = "tasks.mode"
-
-    init(state: TaskViewState) {
-        self = state.mode.flatMap(TasksMode.init(rawValue:)) ?? .list
-    }
+    static let fallback = TasksMode.list
 
     @MainActor
     static func current(in model: TaskViewModel) -> TasksMode {
         TasksMode(state: model.state)
     }
 
-    var id: String { rawValue }
-
-    var title: String {
+    var layout: ProjectBuiltInTab {
         switch self {
-        case .list: "List"
-        case .board: "Board"
-        case .table: "Table"
-        }
-    }
-
-    var symbol: String {
-        switch self {
-        case .list: ProjectBuiltInTab.list.symbol
-        case .board: ProjectBuiltInTab.board.symbol
-        case .table: ProjectBuiltInTab.table.symbol
+        case .list: .list
+        case .board: .board
+        case .table: .table
         }
     }
 
