@@ -3,12 +3,10 @@ import SwiftUI
 import TychoCore
 import UniformTypeIdentifiers
 
-private struct FileUploaderModifier: ViewModifier {
-    @Environment(\.modelContext) private var context
+private struct FilePickerModifier: ViewModifier {
     @Environment(ToastCenter.self) private var toast
     @Binding var isPresented: Bool
-    let project: Project?
-    let task: TaskItem?
+    let onPick: ([URL]) -> Void
 
     func body(content: Content) -> some View {
         content.fileImporter(
@@ -19,16 +17,33 @@ private struct FileUploaderModifier: ViewModifier {
     private func handle(_ result: Result<[URL], Error>) {
         switch result {
         case .success(let urls):
-            FileUpload.perform(urls, project: project, task: task, context: context, toast: toast)
+            onPick(urls)
         case .failure(let error):
             toast.report(error)
         }
     }
 }
 
+private struct FileUploaderModifier: ViewModifier {
+    @Environment(\.modelContext) private var context
+    @Environment(ToastCenter.self) private var toast
+    @Binding var isPresented: Bool
+    let task: TaskItem
+
+    func body(content: Content) -> some View {
+        content.pickFiles(isPresented: $isPresented) { urls in
+            FileUpload.perform(urls, project: task.project, task: task, context: context, toast: toast)
+        }
+    }
+}
+
 extension View {
-    func fileUploader(isPresented: Binding<Bool>, project: Project?, task: TaskItem? = nil) -> some View {
-        modifier(FileUploaderModifier(isPresented: isPresented, project: project, task: task))
+    func pickFiles(isPresented: Binding<Bool>, onPick: @escaping ([URL]) -> Void) -> some View {
+        modifier(FilePickerModifier(isPresented: isPresented, onPick: onPick))
+    }
+
+    func fileUploader(isPresented: Binding<Bool>, task: TaskItem) -> some View {
+        modifier(FileUploaderModifier(isPresented: isPresented, task: task))
     }
 
     func filePreview(item: Binding<FileRecord?>) -> some View {
