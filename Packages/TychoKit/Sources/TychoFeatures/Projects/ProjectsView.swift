@@ -62,25 +62,33 @@ struct ProjectsView: View {
     }
 
     private func summary(of visible: [Project]) -> some View {
-        Form {
-            ForEach(ProjectGroup.summary(visible, sort: sort)) { group in
-                ForEach(Array(group.projects.enumerated()), id: \.element.id) { offset, project in
+        ScrollView {
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: 300), spacing: 16)], alignment: .leading, spacing: 16) {
+                ForEach(ProjectGroup.summary(visible, sort: sort)) { group in
                     Section {
-                        Button {
-                            router.openProject(project.id, tab: .board)
-                        } label: {
-                            ProjectSummaryRow(project: project)
-                        }
-                        .buttonStyle(.plain)
-                        .contextMenu { menu(for: project) }
-                        .accessibilityIdentifier("project.row.\(project.key)")
+                        ForEach(group.projects) { tile(for: $0) }
                     } header: {
-                        if offset == 0 { Text(group.title) }
+                        Text(group.title)
+                            .font(.title3.weight(.semibold))
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.top, 8)
+                            .accessibilityAddTraits(.isHeader)
                     }
                 }
             }
+            .padding(20)
         }
-        .formStyle(.grouped)
+    }
+
+    private func tile(for project: Project) -> some View {
+        Button {
+            router.openProject(project.id, tab: .board)
+        } label: {
+            ProjectSummaryTile(project: project)
+        }
+        .buttonStyle(.plain)
+        .contextMenu { menu(for: project) }
+        .accessibilityIdentifier("project.row.\(project.key)")
     }
 
     @ToolbarContentBuilder private var toolbarItems: some ToolbarContent {

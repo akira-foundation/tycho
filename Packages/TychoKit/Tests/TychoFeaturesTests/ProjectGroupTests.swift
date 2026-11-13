@@ -13,13 +13,19 @@ struct ProjectGroupTests {
         return project
     }
 
-    @Test func favoritesComeFirstAndLeaveTheirStatusGroup() {
+    @Test func favoritesComeFirstThenActiveThenCompleted() {
         let risky = project("Launch", status: .risk, favorite: true)
         let other = project("Portal", status: .risk, favorite: false)
+        let planned = project("Campaign", status: .planning, favorite: false)
         let done = project("Site", status: .complete, favorite: false)
-        let groups = ProjectGroup.summary([done, other, risky], sort: .name)
-        #expect(groups.map(\.title) == ["Favorites", "At Risk", "Completed"])
-        #expect(groups.map { $0.projects.map(\.name) } == [["Launch"], ["Portal"], ["Site"]])
+        let groups = ProjectGroup.summary([done, other, risky, planned], sort: .name)
+        #expect(groups.map(\.title) == ["Favorites", "Active", "Completed"])
+        #expect(groups.map { $0.projects.map(\.name) } == [["Launch"], ["Campaign", "Portal"], ["Site"]])
+    }
+
+    @Test func aCompletedFavoriteStaysInFavorites() {
+        let done = project("Site", status: .complete, favorite: true)
+        #expect(ProjectGroup.summary([done], sort: .name).map(\.title) == ["Favorites"])
     }
 
     @Test func groupsFollowTheChosenSort() {

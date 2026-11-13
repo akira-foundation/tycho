@@ -8,13 +8,14 @@ struct ProjectGroup: Identifiable {
     var id: String { title }
 
     static func summary(_ projects: [Project], sort: ProjectSort) -> [ProjectGroup] {
-        let favorites = projects.filter(\.isFavorite)
-        let others = projects.filter { !$0.isFavorite }
-        let favoriteGroup = [ProjectGroup(title: "Favorites", projects: sort.sorted(favorites))]
-        let statusGroups = ProjectStatus.allCases.map { status in
-            ProjectGroup(title: status.title, projects: sort.sorted(others.filter { $0.status == status }))
-        }
-        return (favoriteGroup + statusGroups).filter { !$0.projects.isEmpty }
+        let sorted = sort.sorted(projects)
+        let others = sorted.filter { !$0.isFavorite }
+        return [
+            ProjectGroup(title: "Favorites", projects: sorted.filter(\.isFavorite)),
+            ProjectGroup(title: "Active", projects: others.filter { $0.status != .complete }),
+            ProjectGroup(title: "Completed", projects: others.filter { $0.status == .complete }),
+        ]
+        .filter { !$0.projects.isEmpty }
     }
 
     static func subtitle(_ projects: [Project]) -> String {
