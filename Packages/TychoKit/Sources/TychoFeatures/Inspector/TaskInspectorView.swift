@@ -29,9 +29,9 @@ struct TaskInspectorView: View {
                         .labelsHidden()
                         .onSubmit { commitTitle(task) }
                         .accessibilityIdentifier("inspector.title")
+                    NotesEditor(task: task).id(task.id)
                 }
                 TaskPropertiesSection(task: task)
-                NotesEditor(task: task)
                 SubtaskList(task: task)
                 AttachmentsSection(task: task)
             }

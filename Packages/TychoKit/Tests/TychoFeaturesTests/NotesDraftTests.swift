@@ -3,29 +3,26 @@ import Testing
 @testable import TychoFeatures
 
 struct NotesDraftTests {
-    @Test func aSavedDraftLeavesEditMode() {
+    @Test func aCommittedDraftIsSaved() {
         var stored = "Old"
         var draft = NotesDraft()
         draft.begin(with: stored)
         draft.text = "New"
 
         draft.commit(storedNotes: { stored }) { stored = $0 }
-        draft.finishIfSaved()
 
         #expect(stored == "New")
-        #expect(!draft.isEditing)
+        #expect(!draft.hasUnsavedText)
     }
 
-    @Test func aDraftWhoseSaveFailedStaysInEditMode() {
+    @Test func aDraftWhoseSaveFailedStaysUnsaved() {
         let stored = "Old"
         var draft = NotesDraft()
         draft.begin(with: stored)
         draft.text = "New"
 
         draft.commit(storedNotes: { stored }) { _ in }
-        draft.finishIfSaved()
 
-        #expect(draft.isEditing)
         #expect(draft.text == "New")
         #expect(draft.hasUnsavedText)
     }
@@ -38,10 +35,9 @@ struct NotesDraftTests {
         var saved: [String] = []
 
         draft.commit(storedNotes: { stored }) { saved.append($0) }
-        draft.finishIfSaved()
 
         #expect(saved.isEmpty)
-        #expect(!draft.isEditing)
+        #expect(!draft.hasUnsavedText)
     }
 
     @Test func aDraftAlreadyStoredElsewhereIsNotWrittenAgain() {
@@ -53,9 +49,8 @@ struct NotesDraftTests {
         var saved: [String] = []
 
         draft.commit(storedNotes: { stored }) { saved.append($0) }
-        draft.finishIfSaved()
 
         #expect(saved.isEmpty)
-        #expect(!draft.isEditing)
+        #expect(!draft.hasUnsavedText)
     }
 }

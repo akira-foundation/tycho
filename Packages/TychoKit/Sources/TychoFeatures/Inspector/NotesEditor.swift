@@ -9,40 +9,33 @@ struct NotesEditor: View {
     let task: TaskItem
     @State private var draft = NotesDraft()
     @State private var flushToken = UUID()
+    @FocusState private var isFocused: Bool
 
     var body: some View {
-        Section {
-            switch (draft.isEditing, task.notes.isEmpty) {
-            case (true, _):
-                TextEditor(text: $draft.text)
-                    .marksTextEditing()
-                    .accessibilityIdentifier("inspector.notes.editor")
-                    .frame(minHeight: 120)
-            case (false, true):
-                Text("No Description").foregroundStyle(.secondary)
-            case (false, false):
-                Text(rendered)
-                    .textSelection(.enabled)
+        TextField("Notes", text: $draft.text, prompt: Text("Notes"), axis: .vertical)
+            .labelsHidden()
+            .lineLimit(3...)
+            .marksTextEditing(isFocused: isFocused)
+            .focused($isFocused)
+            .onSubmit(commitDraft)
+            .onChange(of: isFocused) { _, focused in
+                if !focused { commitDraft() }
             }
-        } header: {
-            HStack {
-                Text("Description")
-                Spacer()
-                Button(draft.isEditing ? "Done" : "Edit", action: toggleEditing)
-                    .buttonStyle(.borderless)
-                    .accessibilityIdentifier("inspector.notes.edit")
+            .accessibilityIdentifier("inspector.notes")
+            .onAppear {
+                draft.begin(with: task.notes)
+                router.registerInspectorFlush(flushToken, commitDraft)
             }
-        }
-        .onAppear { router.registerInspectorFlush(flushToken, commitDraft) }
-        .onDisappear {
-            commitDraft()
-            router.unregisterInspectorFlush(flushToken)
-        }
+            .onChange(of: task.notes) { syncFromStore() }
+            .onDisappear {
+                commitDraft()
+                router.unregisterInspectorFlush(flushToken)
+            }
     }
 
-    private var rendered: AttributedString {
-        let options = AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)
-        return (try? AttributedString(markdown: task.notes, options: options)) ?? AttributedString(task.notes)
+    private func syncFromStore() {
+        guard !draft.hasUnsavedText else { return }
+        draft.begin(with: task.notes)
     }
 
     private func commitDraft() {
@@ -50,11 +43,5 @@ struct NotesEditor: View {
         draft.commit(storedNotes: { task.notes }) { notes in
             toast.perform { try TaskActions(context: context).edit(task) { $0.notes = notes } }
         }
-    }
-
-    private func toggleEditing() {
-        guard draft.isEditing else { return draft.begin(with: task.notes) }
-        commitDraft()
-        draft.finishIfSaved()
     }
 }

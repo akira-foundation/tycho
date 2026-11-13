@@ -67,8 +67,7 @@ final class TychoInspectorTests: XCTestCase {
     }
 
     private func typeUnsavedNotes(_ notes: String) {
-        mouseClick("inspector.notes.edit")
-        let editor = element("inspector.notes.editor")
+        let editor = element("inspector.notes")
         XCTAssertTrue(editor.waitForExistence(timeout: 5))
         editor.click()
         editor.typeText(notes)
@@ -76,7 +75,9 @@ final class TychoInspectorTests: XCTestCase {
 
     private func reopenedNotesShow(_ notes: String) -> Bool {
         _ = openInspector(from: element("task.WEB-118"))
-        return app.staticTexts[notes].firstMatch.waitForExistence(timeout: 5)
+        let field = element("inspector.notes")
+        guard field.waitForExistence(timeout: 5) else { return false }
+        return (field.value as? String) == notes
     }
 
     func testUnsavedNotesSurviveClosingTheInspector() {

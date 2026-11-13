@@ -42,7 +42,7 @@ struct TaskPropertiesSection: View {
             LabeledContent("Estimate") {
                 TextField("Estimate", text: $estimate, prompt: Text("e.g. 2d"))
                     .labelsHidden()
-                    .multilineTextAlignment(.trailing)
+                    .multilineTextAlignment(.leading)
                     .marksTextEditing()
                     .onSubmit(commitEstimate)
             }
