@@ -1,5 +1,4 @@
 import SwiftUI
-import TychoDesign
 
 struct RecoveryView: View {
     let message: String
@@ -8,18 +7,18 @@ struct RecoveryView: View {
     @State private var confirmingReset = false
 
     var body: some View {
-        VStack(spacing: Spacing.s4) {
-            EmptyState(
-                title: "Tycho couldn't open its data", symbol: "externaldrive.badge.exclamationmark", message: message)
-            HStack(spacing: Spacing.s3) {
-                Button("Try again", action: retry).buttonStyle(.tycho(.primary))
-                Button("Reset data", role: .destructive) { confirmingReset = true }
-                    .buttonStyle(.tycho(.danger))
-            }
+        ContentUnavailableView {
+            Label("Tycho Couldn't Open Its Data", systemImage: "externaldrive.badge.exclamationmark")
+        } description: {
+            Text(message)
+        } actions: {
+            Button("Try Again", action: retry)
+                .buttonStyle(.borderedProminent)
+            Button("Reset Data…", role: .destructive) { confirmingReset = true }
+                .buttonStyle(.bordered)
         }
-        .padding(Spacing.s8)
-        .confirmationDialog("Delete all Tycho data on this device?", isPresented: $confirmingReset) {
-            Button("Delete and start over", role: .destructive, action: reset)
+        .confirmationDialog("Delete All Tycho Data on This Device?", isPresented: $confirmingReset) {
+            Button("Delete and Start Over", role: .destructive, action: reset)
         } message: {
             Text("This can't be undone.")
         }
