@@ -16,6 +16,10 @@ public struct TaskDraft {
         self.title = title
         self.status = status
     }
+
+    public mutating func setHasDue(_ isOn: Bool, today: Date, calendar: Calendar) {
+        due = isOn ? due ?? DayTime.noon(of: today, calendar: calendar) : nil
+    }
 }
 
 @MainActor

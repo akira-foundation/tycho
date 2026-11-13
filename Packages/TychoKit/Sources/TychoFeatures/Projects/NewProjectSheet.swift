@@ -8,6 +8,8 @@ struct NewProjectSheet: View {
     @Environment(\.modelContext) private var context
     @Environment(Router.self) private var router
     @Environment(ToastCenter.self) private var toast
+    @Environment(\.self) private var environment
+    @Environment(\.displayScale) private var displayScale
     @Query(sort: \Workspace.createdAt) private var workspaces: [Workspace]
     @Query(sort: \Member.name) private var members: [Member]
     private let project: Project?
@@ -16,6 +18,8 @@ struct NewProjectSheet: View {
     @State private var hasStart: Bool
     @State private var hasDue: Bool
     @State private var error: ValidationError?
+    @State private var didSave = false
+    @FocusState private var isNameFocused: Bool
 
     init(project: Project?) {
         self.project = project
@@ -29,13 +33,27 @@ struct NewProjectSheet: View {
         NavigationStack {
             Form {
                 Section {
-                    TextField("Name", text: $draft.name)
-                        .marksTextEditing()
+                    TextField("Name", text: $draft.name, prompt: Text("Name"))
+                        .labelsHidden()
+                        .marksTextEditing(isFocused: isNameFocused)
+                        .focused($isNameFocused)
+                        .onSubmit(save)
                         .accessibilityIdentifier("project.name")
                         .onChange(of: draft.name) { _, name in
                             error = nil
                             if !keyEdited { draft.key = ProjectSymbols.suggestedKey(for: name) }
                         }
+                    TextField("Description", text: $draft.summary, prompt: Text("Description"), axis: .vertical)
+                        .labelsHidden()
+                        .lineLimit(3...6)
+                        .marksTextEditing()
+                        .accessibilityIdentifier("project.summary")
+                } footer: {
+                    if let error {
+                        Text(error.userMessage).foregroundStyle(.red).accessibilityIdentifier("project.error")
+                    }
+                }
+                Section {
                     TextField(
                         "Key",
                         text: Binding(
@@ -45,14 +63,28 @@ struct NewProjectSheet: View {
                             })
                     )
                     .marksTextEditing()
+                    .onSubmit(save)
                     .accessibilityIdentifier("project.key")
-                    TextField("Description", text: $draft.summary, axis: .vertical).lineLimit(2...4).marksTextEditing()
-                }
-                Section("Appearance") {
+                    Picker("Status", selection: $draft.status) {
+                        ForEach(ProjectStatus.allCases) { status in
+                            Label {
+                                Text(status.title)
+                            } icon: {
+                                swatch(status.tint)
+                            }.tag(status)
+                        }
+                    }
+                    Picker("Lead", selection: $draft.lead) {
+                        Text("No lead").tag(Member?.none)
+                        ForEach(members) { Text($0.name).tag(Member?.some($0)) }
+                    }
                     Picker("Color", selection: $draft.color) {
                         ForEach(ProjectColor.allCases) { color in
-                            Label(color.rawValue.capitalized, systemImage: "circle.fill").foregroundStyle(color.tint)
-                                .tag(color)
+                            Label {
+                                Text(color.rawValue.capitalized)
+                            } icon: {
+                                swatch(color.tint)
+                            }.tag(color)
                         }
                     }
                     LazyVGrid(columns: [GridItem(.adaptive(minimum: 36))], spacing: 8) {
@@ -69,14 +101,7 @@ struct NewProjectSheet: View {
                         }
                     }
                 }
-                Section("Details") {
-                    Picker("Status", selection: $draft.status) {
-                        ForEach(ProjectStatus.allCases) { Text($0.title).tag($0) }
-                    }
-                    Picker("Lead", selection: $draft.lead) {
-                        Text("No lead").tag(Member?.none)
-                        ForEach(members) { Text($0.name).tag(Member?.some($0)) }
-                    }
+                Section {
                     Toggle("Start date", isOn: $hasStart)
                         .toggleStyle(TychoToggleStyle())
                         .accessibilityIdentifier("project.hasStart")
@@ -97,28 +122,32 @@ struct NewProjectSheet: View {
                         }
                     }
                 }
-                if let error {
-                    Text(error.userMessage).foregroundStyle(.red).accessibilityIdentifier("project.error")
-                }
             }
             .formStyle(.grouped)
             .navigationTitle(project == nil ? "New project" : "Edit project")
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel", role: .cancel) { dismiss() }
+                        .keyboardShortcut(.cancelAction)
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button(project == nil ? "Create" : "Save", role: .confirm, action: save)
-                        .keyboardShortcut(.return, modifiers: .command)
+                        .keyboardShortcut(.defaultAction)
                         .disabled(project == nil && workspaces.isEmpty)
                         .accessibilityIdentifier("project.save")
                 }
             }
         }
-        .frame(minWidth: 420, minHeight: 520)
+        .frame(minWidth: 420, minHeight: 600)
+        .onAppear { isNameFocused = true }
+    }
+
+    private func swatch(_ color: Color) -> Image {
+        MenuSwatch.image(color.resolve(in: environment), scale: displayScale)
     }
 
     private func save() {
+        guard !didSave else { return }
         var final = draft
         if !hasStart { final.start = nil }
         if !hasDue { final.due = nil }
@@ -131,8 +160,9 @@ struct NewProjectSheet: View {
                 let created = try actions.create(final, in: workspace)
                 router.openProject(created.id, tab: .board)
             case (nil, nil):
-                break
+                return
             }
+            didSave = true
             dismiss()
         } catch let validation as ValidationError {
             error = validation

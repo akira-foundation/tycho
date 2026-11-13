@@ -13,6 +13,8 @@ struct NewTaskSheet: View {
     @State private var draft: TaskDraft
     @State private var project: Project?
     @State private var error: ValidationError?
+    @State private var didCreate = false
+    @FocusState private var isTitleFocused: Bool
 
     init(status: TaskStatus, due: Date? = nil) {
         var draft = TaskDraft(title: "", status: status)
@@ -23,28 +25,50 @@ struct NewTaskSheet: View {
     var body: some View {
         NavigationStack {
             Form {
-                TextField("Task title", text: $draft.title)
-                    .marksTextEditing()
-                    .accessibilityIdentifier("task.title")
-                    .onChange(of: draft.title) { error = nil }
-                Picker("Project", selection: $project) {
-                    ForEach(projects.filter { !$0.isArchived }) { Text($0.name).tag(Project?.some($0)) }
+                Section {
+                    TextField("Title", text: $draft.title, prompt: Text("Title"))
+                        .labelsHidden()
+                        .marksTextEditing(isFocused: isTitleFocused)
+                        .focused($isTitleFocused)
+                        .onSubmit(save)
+                        .accessibilityIdentifier("task.title")
+                        .onChange(of: draft.title) { error = nil }
+                    TextField("Notes", text: $draft.notes, prompt: Text("Notes"), axis: .vertical)
+                        .labelsHidden()
+                        .lineLimit(3...6)
+                        .marksTextEditing()
+                        .accessibilityIdentifier("task.notes")
+                } footer: {
+                    if let error {
+                        Text(error.userMessage).foregroundStyle(.red)
+                    }
                 }
-                Picker("Status", selection: $draft.status) {
-                    ForEach(TaskStatus.allCases) { Text($0.title).tag($0) }
+                Section {
+                    Picker("Project", selection: $project) {
+                        ForEach(projects.filter { !$0.isArchived }) { Text($0.name).tag(Project?.some($0)) }
+                    }
+                    Picker("Status", selection: $draft.status) {
+                        ForEach(TaskStatus.allCases) { Text($0.title).tag($0) }
+                    }
+                    Picker("Priority", selection: $draft.priority) {
+                        ForEach(TaskPriority.allCases) { Text($0.title).tag($0) }
+                    }
+                    Picker("Assignee", selection: $draft.assignee) {
+                        Text("Unassigned").tag(Member?.none)
+                        ForEach(members) { Text($0.name).tag(Member?.some($0)) }
+                    }
                 }
-                Picker("Priority", selection: $draft.priority) {
-                    ForEach(TaskPriority.allCases) { Text($0.title).tag($0) }
-                }
-                Picker("Assignee", selection: $draft.assignee) {
-                    Text("Unassigned").tag(Member?.none)
-                    ForEach(members) { Text($0.name).tag(Member?.some($0)) }
-                }
-                LabeledContent("Due") {
-                    DatePill(date: draft.due, emptyText: "No date") { draft.due = $0 }
-                }
-                if let error {
-                    Text(error.userMessage).foregroundStyle(.red)
+                Section {
+                    Toggle("Due", isOn: hasDue)
+                        .accessibilityIdentifier("task.hasDue")
+                    if let due = draft.due {
+                        DatePicker(
+                            "Due date",
+                            selection: Binding(get: { due }, set: { draft.due = DatePill.normalized($0) }),
+                            displayedComponents: .date
+                        )
+                        .accessibilityIdentifier("task.due")
+                    }
                 }
             }
             .formStyle(.grouped)
@@ -52,10 +76,11 @@ struct NewTaskSheet: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel", role: .cancel) { dismiss() }
+                        .keyboardShortcut(.cancelAction)
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Create", role: .confirm, action: save)
-                        .keyboardShortcut(.return, modifiers: .command)
+                        .keyboardShortcut(.defaultAction)
                         .disabled(project == nil)
                         .accessibilityIdentifier("task.create")
                 }
@@ -71,13 +96,21 @@ struct NewTaskSheet: View {
         .onAppear {
             project = NewTaskTarget.project(current: router.currentProjectID, projects: projects)
             draft.assignee = members.first(where: \.isMe)
+            isTitleFocused = true
         }
     }
 
+    private var hasDue: Binding<Bool> {
+        Binding(
+            get: { draft.due != nil },
+            set: { draft.setHasDue($0, today: .now, calendar: DateText.gregorian) })
+    }
+
     private func save() {
-        guard let project else { return }
+        guard let project, !didCreate else { return }
         do {
             try TaskActions(context: context).create(draft, in: project)
+            didCreate = true
             dismiss()
         } catch let validation as ValidationError {
             error = validation
