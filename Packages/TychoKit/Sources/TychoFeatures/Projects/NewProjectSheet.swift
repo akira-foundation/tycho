@@ -160,7 +160,7 @@ struct NewProjectSheet: View {
                 let created = try actions.create(final, in: workspace)
                 router.openProject(created.id, tab: .board)
             case (nil, nil):
-                break
+                return
             }
             didSave = true
             dismiss()

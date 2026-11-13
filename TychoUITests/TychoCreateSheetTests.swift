@@ -108,6 +108,8 @@ final class TychoCreateSheetTests: XCTestCase {
 
         XCTAssertTrue(name.waitForNonExistence(timeout: 5))
         XCTAssertTrue(element("project.tab").waitForExistence(timeout: 5))
+        let created = app.outlines.staticTexts.matching(NSPredicate(format: "value == 'Beta'"))
+        XCTAssertEqual(created.count, 1, "Return should create the project once")
     }
 
     func testEscapeCancelsTheNewProjectSheet() {
