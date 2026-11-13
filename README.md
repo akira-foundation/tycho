@@ -3,6 +3,7 @@
 </p>
 
 <p align="center">
+  <a href="https://github.com/akira-foundation/tycho/releases"><img src="https://img.shields.io/github/downloads/akira-foundation/tycho/total" alt="Downloads"></a>
   <img src="https://img.shields.io/badge/platforms-iOS%2027%20%7C%20macOS%2027-blueviolet" alt="Platforms">
   <img src="https://img.shields.io/badge/Swift-6.2-orange" alt="Swift">
   <img src="https://img.shields.io/badge/license-MIT%20%2F%20Apache--2.0-blue" alt="license">
