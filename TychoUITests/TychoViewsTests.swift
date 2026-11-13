@@ -181,8 +181,7 @@ final class TychoViewsTests: XCTestCase {
         let header = element("group.todo")
         let row = element("task.WEB-118")
         XCTAssertTrue(row.waitForExistence(timeout: 5))
-        let disclosure = app.outlines.firstMatch.outlineRows
-            .containing(.any, identifier: "group.todo").disclosureTriangles.firstMatch
+        let disclosure = app.outlineRows.containing(.any, identifier: "group.todo").disclosureTriangles.firstMatch
 
         header.hover()
         disclosure.click()
