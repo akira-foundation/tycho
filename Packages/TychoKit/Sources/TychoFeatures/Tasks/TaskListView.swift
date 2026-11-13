@@ -46,6 +46,7 @@ struct TaskListView: View {
             }
         }
         .listStyle(.sidebar)
+        .windowBackgroundOnMac()
         .tychoAnimation(value: tasks.movementSignature)
         .tychoAnimation(value: collapsed)
     }
@@ -94,5 +95,15 @@ struct TaskListView: View {
                 items.map(\.id), into: status, before: target, in: tasks)
         }
         return handled
+    }
+}
+
+extension View {
+    @ViewBuilder fileprivate func windowBackgroundOnMac() -> some View {
+        #if os(macOS)
+        scrollContentBackground(.hidden)
+        #else
+        self
+        #endif
     }
 }

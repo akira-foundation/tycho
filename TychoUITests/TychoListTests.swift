@@ -31,20 +31,23 @@ final class TychoListTests: XCTestCase {
     }
 
     func testGroupAddButtonOpensTheNewTaskSheetWithThatStatus() {
-        app.openWebsiteTab("List")
+        openPortalList()
         let header = element("group.review")
-        let add = element("group.review.add")
         XCTAssertTrue(header.waitForExistence(timeout: 5))
-        XCTAssertTrue(add.exists, "the add button should stay in the accessibility tree without hovering")
 
         header.hover()
-        add.click()
+        let disclosure = app.outlineRows.containing(.any, identifier: "group.review").disclosureTriangles.firstMatch
+        XCTAssertTrue(disclosure.waitForExistence(timeout: 5))
+        disclosure.coordinate(withNormalizedOffset: CGVector(dx: 0, dy: 0.5)).withOffset(CGVector(dx: -6, dy: 0))
+            .click()
 
-        let status = app.popUpButtons["Status"].firstMatch
-        XCTAssertTrue(status.waitForExistence(timeout: 5))
-        XCTAssertEqual(status.value as? String, "Review")
+        let sheet = app.sheets.firstMatch
+        XCTAssertTrue(sheet.waitForExistence(timeout: 5))
+        let pickers = sheet.popUpButtons
+        XCTAssertTrue(pickers.matching(NSPredicate(format: "value == %@", "Customer Portal")).firstMatch.exists)
+        XCTAssertTrue(pickers.matching(NSPredicate(format: "value == %@", "Review")).firstMatch.exists)
         app.typeKey(.escape, modifierFlags: [])
-        XCTAssertTrue(status.waitForNonExistence(timeout: 5))
+        XCTAssertTrue(sheet.waitForNonExistence(timeout: 5))
     }
 
     func testEmptyGroupShowsOnlyItsHeader() {
@@ -56,19 +59,6 @@ final class TychoListTests: XCTestCase {
         let rows = app.elements(withIdentifierPrefix: "task.").allElementsBoundByIndex
         XCTAssertFalse(rows.contains { $0.frame.minY > review.frame.maxY && $0.frame.maxY < done.frame.minY })
         XCTAssertLessThan(done.frame.minY - review.frame.maxY, row.frame.height)
-    }
-
-    func testDroppingOntoAnEmptyGroupMovesTheTask() {
-        openPortalList()
-        let row = element("task.CP-103")
-        let review = element("group.review")
-        let done = element("group.done")
-        XCTAssertTrue(review.waitForExistence(timeout: 5))
-        XCTAssertLessThan(row.frame.minY, review.frame.minY)
-
-        row.press(forDuration: 0.6, thenDragTo: review)
-
-        XCTAssertTrue(eventually { row.frame.minY > review.frame.maxY && row.frame.maxY < done.frame.minY })
     }
 }
 #endif

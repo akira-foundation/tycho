@@ -28,18 +28,27 @@ struct TaskGroupHeader: View {
                     .help("Add Task")
                     .focused($isAddFocused)
                     .opacity(revealsAdd ? 1 : 0)
-                    .accessibilityIdentifier("group.\(group.id).add")
+                    .accessibilityHidden(isHoverOnly)
             }
         }
         .contentShape(Rectangle())
+        .accessibilityActions {
+            if let onAdd {
+                Button("Add Task to \(group.title)", action: onAdd)
+            }
+        }
         .onHover { isHovering = $0 }
     }
 
-    private var revealsAdd: Bool {
+    private var isHoverOnly: Bool {
         #if os(macOS)
-        isHovering || isAddFocused
-        #else
         true
+        #else
+        false
         #endif
+    }
+
+    private var revealsAdd: Bool {
+        !isHoverOnly || isHovering || isAddFocused
     }
 }
