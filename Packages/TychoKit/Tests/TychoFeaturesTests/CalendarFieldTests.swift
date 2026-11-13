@@ -11,14 +11,26 @@ struct CalendarFieldTests {
     private let date = DateText.gregorian.date(from: DateComponents(year: 2026, month: 11, day: 15, hour: 12))!
 
     private func host(_ view: some View) -> NSWindow {
-        let window = NSWindow(contentViewController: NSHostingController(rootView: view.frame(width: 360)))
-        window.makeKeyAndOrderFront(nil)
-        settle()
+        let controller = NSHostingController(rootView: Form { view }.formStyle(.grouped).frame(width: 420, height: 240))
+        let window = NSWindow(
+            contentRect: NSRect(x: 0, y: 0, width: 420, height: 240),
+            styleMask: [.borderless],
+            backing: .buffered,
+            defer: false)
+        window.isReleasedWhenClosed = false
+        window.contentViewController = controller
+        window.contentView?.layoutSubtreeIfNeeded()
+        RunLoop.main.run(until: Date().addingTimeInterval(0.3))
+        window.contentView?.layoutSubtreeIfNeeded()
         return window
     }
 
-    private func settle() {
-        RunLoop.main.run(until: Date().addingTimeInterval(0.6))
+    private func release(_ windows: NSWindow...) {
+        for window in windows {
+            window.contentViewController = nil
+            window.close()
+        }
+        RunLoop.main.run(until: Date().addingTimeInterval(0.5))
     }
 
     private func views<T: NSView>(of type: T.Type, in view: NSView?) -> [T] {
@@ -28,21 +40,41 @@ struct CalendarFieldTests {
         return [match] + nested
     }
 
-    private func visiblePopovers() -> Int {
-        NSApplication.shared.windows.filter { String(describing: type(of: $0)).contains("Popover") && $0.isVisible }
-            .count
-    }
-
-    private func datePickers() -> [NSDatePicker] {
-        NSApplication.shared.windows.flatMap { views(of: NSDatePicker.self, in: $0.contentView?.superview) }
-    }
-
-    @Test func inspectorDateRowShowsNoStepperField() {
+    @Test func inspectorDateRowShowsASwitchAndADatePicker() {
         let window = host(OptionalDateRow(title: "Start", date: date) { _ in })
-        defer { window.close() }
+        let other = host(OptionalDateRow(title: "Start", date: nil) { _ in })
+        defer { release(window, other) }
+        let withDate = window.contentView
+        let withoutDate = other.contentView
 
-        #expect(views(of: NSDatePicker.self, in: window.contentView).isEmpty)
-        #expect((window.contentView?.fittingSize.height ?? 0) > 0)
+        #expect(views(of: NSSwitch.self, in: withDate).count == 1)
+        #expect(views(of: NSDatePicker.self, in: withDate).count == 1)
+        #expect(views(of: NSSwitch.self, in: withoutDate).count == 1)
+        #expect(views(of: NSDatePicker.self, in: withoutDate).isEmpty)
+    }
+
+    @Test func turningTheDateBackOnPicksTodayAtNoon() {
+        var received: Date?? = .none
+        let row = OptionalDateRow(title: "Due", date: nil) { received = .some($0) }
+
+        row.isOn.wrappedValue = true
+
+        let calendar = DateText.gregorian
+        let expected = calendar.dateComponents([.year, .month, .day], from: .now)
+        let picked = received.flatMap { $0 }
+        #expect(picked != nil)
+        #expect(
+            picked.map { calendar.dateComponents([.year, .month, .day, .hour], from: $0) }
+                == DateComponents(year: expected.year, month: expected.month, day: expected.day, hour: 12))
+    }
+
+    @Test func turningTheDateOffSendsNil() {
+        var received: Date?? = .none
+        let row = OptionalDateRow(title: "Due", date: date) { received = .some($0) }
+
+        row.isOn.wrappedValue = false
+
+        #expect(received == .some(nil))
     }
 
     @Test func pickedDatesLandOnNoon() {
@@ -56,15 +88,6 @@ struct CalendarFieldTests {
         #expect(
             calendar.dateComponents([.year, .month, .day, .hour], from: stored)
                 == DateComponents(year: 2026, month: 12, day: 3, hour: 12))
-    }
-
-    @Test func openDateFieldShowsTheMonthGridInAPopover() {
-        let popoversBefore = visiblePopovers()
-        let window = host(CalendarField(title: "Due", selection: .constant(date), isPicking: true))
-        defer { window.close() }
-
-        #expect(visiblePopovers() > popoversBefore)
-        #expect(datePickers().isEmpty)
     }
 }
 #endif

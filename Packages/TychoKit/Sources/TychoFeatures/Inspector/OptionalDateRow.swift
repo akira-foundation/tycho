@@ -6,20 +6,20 @@ struct OptionalDateRow: View {
     let date: Date?
     let onChange: (Date?) -> Void
 
+    var isOn: Binding<Bool> {
+        Binding(
+            get: { date != nil },
+            set: { onChange($0 ? DatePill.normalized(.now) : nil) })
+    }
+
     var body: some View {
-        LabeledContent(title) {
-            if let date {
-                HStack(spacing: 6) {
-                    CalendarField(title: title, selection: Binding(get: { date }, set: { onChange($0) }))
-                    Button("Remove \(title)", systemImage: "xmark.circle.fill") { onChange(nil) }
-                        .labelStyle(.iconOnly)
-                        .buttonStyle(.borderless)
-                        .foregroundStyle(.secondary)
-                }
-            } else {
-                Button("Add \(title)") { onChange(DatePill.normalized(.now)) }
-                    .buttonStyle(.borderless)
-            }
+        Toggle("\(title) Date", isOn: isOn)
+        if let date {
+            DatePicker(
+                title,
+                selection: Binding(get: { date }, set: { onChange(DatePill.normalized($0)) }),
+                displayedComponents: .date
+            )
         }
     }
 }
