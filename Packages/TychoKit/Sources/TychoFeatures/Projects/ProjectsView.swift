@@ -9,88 +9,111 @@ struct ProjectsView: View {
     @Environment(\.modelContext) private var context
     @Query(filter: #Predicate<Project> { !$0.isArchived }) private var projects: [Project]
     @AppStorage("projects.sort") private var sort = ProjectSort.recent
-    @AppStorage("projects.layout") private var layout = ProjectLayout.grid
+    @State private var filter = ProjectFilter()
     @State private var pendingDelete: Project?
+    @FocusState private var isSearchFocused: Bool
 
     var body: some View {
-        let sorted = sort.sorted(projects)
-        Group {
-            switch (projects.isEmpty, layout) {
-            case (true, _):
-                ContentUnavailableView {
-                    Label("No Projects", systemImage: "folder")
-                } description: {
-                    Text("Create a project to start organising tasks.")
-                } actions: {
-                    Button("New Project") { router.newProject() }
-                }
-            case (false, .grid):
-                ScrollView {
-                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 260), spacing: 16)], spacing: 16) {
-                        ForEach(sorted) { project in
-                            Button {
-                                router.openProject(project.id, tab: .board)
-                            } label: {
-                                ProjectCard(project: project)
-                            }
-                            .buttonStyle(.plain)
-                            .contextMenu { menu(for: project) }
-                        }
-                    }
-                    .padding()
-                }
-            case (false, .list):
-                List(sorted) { project in
-                    Button {
-                        router.openProject(project.id, tab: .board)
-                    } label: {
-                        HStack(spacing: 12) {
-                            ProjectGlyph(symbol: project.symbol, color: project.color.tint)
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(project.name)
-                                Text(project.status.title).font(.caption).foregroundStyle(project.status.tint)
-                            }
-                            Spacer()
-                            ProgressRing(percent: project.progress, color: project.color.tint)
-                            Text("\(project.progress)%")
-                                .font(.callout)
-                                .monospacedDigit()
-                                .foregroundStyle(.secondary)
-                        }
-                        .contentShape(Rectangle())
-                    }
-                    .buttonStyle(.plain)
-                    .contextMenu { menu(for: project) }
+        content
+            .navigationTitle("Projects")
+            .navigationSubtitle(ProjectGroup.subtitle(projects))
+            .searchable(text: $filter.query, prompt: "Search Projects")
+            .searchFocused($isSearchFocused)
+            .marksTextEditing(isFocused: isSearchFocused)
+            .toolbar { toolbarItems }
+            .confirmationDialog(
+                "Delete project?",
+                isPresented: Binding(get: { pendingDelete != nil }, set: { if !$0 { pendingDelete = nil } }),
+                presenting: pendingDelete
+            ) { project in
+                Button("Delete \(project.name) and its tasks", role: .destructive) {
+                    toast.perform { try ProjectActions(context: context).delete(project) }
+                    pendingDelete = nil
                 }
             }
+    }
+
+    @ViewBuilder private var content: some View {
+        if projects.isEmpty {
+            ContentUnavailableView {
+                Label("No Projects", systemImage: "folder")
+            } description: {
+                Text("Create a project to start organising tasks.")
+            } actions: {
+                Button("New Project") { router.newProject() }
+            }
+        } else {
+            results(filter.apply(projects))
         }
-        .navigationTitle("Projects")
-        .toolbar {
-            ToolbarItem {
-                Menu("View Options", systemImage: "ellipsis.circle") {
-                    Picker("View As", selection: $layout) {
-                        ForEach(ProjectLayout.allCases) { Label($0.title, systemImage: $0.symbol).tag($0) }
+    }
+
+    @ViewBuilder private func results(_ visible: [Project]) -> some View {
+        if visible.isEmpty {
+            ContentUnavailableView {
+                Label("No Results", systemImage: "magnifyingglass")
+            } description: {
+                Text("No projects match your search or filters.")
+            } actions: {
+                Button("Clear Filters") { filter = ProjectFilter() }
+            }
+        } else {
+            summary(of: visible)
+        }
+    }
+
+    private func summary(of visible: [Project]) -> some View {
+        ScrollView {
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: 300), spacing: 16)], alignment: .leading, spacing: 16) {
+                ForEach(ProjectGroup.summary(visible, sort: sort)) { group in
+                    Section {
+                        ForEach(group.projects) { tile(for: $0) }
+                    } header: {
+                        Text(group.title)
+                            .font(.title3.weight(.semibold))
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.top, 8)
+                            .accessibilityAddTraits(.isHeader)
                     }
-                    .pickerStyle(.inline)
-                    Picker("Sort By", selection: $sort) {
-                        ForEach(ProjectSort.allCases) { Text($0.title).tag($0) }
-                    }
-                    .pickerStyle(.menu)
                 }
-                .accessibilityIdentifier("projects.options")
             }
-            ToolbarItem { Button("New Project", systemImage: "plus") { router.newProject() } }
+            .padding(20)
         }
-        .confirmationDialog(
-            "Delete project?",
-            isPresented: Binding(get: { pendingDelete != nil }, set: { if !$0 { pendingDelete = nil } }),
-            presenting: pendingDelete
-        ) { project in
-            Button("Delete \(project.name) and its tasks", role: .destructive) {
-                toast.perform { try ProjectActions(context: context).delete(project) }
-                pendingDelete = nil
+    }
+
+    private func tile(for project: Project) -> some View {
+        Button {
+            router.openProject(project.id, tab: .board)
+        } label: {
+            ProjectSummaryTile(project: project)
+        }
+        .buttonStyle(.plain)
+        .contextMenu { menu(for: project) }
+        .accessibilityIdentifier("project.row.\(project.key)")
+    }
+
+    @ToolbarContentBuilder private var toolbarItems: some ToolbarContent {
+        ToolbarItem {
+            Menu("Filter", systemImage: FilterToolbarButton.symbol(filterCount: filter.status == nil ? 0 : 1)) {
+                Picker("Status", selection: $filter.status) {
+                    Text("All Statuses").tag(ProjectStatus?.none)
+                    ForEach(ProjectStatus.allCases) { status in
+                        Label(status.title, systemImage: status.symbol).tag(ProjectStatus?.some(status))
+                    }
+                }
+                .pickerStyle(.inline)
             }
+            .accessibilityIdentifier("projects.filter")
         }
+        ToolbarItem {
+            Menu("Sort By", systemImage: "arrow.up.arrow.down") {
+                Picker("Sort By", selection: $sort) {
+                    ForEach(ProjectSort.allCases) { Text($0.title).tag($0) }
+                }
+                .pickerStyle(.inline)
+            }
+            .accessibilityIdentifier("projects.sort")
+        }
+        ToolbarItem { Button("New Project", systemImage: "plus") { router.newProject() } }
     }
 
     @ViewBuilder private func menu(for project: Project) -> some View {

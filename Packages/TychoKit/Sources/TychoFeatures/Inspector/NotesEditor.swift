@@ -4,45 +4,66 @@ import TychoCore
 
 struct NotesEditor: View {
     @Environment(\.modelContext) private var context
+    @Environment(\.fontResolutionContext) private var fontContext
     @Environment(ToastCenter.self) private var toast
     @Environment(Router.self) private var router
     let task: TaskItem
     @State private var draft = NotesDraft()
+    @State private var text = AttributedString()
+    @State private var loadedText = AttributedString()
     @State private var flushToken = UUID()
+    @FocusState private var isFocused: Bool
 
     var body: some View {
-        Section {
-            switch (draft.isEditing, task.notes.isEmpty) {
-            case (true, _):
-                TextEditor(text: $draft.text)
-                    .marksTextEditing()
-                    .accessibilityIdentifier("inspector.notes.editor")
-                    .frame(minHeight: 120)
-            case (false, true):
-                Text("No Description").foregroundStyle(.secondary)
-            case (false, false):
-                Text(rendered)
-                    .textSelection(.enabled)
+        TextEditor(text: $text)
+            .attributedTextFormattingDefinition(NotesAttributes.self)
+            .frame(minHeight: 120)
+            .overlay(alignment: .topLeading) { placeholder }
+            .marksTextEditing(isFocused: isFocused)
+            .focused($isFocused)
+            .onChange(of: text) { recordEdit() }
+            .onChange(of: isFocused) { _, focused in
+                if !focused { commitDraft() }
             }
-        } header: {
-            HStack {
-                Text("Description")
-                Spacer()
-                Button(draft.isEditing ? "Done" : "Edit", action: toggleEditing)
-                    .buttonStyle(.borderless)
-                    .accessibilityIdentifier("inspector.notes.edit")
+            .accessibilityIdentifier("inspector.notes")
+            .onAppear {
+                load(task.notes)
+                router.registerInspectorFlush(flushToken, commitDraft)
             }
-        }
-        .onAppear { router.registerInspectorFlush(flushToken, commitDraft) }
-        .onDisappear {
-            commitDraft()
-            router.unregisterInspectorFlush(flushToken)
+            .onChange(of: task.notes) { syncFromStore() }
+            .onDisappear {
+                commitDraft()
+                router.unregisterInspectorFlush(flushToken)
+            }
+    }
+
+    @ViewBuilder private var placeholder: some View {
+        if text.characters.isEmpty {
+            Text("Notes")
+                .foregroundStyle(.tertiary)
+                .padding(.leading, 5)
+                .allowsHitTesting(false)
+                .accessibilityHidden(true)
         }
     }
 
-    private var rendered: AttributedString {
-        let options = AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)
-        return (try? AttributedString(markdown: task.notes, options: options)) ?? AttributedString(task.notes)
+    private func load(_ notes: String) {
+        draft.begin(with: notes)
+        text = NotesMarkdown.attributed(notes)
+        loadedText = text
+    }
+
+    private func recordEdit() {
+        guard text != loadedText else {
+            draft.discardEdits()
+            return
+        }
+        draft.text = NotesMarkdown.markdown(text, context: fontContext)
+    }
+
+    private func syncFromStore() {
+        guard !draft.hasUnsavedText else { return }
+        load(task.notes)
     }
 
     private func commitDraft() {
@@ -51,10 +72,10 @@ struct NotesEditor: View {
             toast.perform { try TaskActions(context: context).edit(task) { $0.notes = notes } }
         }
     }
+}
 
-    private func toggleEditing() {
-        guard draft.isEditing else { return draft.begin(with: task.notes) }
-        commitDraft()
-        draft.finishIfSaved()
-    }
+struct NotesAttributes: AttributeScope {
+    let font: AttributeScopes.SwiftUIAttributes.FontAttribute
+    let strikethroughStyle: AttributeScopes.SwiftUIAttributes.StrikethroughStyleAttribute
+    let link: AttributeScopes.FoundationAttributes.LinkAttribute
 }

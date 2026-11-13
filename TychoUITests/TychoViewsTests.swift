@@ -29,6 +29,38 @@ final class TychoViewsTests: XCTestCase {
         app.menuItems.matching(NSPredicate(format: "title == %@ AND enabled == true", title)).firstMatch
     }
 
+    func testProjectsSummaryOpensAProject() {
+        openSidebar("Projects", revealing: "project.row.WEB")
+        element("project.row.WEB").click()
+        XCTAssertTrue(element("project.tab").waitForExistence(timeout: 5))
+    }
+
+    func testBoardColumnsHideAndShowFromViewOptions() {
+        openSidebar("Website Redesign", revealing: "column.backlog")
+        let toggleBacklog = {
+            self.element("view.options").click()
+            self.element("board.columns").click()
+            self.app.menuItems["Backlog"].firstMatch.click()
+        }
+        toggleBacklog()
+        XCTAssertTrue(element("column.backlog").waitForNonExistence(timeout: 5))
+        XCTAssertTrue(element("column.todo").exists)
+        toggleBacklog()
+        XCTAssertTrue(element("column.backlog").waitForExistence(timeout: 5))
+    }
+
+    func testBoardColumnAddOpensTheNewTaskSheetWithThatStatus() {
+        openSidebar("Website Redesign", revealing: "column.review.add")
+        element("column.review.add").click()
+        let sheet = app.sheets.firstMatch
+        XCTAssertTrue(sheet.waitForExistence(timeout: 5))
+        XCTAssertTrue(sheet.popUpButtons.matching(NSPredicate(format: "value == %@", "Review")).firstMatch.exists)
+        app.typeKey(.escape, modifierFlags: [])
+        XCTAssertTrue(sheet.waitForNonExistence(timeout: 5))
+        let composers = app.textFields.matching(NSPredicate(format: "placeholderValue == %@", "Add Task"))
+        XCTAssertEqual(composers.count, 0)
+    }
+
     func testEveryProjectTabOpens() {
         let markers = [
             ("Board", "column.todo"), ("List", "group.todo"), ("Table", "table.grid"),
@@ -39,6 +71,19 @@ final class TychoViewsTests: XCTestCase {
         for (tab, marker) in markers {
             picker.descendants(matching: .any)[tab].firstMatch.click()
             XCTAssertTrue(element(marker).waitForExistence(timeout: 5), "\(tab) did not open")
+        }
+    }
+
+    func testEveryMyTasksModeOpens() {
+        let markers = [
+            ("Board", "column.todo"), ("Table", "table.grid"), ("Calendar", "calendar.title"),
+            ("List", "group.completed"),
+        ]
+        openSidebar("My Tasks", revealing: "mytasks.mode")
+        let picker = element("mytasks.mode")
+        for (mode, marker) in markers {
+            picker.radioButtons[mode].firstMatch.click()
+            XCTAssertTrue(element(marker).waitForExistence(timeout: 5), "\(mode) did not open")
         }
     }
 

@@ -18,7 +18,9 @@ struct SubtaskRow: View {
                     .imageScale(.large)
             }
             .buttonStyle(.plain)
-            TextField("Subtask", text: $title)
+            TextField("Subtask", text: $title, prompt: Text("Subtask"))
+                .labelsHidden()
+                .multilineTextAlignment(.leading)
                 .marksTextEditing()
                 .textFieldStyle(.plain)
                 .strikethrough(subtask.isDone)

@@ -24,7 +24,7 @@ struct TasksView: View {
             case .list:
                 list(source)
             case .board:
-                BoardView(tasks: visible(source), project: nil)
+                BoardView(tasks: visible(source), project: nil, hiddenStatuses: model.state.hiddenStatuses)
             case .table:
                 TaskTableView(tasks: source, model: model)
             }
@@ -36,10 +36,13 @@ struct TasksView: View {
             if isCompactWidth {
                 modePicker(mode).pickerStyle(.menu)
             }
+            if mode == .board {
+                BoardColumnsMenu(model: model)
+            }
         }
         .toolbar {
             if !isCompactWidth {
-                ToolbarItem { modePicker(mode).pickerStyle(.segmented).segmentedToolbarWidth(TasksMode.allCases.count) }
+                ToolbarItem { modePicker(mode).segmentedToolbar() }
             }
             ToolbarItem(placement: .primaryAction) {
                 Button("New Task", systemImage: "plus") { router.newTask() }
@@ -50,13 +53,8 @@ struct TasksView: View {
         .navigationSubtitle(TasksMode.subtitle(projectCount: projects.count, state: model.state))
     }
 
-    private func modePicker(_ mode: TasksMode) -> some View {
-        Picker(selection: Binding(get: { mode }, set: { model.state.mode = $0.rawValue })) {
-            ForEach(TasksMode.allCases) { SegmentLabel(title: $0.title, symbol: $0.symbol).tag($0) }
-        } label: {
-            Label("View", systemImage: mode.symbol)
-        }
-        .accessibilityIdentifier("tasks.mode")
+    private func modePicker(_ mode: TasksMode) -> TaskModePicker<TasksMode> {
+        TaskModePicker(model: model, mode: mode, identifier: "tasks.mode")
     }
 
     private func visible(_ source: [TaskItem]) -> [TaskItem] {
@@ -75,15 +73,5 @@ struct TasksView: View {
                 grouping: state.grouping, project: nil,
                 allowsReorder: ListDropPolicy.allowsReorder(sort: state.sort, grouping: state.grouping))
         }
-    }
-}
-
-extension View {
-    @ViewBuilder fileprivate func segmentedToolbarWidth(_ segments: Int) -> some View {
-        #if os(iOS)
-        self.frame(width: CGFloat(segments) * 44)
-        #else
-        self
-        #endif
     }
 }

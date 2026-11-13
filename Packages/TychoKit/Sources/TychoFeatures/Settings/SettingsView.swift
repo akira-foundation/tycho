@@ -44,7 +44,7 @@ public struct SettingsView: View {
             } header: {
                 Text("Date & time")
             } footer: {
-                Text("Affects calendars and the timeline.")
+                Text("Applies to Calendar and Timeline. Date pickers follow the system's first day of the week.")
             }
             Section {
                 ForEach(Array(ShortcutCatalog.groups.enumerated()), id: \.offset) { _, group in

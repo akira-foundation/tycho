@@ -29,8 +29,8 @@ struct ProjectTabContent: View {
         let engine = TaskViewEngine(model: model, members: members, projects: projects)
         switch layout {
         case .board:
-            BoardView(tasks: visible(source), project: project)
-                .taskViewControls(engine)
+            BoardView(tasks: visible(source), project: project, hiddenStatuses: model.state.hiddenStatuses)
+                .taskViewControls(engine) { BoardColumnsMenu(model: model) }
         case .list:
             list(source)
                 .taskViewControls(engine, showsGroup: true)

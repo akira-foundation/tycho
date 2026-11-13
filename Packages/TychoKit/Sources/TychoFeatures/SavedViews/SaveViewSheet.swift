@@ -27,11 +27,14 @@ struct SaveViewSheet: View {
         NavigationStack {
             Form {
                 Section {
-                    TextField("View name", text: $name, prompt: Text("e.g. Design review queue"))
+                    TextField("View Name", text: $name, prompt: Text("e.g. Design review queue"))
+                        .labelsHidden()
                         .marksTextEditing(isFocused: isNameFocused)
                         .focused($isNameFocused)
                         .onSubmit(save)
                         .accessibilityIdentifier("saveView.name")
+                }
+                Section {
                     Picker("Layout", selection: $layout) {
                         ForEach(SavedViewLayout.allCases, id: \.self) { Text($0.title).tag($0) }
                     }

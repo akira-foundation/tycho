@@ -35,7 +35,7 @@ struct AttachmentsSection: View {
             upload(urls)
             return !urls.isEmpty
         }
-        .fileUploader(isPresented: $importing, project: task.project, task: task)
+        .fileUploader(isPresented: $importing, task: task)
         .filePreview(item: $previewing)
     }
 

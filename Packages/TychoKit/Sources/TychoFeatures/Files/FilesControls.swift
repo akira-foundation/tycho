@@ -41,7 +41,7 @@ struct FilesControls: ViewModifier {
     }
 
     private var upload: some View {
-        Button("Upload", systemImage: "arrow.up.doc", action: onUpload)
+        Button("Attach Files…", systemImage: "paperclip", action: onUpload)
             .accessibilityIdentifier("files.upload")
     }
 

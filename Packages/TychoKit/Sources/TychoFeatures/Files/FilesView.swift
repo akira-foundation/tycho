@@ -16,20 +16,22 @@ struct FilesView: View {
     @State private var renameText = ""
     @State private var deleting: FileRecord?
     @State private var importing = false
+    @State private var pendingAttachment: PendingAttachment?
 
     var body: some View {
         let files = FileQuery.apply(project.files ?? [], search: search, kind: kind, sort: sort)
         content(files)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .dropDestination(for: URL.self) { urls, _ in
-                upload(urls)
+                stage(urls)
                 return !urls.isEmpty
             }
             .modifier(
                 FilesControls(search: $search, kind: $kind, sort: $sort, layout: $layout) { importing = true }
             )
             .accessibilityIdentifier("files.content")
-            .fileUploader(isPresented: $importing, project: project)
+            .pickFiles(isPresented: $importing, onPick: stage)
+            .sheet(item: $pendingAttachment) { AttachFilesSheet(urls: $0.urls, project: project) }
             .filePreview(item: $previewing)
             .blocksNavigation(while: renaming != nil)
             .alert("Rename File", isPresented: isRenaming) {
@@ -59,9 +61,9 @@ struct FilesView: View {
             ContentUnavailableView {
                 Label("No Files", systemImage: "folder")
             } description: {
-                Text("Upload designs, documents, and assets to share them with the project.")
+                Text("Attach designs, documents, and assets to a task to see them here.")
             } actions: {
-                Button("Upload Files") { importing = true }
+                Button("Attach Files…") { importing = true }
                     .buttonStyle(.borderedProminent)
             }
         }
@@ -91,8 +93,9 @@ struct FilesView: View {
         )
     }
 
-    private func upload(_ urls: [URL]) {
-        FileUpload.perform(urls, project: project, task: nil, context: context, toast: toast)
+    private func stage(_ urls: [URL]) {
+        guard !urls.isEmpty else { return }
+        pendingAttachment = PendingAttachment(urls: urls)
     }
 
     private func commitRename() {

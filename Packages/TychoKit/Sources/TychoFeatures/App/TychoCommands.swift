@@ -9,6 +9,9 @@ public struct TychoCommands: Commands {
 
     public var body: some Commands {
         SidebarCommands()
+        #if os(macOS)
+        TextFormattingCommands()
+        #endif
         CommandGroup(replacing: .newItem) {
             Button("New Task") { router?.newTask() }
                 .keyboardShortcut("n")

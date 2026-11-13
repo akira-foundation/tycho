@@ -23,10 +23,16 @@ extension TaskItem {
 }
 
 extension Project {
+    public var taskCount: Int {
+        tasks?.count ?? 0
+    }
+
+    public var doneTaskCount: Int {
+        (tasks ?? []).filter { $0.status == .done }.count
+    }
+
     public var progress: Int {
-        let all = tasks ?? []
-        guard !all.isEmpty else { return 0 }
-        let done = all.filter { $0.status == .done }.count
-        return Int((Double(done) / Double(all.count) * 100).rounded())
+        guard taskCount > 0 else { return 0 }
+        return Int((Double(doneTaskCount) / Double(taskCount) * 100).rounded())
     }
 }

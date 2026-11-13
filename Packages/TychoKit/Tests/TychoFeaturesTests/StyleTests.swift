@@ -13,7 +13,12 @@ struct StyleTests {
         #expect(TaskLabel.allCases.map(\.token) == [.violet, .blue, .teal, .amber, .rose, .red, .green, .orange])
     }
 
-    @Test func projectStatusTones() {
-        #expect(ProjectStatus.allCases.map(\.token) == [.gray, .blue, .red, .amber, .green])
+    @Test func projectStatusUsesSystemSymbolsAndColors() {
+        #expect(
+            ProjectStatus.allCases.map(\.symbol) == [
+                "circle.dashed", "circle.lefthalf.filled", "exclamationmark.triangle.fill", "pause.circle.fill",
+                "checkmark.circle.fill",
+            ])
+        #expect(ProjectStatus.allCases.map(\.tint) == [.gray, .blue, .red, .orange, .green])
     }
 }
