@@ -35,4 +35,11 @@ struct BoardStatusVisibilityTests {
         #expect(try JSONDecoder().decode(TaskViewState.self, from: json).hiddenStatuses == [.review])
         #expect(try JSONDecoder().decode(TaskViewState.self, from: Data("{}".utf8)).hiddenStatuses.isEmpty)
     }
+
+    @Test func aStoredStateHidingEveryStatusShowsThemAll() throws {
+        let every = TaskStatus.allCases.map { "\"\($0.rawValue)\"" }.joined(separator: ",")
+        let json = Data(("{\"hiddenStatuses\":[" + every + "]}").utf8)
+        let decoded = try JSONDecoder().decode(TaskViewState.self, from: json)
+        #expect(decoded.visibleStatuses == TaskStatus.allCases)
+    }
 }

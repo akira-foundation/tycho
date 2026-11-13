@@ -39,7 +39,8 @@ public struct TaskViewState: Codable, Equatable, Sendable {
             rawHidden.map { Set($0.compactMap(TableColumnID.init(rawValue:))) }
             ?? TableColumnID.defaultHidden(inProject: false)
         let rawHiddenStatuses = (try? container.decodeIfPresent([String].self, forKey: .hiddenStatuses)) ?? []
-        hiddenStatuses = Set(rawHiddenStatuses.compactMap(TaskStatus.init(rawValue:)))
+        let decodedHiddenStatuses = Set(rawHiddenStatuses.compactMap(TaskStatus.init(rawValue:)))
+        hiddenStatuses = decodedHiddenStatuses.count < TaskStatus.allCases.count ? decodedHiddenStatuses : []
     }
 
     public func encode(to encoder: any Encoder) throws {
